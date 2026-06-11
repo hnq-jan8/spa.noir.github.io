@@ -1,0 +1,5 @@
+# Repo này chỉ host static page trên GitHub Pages.
+# Ignore tất cả, chỉ track folder deploy /docs (và file này).
+/*
+!/docs
+!/.gitignore
