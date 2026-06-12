@@ -264,14 +264,15 @@ export default function Navbar({ locale }: NavbarProps) {
 
       {/* Mobile breadcrumb: cho biết đang ở trang nào vì navbar mobile không hiện active tab */}
       {activeItem && !menuOpen && (
-        <div className="md:hidden border-t border-black/20 bg-black/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center gap-1.5 text-xs">
-            <Link
-              href={`/${locale}`}
-              className="text-gray-300 hover:text-white transition-colors flex-shrink-0"
-            >
+        <div className="md:hidden px-4 pt-3.5 absolute w-full">
+          <div
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+            bg-gray-500/10 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
+          >
+            <Link href={`/${locale}`} className="text-gray-700">
               {t("home")}
             </Link>
+
             <svg
               className="w-3 h-3 text-gray-400 flex-shrink-0"
               fill="none"
@@ -285,9 +286,8 @@ export default function Navbar({ locale }: NavbarProps) {
                 d="M9 5l7 7-7 7"
               />
             </svg>
-            <span className="text-white font-medium truncate">
-              {activeItem.label}
-            </span>
+
+            <span className="font-medium truncate">{activeItem.label}</span>
           </div>
         </div>
       )}
