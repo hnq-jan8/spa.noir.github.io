@@ -51,7 +51,8 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         {canScrollLeft && (
           <button
             onClick={() => scroll("left")}
-            className="absolute -left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-white/70 hover:text-white bg-gray-400/90 rounded-full shadow-lg"
+            className="absolute -left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70
+            bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full"
             aria-label="Scroll left"
           >
             <svg
@@ -111,7 +112,8 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         {canScrollRight && (
           <button
             onClick={() => scroll("right")}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-white/70 hover:text-white bg-gray-400/90 rounded-full shadow-lg"
+            className="absolute -right-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70
+            bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full"
             aria-label="Scroll right"
           >
             <svg

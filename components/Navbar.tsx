@@ -269,7 +269,10 @@ export default function Navbar({ locale }: NavbarProps) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
             bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
           >
-            <Link href={`/${locale}`} className="text-gray-700">
+            <Link
+              href={`/${locale}`}
+              className="text-gray-700 hover:text-gray-950"
+            >
               {t("home")}
             </Link>
 
