@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "officialUpdates": "Official Updates",
+    "pressReleases": "Press Releases",
+    "flightInfo": "Affected Flight Info",
+    "support": "Support"
+  },
+  "footer": {
+    "contact": "Contact",
+    "office": "Office",
+    "agent": "Agent",
+    "placeholder": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat."
+  },
+  "home": {
+    "title": "Sun PhuQuoc Airways",
+    "subtitle": "Official information from the airline",
+    "officialUpdatesDesc": "Timeline of latest updates",
+    "pressReleasesDesc": "Official articles and statements",
+    "flightInfoDesc": "Flight list and status",
+    "supportDesc": "Hotline and contact information"
+  },
+  "support": {
+    "passengerHotline": "Passenger Hotline",
+    "familyHotline": "Family Hotline",
+    "supportEmail": "Support Email",
+    "mediaContact": "Press / Media Contact"
+  },
+  "flightInfo": {
+    "title": "Flight Information",
+    "policy": "Change / Refund Policy",
+    "policyContent": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.",
+    "no": "No",
+    "type": "Type",
+    "capacity": "Capacity",
+    "lightNo": "Light No",
+    "route": "Route",
+    "srtd": "SRTD",
+    "atd": "ATD",
+    "note": "Note"
+  }
+}

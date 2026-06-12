@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "officialUpdates": "Cập nhật chính thức",
+    "pressReleases": "Thông cáo báo chí",
+    "flightInfo": "Thông tin chuyến bay bị ảnh hưởng",
+    "support": "Hỗ trợ"
+  },
+  "footer": {
+    "contact": "Liên Hệ",
+    "office": "Văn Phòng",
+    "agent": "Đại Lý",
+    "placeholder": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat."
+  },
+  "home": {
+    "title": "Sun PhuQuoc Airways",
+    "subtitle": "Thông tin chính thức từ hãng hàng không",
+    "officialUpdatesDesc": "Timeline các cập nhật mới nhất",
+    "pressReleasesDesc": "Bài viết và thông cáo chính thức",
+    "flightInfoDesc": "Danh sách và trạng thái các chuyến bay",
+    "supportDesc": "Hotline và thông tin liên hệ"
+  },
+  "support": {
+    "passengerHotline": "Hotline hành khách",
+    "familyHotline": "Hotline thân nhân",
+    "supportEmail": "Email hỗ trợ",
+    "mediaContact": "Đầu mối báo chí / Truyền thông"
+  },
+  "flightInfo": {
+    "title": "Thông tin chuyến bay",
+    "policy": "Chính sách đổi/hoàn vé",
+    "policyContent": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.",
+    "no": "No",
+    "type": "Type",
+    "capacity": "Capacity",
+    "lightNo": "Light No",
+    "route": "Route",
+    "srtd": "SRTD",
+    "atd": "ATD",
+    "note": "Note"
+  }
+}

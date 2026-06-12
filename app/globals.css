@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: system-ui, -apple-system, sans-serif;
+    /* Top overscroll — Chromium reads html background */
+    background-color: #707070;
+    overflow-x: clip;
+  }
+
+  body {
+    @apply bg-white text-gray-900 min-h-screen;
+    overflow-x: clip;
+    /* Extends white paint area for bottom/side overscroll without extra scroll height */
+    box-shadow: 0 0 0 100vmax #ffffff;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 py-2 px-1 relative;
+  }
+
+  .nav-link.active {
+    @apply text-gray-900 font-medium;
+  }
+
+  .nav-link.active::after {
+    content: "";
+    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900;
+  }
+
+  .pill-badge {
+    @apply border border-gray-400 rounded-full px-6 py-2 text-sm text-gray-700 inline-block;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-gray-900 mb-4;
+  }
+
+  .timeline-card {
+    @apply border-l-2 border-gray-300 pl-4;
+  }
+}
