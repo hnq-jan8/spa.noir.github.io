@@ -264,10 +264,10 @@ export default function Navbar({ locale }: NavbarProps) {
 
       {/* Mobile breadcrumb: cho biết đang ở trang nào vì navbar mobile không hiện active tab */}
       {activeItem && !menuOpen && (
-        <div className="md:hidden px-4 pt-3.5 absolute w-full">
+        <div className="md:hidden px-4 pt-4 absolute w-full">
           <div
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
-            bg-gray-500/10 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
+            bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
           >
             <Link href={`/${locale}`} className="text-gray-700">
               {t("home")}
