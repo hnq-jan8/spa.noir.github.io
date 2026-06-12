@@ -35,6 +35,8 @@ export default function Navbar({ locale }: NavbarProps) {
   ];
 
   const pathWithoutLocale = pathname.replace(/^\/(vi|en)/, "") || "/";
+  const normalizedPath = pathname.replace(/\/$/, "") || "/";
+  const activeItem = navItems.find((item) => item.href === normalizedPath);
 
   const updateScrollState = useCallback(() => {
     const el = navRef.current;
@@ -83,7 +85,7 @@ export default function Navbar({ locale }: NavbarProps) {
               alt="SUN PhuQuoc Airways"
               width={1024}
               height={251}
-              className="h-9 w-auto transition group-hover:drop-shadow-[0_0_10px_#d0d0d0]"
+              className="h-9 w-auto transition group-hover:drop-shadow-[0_0_12px_#000000]"
               priority
             />
           </Link>
@@ -96,7 +98,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
                   <button
                     onClick={() => scrollNav("left")}
-                    className="absolute left-0 top-0 bottom-0 w-5 flex items-center justify-center text-gray-300 hover:text-white z-20 lg:hidden"
+                    className="absolute -left-1 top-0 bottom-0 w-5 flex items-center justify-center text-gray-300 hover:text-white z-20 lg:hidden"
                     aria-label="Scroll left"
                   >
                     <svg
@@ -153,7 +155,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
                   <button
                     onClick={() => scrollNav("right")}
-                    className="absolute right-0 top-0 bottom-0 w-5 flex items-center justify-center text-gray-300 hover:text-white z-20 lg:hidden"
+                    className="absolute -right-1 top-0 bottom-0 w-5 flex items-center justify-center text-gray-300 hover:text-white z-20 lg:hidden"
                     aria-label="Scroll right"
                   >
                     <svg
@@ -241,7 +243,6 @@ export default function Navbar({ locale }: NavbarProps) {
       {menuOpen && (
         <div className="md:hidden bg-[#5a5a5a] border-t border-black/20">
           {navItems.map((item) => {
-            const normalizedPath = pathname.replace(/\/$/, "") || "/";
             const isActive = normalizedPath === item.href;
             return (
               <Link
@@ -258,6 +259,36 @@ export default function Navbar({ locale }: NavbarProps) {
               </Link>
             );
           })}
+        </div>
+      )}
+
+      {/* Mobile breadcrumb: cho biết đang ở trang nào vì navbar mobile không hiện active tab */}
+      {activeItem && !menuOpen && (
+        <div className="md:hidden border-t border-black/20 bg-black/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center gap-1.5 text-xs">
+            <Link
+              href={`/${locale}`}
+              className="text-gray-300 hover:text-white transition-colors flex-shrink-0"
+            >
+              {t("home")}
+            </Link>
+            <svg
+              className="w-3 h-3 text-gray-400 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <span className="text-white font-medium truncate">
+              {activeItem.label}
+            </span>
+          </div>
         </div>
       )}
     </header>
