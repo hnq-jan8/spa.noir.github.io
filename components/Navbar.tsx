@@ -120,7 +120,7 @@ export default function Navbar({ locale }: NavbarProps) {
 
               <nav
                 ref={navRef}
-                className="flex items-stretch overflow-x-auto scrollbar-hide h-full w-full px-2 scroll-px-5 lg:px-0 lg:scroll-px-0"
+                className="flex items-stretch overflow-x-auto overflow-y-clip scrollbar-hide h-full w-full px-2 scroll-px-5 lg:px-0 lg:scroll-px-0"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
                 {navItems.map((item) => {

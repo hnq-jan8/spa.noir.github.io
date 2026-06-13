@@ -74,7 +74,7 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         {/* Scrollable row — padding inside so start/end content stays visible at scroll edges */}
         <div
           ref={scrollRef}
-          className="flex overflow-x-auto gap-0 px-8"
+          className="flex overflow-x-auto gap-0 px-8 overflow-y-clip"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
