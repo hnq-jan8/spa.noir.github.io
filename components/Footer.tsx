@@ -19,7 +19,7 @@ export default function Footer() {
         {/* Logo */}
         <div className="mb-8">
           <Image
-            src="/logo.png"
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`}
             alt="Sun Phu Quoc Airways"
             width={180}
             height={60}
