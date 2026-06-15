@@ -95,14 +95,14 @@ export default function Navbar({ locale }: NavbarProps) {
             <div className="relative flex-1 min-w-0 self-stretch">
               {canScrollLeft && (
                 <>
-                  <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
+                  <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
                   <button
                     onClick={() => scrollNav("left")}
-                    className="absolute -left-1 top-0 bottom-0 w-5 flex items-center justify-center text-gray-300 hover:text-white z-20 lg:hidden"
+                    className="absolute left-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden"
                     aria-label="Scroll left"
                   >
                     <svg
-                      className="w-3.5 h-3.5"
+                      className="absolute left-1 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -152,14 +152,14 @@ export default function Navbar({ locale }: NavbarProps) {
 
               {canScrollRight && (
                 <>
-                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
+                  <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
                   <button
                     onClick={() => scrollNav("right")}
-                    className="absolute -right-1 top-0 bottom-0 w-5 flex items-center justify-center text-gray-300 hover:text-white z-20 lg:hidden"
+                    className="absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden"
                     aria-label="Scroll right"
                   >
                     <svg
-                      className="w-3.5 h-3.5"
+                      className="absolute right-1 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
