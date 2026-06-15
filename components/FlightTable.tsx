@@ -2,7 +2,7 @@ export interface FlightRow {
   no: number | string;
   type: string;
   capacity: number | string;
-  lightNo: string;
+  flightNo: string;
   route: string;
   srtd: string;
   atd: string;
@@ -13,7 +13,7 @@ interface FlightHeaders {
   no: string;
   type: string;
   capacity: string;
-  lightNo: string;
+  flightNo: string;
   route: string;
   srtd: string;
   atd: string;
@@ -28,7 +28,7 @@ interface FlightTableProps {
 
 const defaultHeaders: FlightHeaders = {
   no: "No", type: "Type", capacity: "Capacity",
-  lightNo: "Light No", route: "Route", srtd: "SRTD", atd: "ATD", note: "Note",
+  flightNo: "Flight No", route: "Route", srtd: "SRTD", atd: "ATD", note: "Note",
 };
 
 export default function FlightTable({ title = "Flight Information", rows, headers = defaultHeaders }: FlightTableProps) {
@@ -40,7 +40,7 @@ export default function FlightTable({ title = "Flight Information", rows, header
         <table className="w-full text-sm text-left min-w-[600px]">
           <thead>
             <tr className="border-b border-gray-200">
-              {[h.no, h.type, h.capacity, h.lightNo, h.route, h.srtd, h.atd, h.note].map((label) => (
+              {[h.no, h.type, h.capacity, h.flightNo, h.route, h.srtd, h.atd, h.note].map((label) => (
                 <th key={label} className="py-2 pr-8 font-bold text-gray-900">
                   {label}
                 </th>
@@ -53,7 +53,7 @@ export default function FlightTable({ title = "Flight Information", rows, header
                 <td className="py-3 pr-8 text-gray-600">{row.no}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.type}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.capacity}</td>
-                <td className="py-3 pr-8 text-gray-600">{row.lightNo}</td>
+                <td className="py-3 pr-8 text-gray-600">{row.flightNo}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.route}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.srtd}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.atd}</td>

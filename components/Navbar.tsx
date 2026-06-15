@@ -31,7 +31,7 @@ export default function Navbar({ locale }: NavbarProps) {
     { label: t("officialUpdates"), href: `/${locale}/official-updates` },
     { label: t("pressReleases"), href: `/${locale}/press-releases` },
     { label: t("flightInfo"), href: `/${locale}/flight-info` },
-    { label: t("support"), href: `/${locale}/support` },
+    { label: t("faqs"), href: `/${locale}/faqs` },
   ];
 
   const pathWithoutLocale = pathname.replace(/^\/(vi|en)/, "") || "/";

@@ -11,10 +11,8 @@
   }
 
   body {
-    @apply bg-white text-gray-900 min-h-screen;
+    @apply bg-[#707070] text-gray-900 min-h-screen;
     overflow-x: clip;
-    /* Extends white paint area for bottom/side overscroll without extra scroll height */
-    box-shadow: 0 0 0 100vmax #ffffff;
   }
 }
 

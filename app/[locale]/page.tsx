@@ -26,9 +26,9 @@ export default function Home({ params }: { params: { locale: string } }) {
       desc: t("flightInfoDesc"),
     },
     {
-      href: `/${locale}/support`,
-      label: tn("support"),
-      desc: t("supportDesc"),
+      href: `/${locale}/faqs`,
+      label: tn("faqs"),
+      desc: t("faqsDesc"),
     },
   ];
 

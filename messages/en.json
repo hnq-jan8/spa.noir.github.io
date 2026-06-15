@@ -4,13 +4,14 @@
     "officialUpdates": "Official Updates",
     "pressReleases": "Press Releases",
     "flightInfo": "Affected Flight Info",
-    "support": "Support"
+    "faqs": "FAQs"
   },
   "footer": {
     "contact": "Contact",
     "office": "Office",
     "agent": "Agent",
-    "placeholder": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat."
+    "placeholder": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.",
+    "officialSite": "Official Website"
   },
   "home": {
     "title": "Sun PhuQuoc Airways",
@@ -18,7 +19,7 @@
     "officialUpdatesDesc": "Timeline of latest updates",
     "pressReleasesDesc": "Official articles and statements",
     "flightInfoDesc": "Flight list and status",
-    "supportDesc": "Hotline and contact information"
+    "faqsDesc": "Frequently asked questions"
   },
   "support": {
     "passengerHotline": "Passenger Hotline",
@@ -33,7 +34,7 @@
     "no": "No",
     "type": "Type",
     "capacity": "Capacity",
-    "lightNo": "Light No",
+    "flightNo": "Flight No",
     "route": "Route",
     "srtd": "SRTD",
     "atd": "ATD",
