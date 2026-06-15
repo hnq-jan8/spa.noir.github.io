@@ -263,7 +263,7 @@ export default function Navbar({ locale }: NavbarProps) {
       )}
 
       {/* Mobile breadcrumb: cho biết đang ở trang nào vì navbar mobile không hiện active tab */}
-      {activeItem && !menuOpen && (
+      {activeItem && (
         <div className="md:hidden px-4 pt-4 absolute w-full">
           <div
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
