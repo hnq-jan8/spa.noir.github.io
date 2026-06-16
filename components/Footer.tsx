@@ -26,15 +26,13 @@ export default function Footer() {
 
         {/* Contact info — moved onto the page itself for the homepage */}
         {!isHome && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 min-[510px]:grid-cols-2 lg:grid-cols-4 gap-6">
             {supportContacts.map((card) => (
               <div key={card.key}>
                 <p className="text-xs text-gray-300 mb-1 uppercase tracking-wide">
                   {ts(card.key)}
                 </p>
-                <p className="text-sm font-semibold text-white">
-                  {card.value}
-                </p>
+                <p className="text-sm font-semibold text-white">{card.value}</p>
               </div>
             ))}
           </div>
@@ -44,7 +42,7 @@ export default function Footer() {
         <div
           className={`${
             isHome ? "mt-0" : "mt-10 pt-6 border-t border-white/20"
-          } flex flex-col sm:flex-row items-center justify-between gap-4`}
+          } flex flex-col min-[510px]:flex-row items-center justify-between gap-4`}
         >
           <p className="text-xs text-gray-300">
             © {new Date().getFullYear()} Sun Phu Quoc Airways
