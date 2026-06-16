@@ -45,12 +45,12 @@ export default function Home({ params }: { params: { locale: string } }) {
   return (
     <div className="container-page py-8 md:py-11 max-w-3xl mx-auto">
       {/* As-of timestamp */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg px-4 py-3 mb-4">
-        <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
-        <span>
-          {t("asOf")}: {asOf}
-        </span>
-        <Clock className="w-4 h-4 ml-auto text-gray-400" strokeWidth={2} />
+      <div className="flex items-start gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg px-4 py-3 mb-4">
+        <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5" />
+        <p className="flex flex-wrap gap-x-1">
+          <span>{t("asOf")}:</span>
+          <span className="whitespace-nowrap">{asOf}</span>
+        </p>
       </div>
 
       {/* Official update preview */}
