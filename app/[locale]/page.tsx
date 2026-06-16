@@ -45,7 +45,7 @@ export default function Home({ params }: { params: { locale: string } }) {
   return (
     <div className="container-page py-8 md:py-11 max-w-3xl mx-auto">
       {/* As-of timestamp */}
-      <div className="flex items-start gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg px-4 py-3 mb-4">
+      <div className="flex items-start gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-2xl px-4 py-3 mb-4">
         <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5" />
         <p className="flex flex-wrap gap-x-1">
           <span>{t("asOf")}:</span>
@@ -56,7 +56,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       {/* Official update preview */}
       <Link
         href={`/${locale}/official-updates`}
-        className="block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
+        className="block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
       >
         <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
           <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -76,7 +76,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       </Link>
 
       {/* Support hotlines */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-4">
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
         <p className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold uppercase tracking-wide mb-4">
           <Phone className="w-4 h-4" strokeWidth={2} />
           {t("supportTitle")}
@@ -101,7 +101,7 @@ export default function Home({ params }: { params: { locale: string } }) {
           <Link
             key={page.href}
             href={page.href}
-            className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+            className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
           >
             <div className="flex items-center gap-4 sm:flex-col sm:items-start sm:gap-0">
               <page.Icon
@@ -124,7 +124,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       {/* Press releases */}
       <Link
         href={`/${locale}/press-releases`}
-        className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+        className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
       >
         <div className="flex items-center gap-4">
           <FileText

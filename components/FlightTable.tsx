@@ -27,23 +27,33 @@ interface FlightTableProps {
 }
 
 const defaultHeaders: FlightHeaders = {
-  no: "No", type: "Type", capacity: "Capacity",
-  flightNo: "Flight No", route: "Route", srtd: "SRTD", atd: "ATD", note: "Note",
+  no: "No",
+  type: "Type",
+  capacity: "Capacity",
+  flightNo: "Flight No",
+  route: "Route",
+  srtd: "SRTD",
+  atd: "ATD",
+  note: "Note",
 };
 
-export default function FlightTable({ title = "Flight Information", rows, headers = defaultHeaders }: FlightTableProps) {
+export default function FlightTable({
+  title = "Flight Information",
+  rows,
+  headers = defaultHeaders,
+}: FlightTableProps) {
   const h = headers;
 
   return (
     <div>
       <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
 
-      {/* Mobile / tablet: stacked cards, one row of columns per field */}
+      {/* Mobile: stacked cards, one row of columns per field */}
       <div className="md:hidden space-y-3">
         {rows.map((row, idx) => (
           <div
             key={idx}
-            className="border border-gray-200 rounded-lg bg-white shadow-sm p-4"
+            className="border border-gray-200 rounded-2xl bg-white shadow-sm p-4"
           >
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-200">
               <span className="font-bold text-gray-900">
@@ -70,12 +80,21 @@ export default function FlightTable({ title = "Flight Information", rows, header
         ))}
       </div>
 
-      {/* Desktop: table */}
+      {/* Desktop / tablet: table */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm text-left min-w-[600px]">
           <thead>
             <tr className="border-b border-gray-200">
-              {[h.no, h.type, h.capacity, h.flightNo, h.route, h.srtd, h.atd, h.note].map((label) => (
+              {[
+                h.no,
+                h.type,
+                h.capacity,
+                h.flightNo,
+                h.route,
+                h.srtd,
+                h.atd,
+                h.note,
+              ].map((label) => (
                 <th key={label} className="py-2 pr-8 font-bold text-gray-900">
                   {label}
                 </th>

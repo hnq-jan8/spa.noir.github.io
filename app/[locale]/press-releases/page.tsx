@@ -26,7 +26,7 @@ export default function PressReleases({
   setRequestLocale(params.locale);
   return (
     <div className="container-page pt-16 pb-8 md:py-8">
-      <div className="md:bg-white md:border md:border-gray-200 md:rounded-lg md:shadow-sm md:p-8">
+      <div className="md:bg-white md:border md:border-gray-200 md:rounded-2xl md:shadow-sm md:p-8">
         <ArticleContent
           title={article.title}
           body={article.body}
