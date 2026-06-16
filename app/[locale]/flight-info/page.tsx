@@ -41,7 +41,7 @@ export default function FlightInfo({ params }: { params: { locale: string } }) {
 
   return (
     <div className="container-page pt-16 pb-8 md:py-8">
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+      <div className="md:bg-white md:border md:border-gray-200 md:rounded-lg md:shadow-sm md:p-6">
         <FlightTable
           title={t("title")}
           rows={rows}

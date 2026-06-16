@@ -43,7 +43,7 @@ export default function FlightTable({ title = "Flight Information", rows, header
         {rows.map((row, idx) => (
           <div
             key={idx}
-            className="border border-gray-200 rounded-lg bg-gray-50 p-4"
+            className="border border-gray-200 rounded-lg bg-white shadow-sm p-4"
           >
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-200">
               <span className="font-bold text-gray-900">

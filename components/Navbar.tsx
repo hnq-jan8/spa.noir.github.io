@@ -241,7 +241,7 @@ export default function Navbar({ locale }: NavbarProps) {
 
       {/* Mobile dropdown menu */}
       {menuOpen && (
-        <div className="md:hidden bg-[#5a5a5a] border-t border-black/20">
+        <div className="md:hidden absolute top-full left-0 w-full bg-[#5a5a5a] border-t border-black/20 shadow-lg">
           {navItems.map((item) => {
             const isActive = normalizedPath === item.href;
             return (
@@ -263,7 +263,7 @@ export default function Navbar({ locale }: NavbarProps) {
       )}
 
       {/* Mobile breadcrumb: cho biết đang ở trang nào vì navbar mobile không hiện active tab */}
-      {activeItem && (
+      {activeItem && !menuOpen && (
         <div className="md:hidden px-4 pt-4 absolute w-full">
           <div
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
