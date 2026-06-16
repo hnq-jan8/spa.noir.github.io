@@ -42,7 +42,7 @@ export default function Footer() {
         <div
           className={`${
             isHome ? "mt-0" : "mt-10 pt-6 border-t border-white/20"
-          } flex flex-col min-[410px]:flex-row items-center justify-between gap-4`}
+          } flex flex-col items-start min-[400px]:flex-row min-[400px]:items-center justify-between gap-4`}
         >
           <p className="text-xs text-gray-300">
             © {new Date().getFullYear()} Sun Phu Quoc Airways
@@ -51,9 +51,8 @@ export default function Footer() {
             href="https://www.sunphuquocairways.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 transition-colors text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm"
+            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 transition-colors text-white text-sm px-5 py-2 rounded-xl shadow-sm"
           >
-            {t("officialSite")}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="14"
@@ -69,6 +68,7 @@ export default function Footer() {
               <polyline points="15 3 21 3 21 9" />
               <line x1="10" y1="14" x2="21" y2="3" />
             </svg>
+            {t("officialSite")}
           </a>
         </div>
       </div>
