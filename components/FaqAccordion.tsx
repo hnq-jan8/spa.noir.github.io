@@ -14,7 +14,7 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
       {items.map((item, i) => (
         <div
           key={i}
-          className="border border-gray-200 rounded-xl overflow-hidden"
+          className="bg-white border border-gray-200 rounded-xl overflow-hidden"
         >
           <button
             className="w-full flex items-center justify-between px-6 py-5 text-left"

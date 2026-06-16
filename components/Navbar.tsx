@@ -102,7 +102,7 @@ export default function Navbar({ locale }: NavbarProps) {
                     aria-label="Scroll left"
                   >
                     <svg
-                      className="absolute left-1 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
+                      className="absolute left-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -159,7 +159,7 @@ export default function Navbar({ locale }: NavbarProps) {
                     aria-label="Scroll right"
                   >
                     <svg
-                      className="absolute right-1 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
+                      className="absolute right-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

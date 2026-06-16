@@ -14,7 +14,7 @@ export default function ArticleContent({
   imageAlt = "Article image",
 }: ArticleContentProps) {
   return (
-    <div className="py-6 md:py-8">
+    <div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
         {/* Text content */}
         <div className="lg:col-span-2 order-2 lg:order-1">

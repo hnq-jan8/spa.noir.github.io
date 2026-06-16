@@ -40,26 +40,28 @@ export default function FlightInfo({ params }: { params: { locale: string } }) {
   ];
 
   return (
-    <div className="container-page pt-12 pb-8 md:py-8">
-      <FlightTable
-        title={t("title")}
-        rows={rows}
-        headers={{
-          no: t("no"),
-          type: t("type"),
-          capacity: t("capacity"),
-          flightNo: t("flightNo"),
-          route: t("route"),
-          srtd: t("srtd"),
-          atd: t("atd"),
-          note: t("note"),
-        }}
-      />
-      <div className="mt-10">
-        <h2 className="section-title">{t("policy")}</h2>
-        <p className="text-sm text-gray-700 leading-relaxed max-w-3xl">
-          {t("policyContent")}
-        </p>
+    <div className="container-page pt-16 pb-8 md:py-8">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+        <FlightTable
+          title={t("title")}
+          rows={rows}
+          headers={{
+            no: t("no"),
+            type: t("type"),
+            capacity: t("capacity"),
+            flightNo: t("flightNo"),
+            route: t("route"),
+            srtd: t("srtd"),
+            atd: t("atd"),
+            note: t("note"),
+          }}
+        />
+        <div className="mt-10">
+          <h2 className="section-title">{t("policy")}</h2>
+          <p className="text-sm text-gray-700 leading-relaxed max-w-3xl">
+            {t("policyContent")}
+          </p>
+        </div>
       </div>
     </div>
   );

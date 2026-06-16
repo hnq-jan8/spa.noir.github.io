@@ -14,12 +14,16 @@
     "officialSite": "Official Website"
   },
   "home": {
-    "title": "Sun PhuQuoc Airways",
-    "subtitle": "Official information from the airline",
     "officialUpdatesDesc": "Timeline of latest updates",
     "pressReleasesDesc": "Official articles and statements",
     "flightInfoDesc": "Flight list and status",
-    "faqsDesc": "Frequently asked questions"
+    "faqsDesc": "Frequently asked questions",
+    "asOf": "Information as of",
+    "officialUpdateBadge": "Official Update",
+    "officialUpdateTitle": "Statement from Sun PhuQuoc Airways",
+    "viewAll": "View all",
+    "supportTitle": "Support Hotlines",
+    "pressReleaseLabel": "Press Release"
   },
   "support": {
     "passengerHotline": "Passenger Hotline",

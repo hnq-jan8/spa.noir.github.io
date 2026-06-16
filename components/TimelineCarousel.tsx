@@ -43,9 +43,9 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
       {/* ── Desktop layout (lg+): horizontal scroll ── */}
       <div className="hidden lg:block relative">
         {/* Left fade gradient — width matches scroll padding (px-8 = 32px = w-8) */}
-        <div className="absolute left-0 top-0 -bottom-16 w-8 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none" />
+        <div className="absolute left-0 top-0 -bottom-16 w-8 bg-gradient-to-r from-gray-50 to-transparent z-20 pointer-events-none" />
         {/* Right fade gradient */}
-        <div className="absolute right-0 top-0 -bottom-16 w-8 bg-gradient-to-l from-white to-transparent z-20 pointer-events-none" />
+        <div className="absolute right-0 top-0 -bottom-16 w-8 bg-gradient-to-l from-gray-50 to-transparent z-20 pointer-events-none" />
 
         {/* Left arrow — overlays on top of gradient */}
         {canScrollLeft && (

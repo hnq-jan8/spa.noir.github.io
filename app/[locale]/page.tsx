@@ -1,6 +1,20 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
+import {
+  Clock,
+  Megaphone,
+  Phone,
+  PlaneTakeoff,
+  HelpCircle,
+  FileText,
+  ChevronRight,
+} from "lucide-react";
+import {
+  timelineItems,
+  supportContacts,
+  getBuildTimestamp,
+} from "@/lib/siteData";
 
 export default function Home({ params }: { params: { locale: string } }) {
   const { locale } = params;
@@ -8,48 +22,125 @@ export default function Home({ params }: { params: { locale: string } }) {
 
   const t = useTranslations("home");
   const tn = useTranslations("nav");
+  const ts = useTranslations("support");
 
-  const pages = [
-    {
-      href: `/${locale}/official-updates`,
-      label: tn("officialUpdates"),
-      desc: t("officialUpdatesDesc"),
-    },
-    {
-      href: `/${locale}/press-releases`,
-      label: tn("pressReleases"),
-      desc: t("pressReleasesDesc"),
-    },
+  const latestUpdate = timelineItems[0];
+  const asOf = getBuildTimestamp(locale);
+
+  const gridPages = [
     {
       href: `/${locale}/flight-info`,
       label: tn("flightInfo"),
       desc: t("flightInfoDesc"),
+      Icon: PlaneTakeoff,
     },
     {
       href: `/${locale}/faqs`,
       label: tn("faqs"),
       desc: t("faqsDesc"),
+      Icon: HelpCircle,
     },
   ];
 
   return (
-    <div className="container-page py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">{t("title")}</h1>
-        <p className="text-gray-600 text-lg">{t("subtitle")}</p>
+    <div className="container-page py-8 md:py-11 max-w-3xl mx-auto">
+      {/* As-of timestamp */}
+      <div className="flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg px-4 py-3 mb-4">
+        <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
+        <span>
+          {t("asOf")}: {asOf}
+        </span>
+        <Clock className="w-4 h-4 ml-auto text-gray-400" strokeWidth={2} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-        {pages.map((page) => (
+
+      {/* Official update preview */}
+      <Link
+        href={`/${locale}/official-updates`}
+        className="block bg-white border-l-4 border-amber-600 border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
+      >
+        <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
+          <Megaphone className="w-4 h-4" strokeWidth={2} />
+          {t("officialUpdateBadge")}
+        </p>
+        <h2 className="font-bold text-lg mb-2">{t("officialUpdateTitle")}</h2>
+        <p className="text-sm text-gray-600 leading-relaxed mb-4">
+          {latestUpdate.description}
+        </p>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-400">{latestUpdate.date}</span>
+          <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
+            {t("viewAll")}
+            <ChevronRight className="w-3.5 h-3.5" strokeWidth={2} />
+          </span>
+        </div>
+      </Link>
+
+      {/* Support hotlines */}
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-4">
+        <p className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold uppercase tracking-wide mb-4">
+          <Phone className="w-4 h-4" strokeWidth={2} />
+          {t("supportTitle")}
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {supportContacts.map((contact) => (
+            <div key={contact.key}>
+              <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
+                {ts(contact.key)}
+              </p>
+              <p className="text-sm font-semibold text-gray-900">
+                {contact.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 2-up grid: flight info / faqs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        {gridPages.map((page) => (
           <Link
             key={page.href}
             href={page.href}
-            className="block border-[1.5px] border-gray-200 rounded-lg p-6 hover:border-gray-400 hover:shadow-sm transition-all"
+            className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
           >
-            <h2 className="font-bold text-lg mb-1">{page.label}</h2>
-            <p className="text-sm text-gray-500">{page.desc}</p>
+            <div className="flex items-center gap-4 sm:flex-col sm:items-start sm:gap-0">
+              <page.Icon
+                className="w-6 h-6 text-gray-400 flex-shrink-0 sm:mb-3"
+                strokeWidth={2}
+              />
+              <div>
+                <h2 className="font-bold text-lg sm:mb-1">{page.label}</h2>
+                <p className="text-sm text-gray-500">{page.desc}</p>
+              </div>
+            </div>
+            <ChevronRight
+              className="w-5 h-5 text-gray-300 flex-shrink-0"
+              strokeWidth={2}
+            />
           </Link>
         ))}
       </div>
+
+      {/* Press releases */}
+      <Link
+        href={`/${locale}/press-releases`}
+        className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+      >
+        <div className="flex items-center gap-4">
+          <FileText
+            className="w-6 h-6 text-gray-400 flex-shrink-0"
+            strokeWidth={2}
+          />
+          <div>
+            <h2 className="font-bold text-lg">{tn("pressReleases")}</h2>
+            <p className="text-sm text-gray-500">{t("pressReleasesDesc")}</p>
+          </div>
+        </div>
+        <ChevronRight
+          className="w-5 h-5 text-gray-300 flex-shrink-0"
+          strokeWidth={2}
+        />
+      </Link>
     </div>
   );
 }

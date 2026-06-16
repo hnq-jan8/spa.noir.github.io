@@ -1,23 +1,20 @@
 "use client";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { supportContacts } from "@/lib/siteData";
 
 export default function Footer() {
   const t = useTranslations("footer");
   const ts = useTranslations("support");
-
-  const contacts = [
-    { label: ts("passengerHotline"), value: "0123 456 789" },
-    { label: ts("familyHotline"), value: "0123 456 789" },
-    { label: ts("supportEmail"), value: "loremipsum@gmail.com" },
-    { label: ts("mediaContact"), value: "loremipsum@gmail.com" },
-  ];
+  const pathname = usePathname();
+  const isHome = /^\/(vi|en)\/?$/.test(pathname);
 
   return (
     <footer className="bg-[#707070] text-white mt-16">
-      <div className="container-page py-10">
+      <div className={`container-page ${isHome ? "py-6" : "py-10"}`}>
         {/* Logo */}
-        <div className="mb-8">
+        <div className={isHome ? "mb-6" : "mb-8"}>
           <Image
             src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`}
             alt="Sun Phu Quoc Airways"
@@ -27,20 +24,28 @@ export default function Footer() {
           />
         </div>
 
-        {/* Contact info */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {contacts.map((card) => (
-            <div key={card.label}>
-              <p className="text-xs text-gray-300 mb-1 uppercase tracking-wide">
-                {card.label}
-              </p>
-              <p className="text-sm font-semibold text-white">{card.value}</p>
-            </div>
-          ))}
-        </div>
+        {/* Contact info — moved onto the page itself for the homepage */}
+        {!isHome && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {supportContacts.map((card) => (
+              <div key={card.key}>
+                <p className="text-xs text-gray-300 mb-1 uppercase tracking-wide">
+                  {ts(card.key)}
+                </p>
+                <p className="text-sm font-semibold text-white">
+                  {card.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div
+          className={`${
+            isHome ? "mt-0" : "mt-10 pt-6 border-t border-white/20"
+          } flex flex-col sm:flex-row items-center justify-between gap-4`}
+        >
           <p className="text-xs text-gray-300">
             © {new Date().getFullYear()} Sun Phu Quoc Airways
           </p>
@@ -48,7 +53,7 @@ export default function Footer() {
             href="https://www.sunphuquocairways.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#AC1423] hover:bg-[#a2101f] transition-colors text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm"
+            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 transition-colors text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm"
           >
             {t("officialSite")}
             <svg

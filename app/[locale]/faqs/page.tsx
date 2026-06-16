@@ -28,7 +28,7 @@ export default function Support({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 md:py-12">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 md:py-8">
       <FaqAccordion items={items} />
     </div>
   );

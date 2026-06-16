@@ -3,7 +3,7 @@
     "home": "Trang chủ",
     "officialUpdates": "Cập nhật chính thức",
     "pressReleases": "Thông cáo báo chí",
-    "flightInfo": "Thông tin chuyến bay bị ảnh hưởng",
+    "flightInfo": "Chuyến bay bị ảnh hưởng",
     "faqs": "Câu hỏi thường gặp"
   },
   "footer": {
@@ -14,12 +14,16 @@
     "officialSite": "Trang chính thức"
   },
   "home": {
-    "title": "Sun PhuQuoc Airways",
-    "subtitle": "Thông tin chính thức từ hãng hàng không",
     "officialUpdatesDesc": "Timeline các cập nhật mới nhất",
     "pressReleasesDesc": "Bài viết và thông cáo chính thức",
     "flightInfoDesc": "Danh sách và trạng thái các chuyến bay",
-    "faqsDesc": "Các câu hỏi thường gặp"
+    "faqsDesc": "Các câu hỏi thường gặp",
+    "asOf": "Thông tin tính đến",
+    "officialUpdateBadge": "Cập nhật chính thức",
+    "officialUpdateTitle": "Thông báo từ Sun PhuQuoc Airways",
+    "viewAll": "Xem tất cả",
+    "supportTitle": "Đường dây hỗ trợ",
+    "pressReleaseLabel": "Thông cáo báo chí"
   },
   "support": {
     "passengerHotline": "Hotline hành khách",
