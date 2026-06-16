@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -11,7 +11,11 @@ import "../globals.css";
 export const metadata: Metadata = {
   title: "Sun PhuQuoc Airways",
   description: "Official information from Sun PhuQuoc Airways",
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#707070",
 };
 

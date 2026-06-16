@@ -84,7 +84,7 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
           {items.map((item, idx) => (
             <div key={idx} className="flex flex-col flex-shrink-0 w-64">
               {/* Card */}
-              <div className="border-l-2 border-gray-300 pl-4 pr-6 pb-6 flex-1">
+              <div className="timeline-card">
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {item.description}

@@ -69,7 +69,7 @@ export default function Navbar({ locale }: NavbarProps) {
       ref={headerRef}
       className="sticky top-0 z-50 w-full bg-[#707070] text-white"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container-page">
         <div className="flex items-stretch h-14">
           {/* Logo */}
           <Link
