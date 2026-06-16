@@ -42,7 +42,7 @@ export default function Footer() {
         <div
           className={`${
             isHome ? "mt-0" : "mt-10 pt-6 border-t border-white/20"
-          } flex flex-col min-[510px]:flex-row items-center justify-between gap-4`}
+          } flex flex-col min-[410px]:flex-row items-center justify-between gap-4`}
         >
           <p className="text-xs text-gray-300">
             © {new Date().getFullYear()} Sun Phu Quoc Airways
