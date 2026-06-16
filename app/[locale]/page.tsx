@@ -56,7 +56,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       {/* Official update preview */}
       <Link
         href={`/${locale}/official-updates`}
-        className="block bg-white border-l-4 border-amber-600 border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
+        className="block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
       >
         <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
           <Megaphone className="w-4 h-4" strokeWidth={2} />
