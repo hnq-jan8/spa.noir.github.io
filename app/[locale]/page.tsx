@@ -76,7 +76,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       </Link>
 
       {/* Support hotlines */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
+      <div className="bg-gray-100 border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
         <p className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold uppercase tracking-wide mb-4">
           <Phone className="w-4 h-4" strokeWidth={2} />
           {t("supportTitle")}
