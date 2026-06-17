@@ -1,4 +1,9 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale: params.locale, namespace: "nav" });
+  return { title: t("officialUpdates") };
+}
 import TimelineCarousel from "@/components/TimelineCarousel";
 import { timelineItems } from "@/lib/siteData";
 

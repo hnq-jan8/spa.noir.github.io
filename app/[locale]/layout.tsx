@@ -9,7 +9,10 @@ import RememberLocale from "@/components/RememberLocale";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "Sun PhuQuoc Airways",
+  title: {
+    default: "Sun PhuQuoc Airways",
+    template: "%s | Sun PhuQuoc Airways",
+  },
   description: "Official information from Sun PhuQuoc Airways",
 };
 

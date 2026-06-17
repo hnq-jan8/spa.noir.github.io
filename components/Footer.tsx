@@ -12,7 +12,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#707070] text-white mt-16">
-      <div className={`container-page ${isHome ? "py-6" : "py-10"}`}>
+      <div className={`container-page ${isHome ? "py-8" : "pb-8 pt-10"}`}>
         {/* Logo */}
         <div className={isHome ? "mb-6" : "mb-8"}>
           <Image

@@ -1,4 +1,9 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale: params.locale, namespace: "nav" });
+  return { title: t("faqs") };
+}
 import FaqAccordion from "@/components/FaqAccordion";
 
 const items = [
