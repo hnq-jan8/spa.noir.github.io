@@ -96,20 +96,22 @@ export default function Home({ params }: { params: { locale: string } }) {
       </div>
 
       {/* 2-up grid: flight info / faqs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 min-[800px]:grid-cols-2 gap-4 mb-4">
         {gridPages.map((page) => (
           <Link
             key={page.href}
             href={page.href}
             className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
           >
-            <div className="flex items-center gap-4 sm:flex-col sm:items-start sm:gap-0">
+            <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
               <page.Icon
-                className="w-6 h-6 text-gray-400 flex-shrink-0 sm:mb-3"
+                className="w-6 h-6 text-gray-400 flex-shrink-0 min-[800px]:mb-3"
                 strokeWidth={2}
               />
               <div>
-                <h2 className="font-bold text-lg sm:mb-1">{page.label}</h2>
+                <h2 className="font-bold text-lg min-[800px]:mb-1">
+                  {page.label}
+                </h2>
                 <p className="text-sm text-gray-500">{page.desc}</p>
               </div>
             </div>
