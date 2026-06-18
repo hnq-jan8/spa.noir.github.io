@@ -1,8 +1,6 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import {
-  Clock,
   Megaphone,
   Phone,
   PlaneTakeoff,
@@ -11,33 +9,46 @@ import {
   ChevronRight,
 } from "lucide-react";
 import {
-  timelineItems,
-  supportContacts,
-  getBuildTimestamp,
-} from "@/lib/siteData";
+  getOfficialUpdates,
+  getSupportContacts,
+  t as tr,
+} from "@/lib/directus";
+import { getBuildTimestamp } from "@/lib/siteData";
 
-export default function Home({ params }: { params: { locale: string } }) {
-  const { locale } = params;
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = useTranslations("home");
-  const tn = useTranslations("nav");
-  const ts = useTranslations("support");
+  const [tHome, tNav, tSupport] = await Promise.all([
+    getTranslations({ locale, namespace: "home" }),
+    getTranslations({ locale, namespace: "nav" }),
+    getTranslations({ locale, namespace: "support" }),
+  ]);
 
-  const latestUpdate = timelineItems[0];
+  const [updates, contacts] = await Promise.all([
+    getOfficialUpdates(),
+    getSupportContacts(),
+  ]);
+
+  const latestUpdate = updates[0];
+  const latestTr = latestUpdate ? tr(latestUpdate, locale) : null;
   const asOf = getBuildTimestamp(locale);
 
   const gridPages = [
     {
       href: `/${locale}/flight-info`,
-      label: tn("flightInfo"),
-      desc: t("flightInfoDesc"),
+      label: tNav("flightInfo"),
+      desc: tHome("flightInfoDesc"),
       Icon: PlaneTakeoff,
     },
     {
       href: `/${locale}/faqs`,
-      label: tn("faqs"),
-      desc: t("faqsDesc"),
+      label: tNav("faqs"),
+      desc: tHome("faqsDesc"),
       Icon: HelpCircle,
     },
   ];
@@ -48,44 +59,46 @@ export default function Home({ params }: { params: { locale: string } }) {
       <div className="flex items-start gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-2xl px-4 py-3 mb-4">
         <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5" />
         <p className="flex flex-wrap gap-x-1">
-          <span>{t("asOf")}:</span>
+          <span>{tHome("asOf")}:</span>
           <span className="whitespace-nowrap">{asOf}</span>
         </p>
       </div>
 
       {/* Official update preview */}
-      <Link
-        href={`/${locale}/official-updates`}
-        className="block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
-      >
-        <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
-          <Megaphone className="w-4 h-4" strokeWidth={2} />
-          {t("officialUpdateBadge")}
-        </p>
-        <h2 className="font-bold text-lg mb-2">{t("officialUpdateTitle")}</h2>
-        <p className="text-sm text-gray-600 leading-relaxed mb-4">
-          {latestUpdate.description}
-        </p>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-400">{latestUpdate.date}</span>
-          <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
-            {t("viewAll")}
-            <ChevronRight className="w-3.5 h-3.5" strokeWidth={2} />
-          </span>
-        </div>
-      </Link>
+      {latestUpdate && latestTr && (
+        <Link
+          href={`/${locale}/official-updates`}
+          className="block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
+        >
+          <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
+            <Megaphone className="w-4 h-4" strokeWidth={2} />
+            {tHome("officialUpdateBadge")}
+          </p>
+          <h2 className="font-bold text-lg mb-2">{tHome("officialUpdateTitle")}</h2>
+          <p className="text-sm text-gray-600 leading-relaxed mb-4">
+            {latestTr.description}
+          </p>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-400">{latestUpdate.date}</span>
+            <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
+              {tHome("viewAll")}
+              <ChevronRight className="w-3.5 h-3.5" strokeWidth={2} />
+            </span>
+          </div>
+        </Link>
+      )}
 
       {/* Support hotlines */}
       <div className="bg-gray-100 border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
         <p className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold uppercase tracking-wide mb-4">
           <Phone className="w-4 h-4" strokeWidth={2} />
-          {t("supportTitle")}
+          {tHome("supportTitle")}
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {supportContacts.map((contact) => (
+        <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
+          {contacts.map((contact) => (
             <div key={contact.key}>
               <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
-                {ts(contact.key)}
+                {tSupport(contact.key)}
               </p>
               <p className="text-sm font-semibold text-gray-900">
                 {contact.value}
@@ -134,8 +147,10 @@ export default function Home({ params }: { params: { locale: string } }) {
             strokeWidth={2}
           />
           <div>
-            <h2 className="font-bold text-lg">{tn("pressReleases")}</h2>
-            <p className="text-sm text-gray-500">{t("pressReleasesDesc")}</p>
+            <h2 className="font-bold text-lg">{tNav("pressReleases")}</h2>
+            <p className="text-sm text-gray-500">
+              {tHome("pressReleasesDesc")}
+            </p>
           </div>
         </div>
         <ChevronRight

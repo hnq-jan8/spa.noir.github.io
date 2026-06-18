@@ -1,48 +1,43 @@
-import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import FlightTable from "@/components/FlightTable";
+import { getFlights, getSiteConfig, t as tr } from "@/lib/directus";
 
-export async function generateMetadata({ params }: { params: { locale: string } }) {
-  const t = await getTranslations({ locale: params.locale, namespace: "nav" });
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "nav" });
   return { title: t("flightInfo") };
 }
-import FlightTable from "@/components/FlightTable";
 
-export default function FlightInfo({ params }: { params: { locale: string } }) {
-  setRequestLocale(params.locale);
-  const t = useTranslations("flightInfo");
+export default async function FlightInfo({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
 
-  const rows = [
-    {
-      no: 1,
-      type: "Type 1",
-      capacity: 50,
-      flightNo: "123",
-      route: "Route A",
-      srtd: "08:00",
-      atd: "08:15",
-      note: "On Time",
-    },
-    {
-      no: 2,
-      type: "Type 2",
-      capacity: 60,
-      flightNo: "456",
-      route: "Route B",
-      srtd: "09:00",
-      atd: "09:30",
-      note: "Delayed",
-    },
-    {
-      no: "–",
-      type: "–",
-      capacity: "–",
-      flightNo: "–",
-      route: "–",
-      srtd: "–",
-      atd: "–",
-      note: "–",
-    },
-  ];
+  const [t, flights, config] = await Promise.all([
+    getTranslations({ locale, namespace: "flightInfo" }),
+    getFlights(),
+    getSiteConfig(),
+  ]);
+
+  const rows = flights.map((f, i) => ({
+    no: i + 1,
+    type: f.aircraft_type ?? "–",
+    capacity: f.capacity ?? "–",
+    flightNo: f.flight_no,
+    route: f.route ?? "–",
+    srtd: f.srtd ?? "–",
+    atd: f.atd ?? "–",
+    note: f.note ?? "–",
+  }));
+
+  const flightPolicy = tr(config, locale).flight_policy ?? "";
 
   return (
     <div className="container-page pt-16 pb-8 md:py-8">
@@ -64,7 +59,7 @@ export default function FlightInfo({ params }: { params: { locale: string } }) {
         <div className="mt-10">
           <h2 className="section-title">{t("policy")}</h2>
           <p className="text-sm text-gray-700 leading-relaxed max-w-3xl">
-            {t("policyContent")}
+            {flightPolicy}
           </p>
         </div>
       </div>
