@@ -3,7 +3,10 @@ const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { Authorization: `Bearer ${TOKEN}` },
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "ngrok-skip-browser-warning": "true",
+    },
     cache: "force-cache",
   });
   if (!res.ok) throw new Error(`Directus ${path} → ${res.status}`);
@@ -89,7 +92,9 @@ export interface SiteConfig {
 // ─── Fetch functions (một lần gọi, đủ tất cả locale) ─────────────────────────
 
 export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
-  return get("/items/official_updates?fields=*,translations.*&sort=sort&filter[status][_eq]=published");
+  return get(
+    "/items/official_updates?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+  );
 }
 
 export async function getSupportContacts(): Promise<SupportContact[]> {
@@ -101,11 +106,15 @@ export async function getFlights(): Promise<Flight[]> {
 }
 
 export async function getFaqs(): Promise<Faq[]> {
-  return get("/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published");
+  return get(
+    "/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+  );
 }
 
 export async function getPressReleases(): Promise<PressRelease[]> {
-  return get("/items/press_releases?fields=*,translations.*&sort=-published_at&filter[status][_eq]=published");
+  return get(
+    "/items/press_releases?fields=*,translations.*&sort=-published_at&filter[status][_eq]=published",
+  );
 }
 
 export async function getSiteConfig(): Promise<SiteConfig> {
@@ -116,11 +125,10 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 
 export function t<T extends { translations: { languages_code: string }[] }>(
   item: T,
-  locale: string
+  locale: string,
 ): T["translations"][number] {
   return (
     item.translations.find((tr) => tr.languages_code === locale) ??
     item.translations[0]
   );
 }
-

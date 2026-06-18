@@ -32,6 +32,9 @@ jobs:
 
       - name: Build static site
         run: npm run build
+        env:
+          DIRECTUS_URL: ${{ secrets.DIRECTUS_URL }}
+          DIRECTUS_STATIC_TOKEN: ${{ secrets.DIRECTUS_STATIC_TOKEN }}
 
       - uses: actions/configure-pages@v5
 
