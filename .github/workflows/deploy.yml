@@ -3,8 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # Cho phép chạy tay từ tab Actions
   workflow_dispatch:
+  repository_dispatch:
+    types: [directus-content-update]
 
 permissions:
   contents: read
