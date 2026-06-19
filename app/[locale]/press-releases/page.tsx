@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ArticleContent from "@/components/ArticleContent";
-import { getPressReleases, t as tr } from "@/lib/directus";
+import { getPressReleases, getAssetUrl, t as tr } from "@/lib/directus";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -31,6 +31,7 @@ export default async function PressReleases({
   const body = translation.body
     ? translation.body.split(/\n\n+/).filter(Boolean)
     : [];
+  const imageSrc = getAssetUrl(latest.cover_image) ?? `${basePath}/images/airplane.jpg`;
 
   return (
     <div className="container-page pt-16 pb-8 md:py-8">
@@ -38,8 +39,8 @@ export default async function PressReleases({
         <ArticleContent
           title={translation.title}
           body={body}
-          imageSrc={`${basePath}/images/airplane.jpg`}
-          imageAlt={translation.image_alt ?? "Sun PhuQuoc Airways airplane"}
+          imageSrc={imageSrc}
+          imageAlt={translation.image_alt ?? "alt text"}
         />
       </div>
     </div>

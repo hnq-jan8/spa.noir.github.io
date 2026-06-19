@@ -128,3 +128,7 @@ export function t<T extends { translations: { languages_code: string }[] }>(
     item.translations[0]
   );
 }
+
+export function getAssetUrl(fileId: string | null): string | null {
+  return fileId ? `${BASE}/assets/${fileId}` : null;
+}
