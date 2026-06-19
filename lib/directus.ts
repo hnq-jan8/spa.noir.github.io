@@ -30,7 +30,6 @@ export interface OfficialUpdateTranslation {
 export interface OfficialUpdate {
   id: number;
   date: string;
-  sort: number;
   status: string;
   translations: OfficialUpdateTranslation[];
 }
@@ -39,7 +38,6 @@ export interface SupportContact {
   id: number;
   key: "passengerHotline" | "familyHotline" | "supportEmail" | "mediaContact";
   value: string;
-  sort: number;
 }
 
 export interface Flight {
@@ -51,7 +49,6 @@ export interface Flight {
   srtd: string | null;
   atd: string | null;
   note: string | null;
-  sort: number;
 }
 
 export interface FaqTranslation {
@@ -61,7 +58,6 @@ export interface FaqTranslation {
 }
 export interface Faq {
   id: number;
-  sort: number;
   translations: FaqTranslation[];
 }
 
@@ -93,21 +89,21 @@ export interface SiteConfig {
 
 export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
   return get(
-    "/items/official_updates?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+    "/items/official_updates?fields=*,translations.*&sort=-date&filter[status][_eq]=published",
   );
 }
 
 export async function getSupportContacts(): Promise<SupportContact[]> {
-  return get("/items/support_contacts?sort=sort&filter[status][_eq]=published");
+  return get("/items/support_contacts?sort=id&filter[status][_eq]=published");
 }
 
 export async function getFlights(): Promise<Flight[]> {
-  return get("/items/flights?sort=sort&filter[status][_eq]=published");
+  return get("/items/flights?sort=id&filter[status][_eq]=published");
 }
 
 export async function getFaqs(): Promise<Faq[]> {
   return get(
-    "/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+    "/items/faqs?fields=*,translations.*&sort=id&filter[status][_eq]=published",
   );
 }
 
