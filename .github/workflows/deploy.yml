@@ -12,10 +12,9 @@ permissions:
   pages: write
   id-token: write
 
-# Không chạy chồng nhiều deploy; không huỷ deploy đang chạy giữa chừng
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
