@@ -5,9 +5,6 @@
 /.next/
 /out/
 
-# docs giờ là sản phẩm build do GitHub Actions tạo ra, không commit nữa
-/docs/
-
 # local preview của GitHub Pages (tạo bởi npm run preview)
 /.preview/
 
