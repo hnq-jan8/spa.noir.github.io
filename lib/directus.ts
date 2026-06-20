@@ -7,7 +7,7 @@ async function get<T>(path: string): Promise<T> {
       Authorization: `Bearer ${TOKEN}`,
       "ngrok-skip-browser-warning": "true",
     },
-    cache: "force-cache",
+    cache: process.env.NODE_ENV === "production" ? "force-cache" : "no-store",
   });
   if (!res.ok) throw new Error(`Directus ${path} → ${res.status}`);
   const json = await res.json();

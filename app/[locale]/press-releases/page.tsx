@@ -31,7 +31,8 @@ export default async function PressReleases({
   const body = translation.body
     ? translation.body.split(/\n\n+/).filter(Boolean)
     : [];
-  const imageSrc = getAssetUrl(latest.cover_image) ?? `${basePath}/images/airplane.jpg`;
+  const imageSrc =
+    getAssetUrl(latest.cover_image) ?? `${basePath}/images/airplane.jpg`;
 
   return (
     <div className="container-page pt-16 pb-8 md:py-8">
