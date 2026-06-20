@@ -98,12 +98,12 @@ export async function getSupportContacts(): Promise<SupportContact[]> {
 }
 
 export async function getFlights(): Promise<Flight[]> {
-  return get("/items/flights?sort=id&filter[status][_eq]=published");
+  return get("/items/flights?sort=sort&filter[status][_eq]=published");
 }
 
 export async function getFaqs(): Promise<Faq[]> {
   return get(
-    "/items/faqs?fields=*,translations.*&sort=id&filter[status][_eq]=published",
+    "/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
   );
 }
 
