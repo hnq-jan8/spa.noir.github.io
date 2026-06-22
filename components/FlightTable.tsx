@@ -65,12 +65,11 @@ export default function FlightTable({
             </div>
             <dl className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-y-1.5 min-[400px]:gap-x-8 text-sm">
               {[
-                [h.no, row.no],
                 [h.type, row.type],
                 [h.capacity, row.capacity],
-                [h.route, row.route],
                 [h.srtd, row.srtd],
                 [h.atd, row.atd],
+                [h.route, row.route],
               ].map(([label, value]) => (
                 <div key={label} className="flex items-center justify-between">
                   <dt className="text-gray-400">{label}</dt>
