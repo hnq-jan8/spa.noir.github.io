@@ -112,7 +112,11 @@ export default function FlightTable({
                 <td className="py-3 pr-8 text-gray-600">{row.route}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.srtd}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.atd}</td>
-                <td className="py-3 pr-8 text-gray-600">{row.note}</td>
+                <td className="py-3 pr-8 text-gray-500">
+                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    {row.note}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
