@@ -109,7 +109,7 @@ export async function getFaqs(): Promise<Faq[]> {
 
 export async function getPressReleases(): Promise<PressRelease[]> {
   return get(
-    "/items/press_releases?fields=*,translations.*&sort=-published_at&filter[status][_eq]=published",
+    "/items/press_releases?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
   );
 }
 
