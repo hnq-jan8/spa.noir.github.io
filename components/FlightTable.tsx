@@ -53,15 +53,17 @@ export default function FlightTable({
         {rows.map((row, idx) => (
           <div
             key={idx}
-            className="border border-gray-200 rounded-2xl bg-white shadow-sm p-4"
+            className="border border-gray-200 rounded-2xl bg-white shadow-sm p-4 min-[400px]:px-6"
           >
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-200">
-              <span className="font-bold text-gray-900">
-                {h.flightNo}: {row.flightNo}
+              <span className="font-semibold text-gray-900">
+                {row.flightNo}
               </span>
-              <span className="text-xs text-gray-500">{row.note}</span>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                {row.note}
+              </span>
             </div>
-            <dl className="space-y-1.5 text-sm">
+            <dl className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-y-1.5 min-[400px]:gap-x-8 min-[360px]:gap-x-6 text-sm">
               {[
                 [h.no, row.no],
                 [h.type, row.type],
@@ -82,7 +84,7 @@ export default function FlightTable({
 
       {/* Desktop / tablet: table */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-sm text-left min-w-[600px]">
+        <table className="w-full text-sm text-left">
           <thead>
             <tr className="border-b border-gray-200">
               {[
