@@ -63,7 +63,7 @@ export default function FlightTable({
                 {row.note}
               </span>
             </div>
-            <dl className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-y-1.5 min-[400px]:gap-x-8 min-[360px]:gap-x-6 text-sm">
+            <dl className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-y-1.5 min-[400px]:gap-x-8 text-sm">
               {[
                 [h.no, row.no],
                 [h.type, row.type],
