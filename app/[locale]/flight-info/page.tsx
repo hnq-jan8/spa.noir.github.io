@@ -2,6 +2,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import FlightTable from "@/components/FlightTable";
 import { getFlights, getSiteConfig, t as tr } from "@/lib/directus";
 
+function formatTime(time: string | null): string {
+  if (!time) return "–";
+  return time.slice(0, 5);
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -32,8 +37,8 @@ export default async function FlightInfo({
     capacity: f.capacity ?? "–",
     flightNo: f.flight_no,
     route: f.route ?? "–",
-    srtd: f.srtd ?? "–",
-    atd: f.atd ?? "–",
+    srtd: formatTime(f.srtd),
+    atd: formatTime(f.atd),
     note: f.note ?? "–",
   }));
 
