@@ -48,12 +48,12 @@ export default function FlightTable({
     <div>
       <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
 
-      {/* Mobile: stacked cards, one row of columns per field */}
-      <div className="md:hidden space-y-3">
+      {/* Mobile: stacked cards, one card per flight; 2 cards per row when wide enough */}
+      <div className="md:hidden grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
         {rows.map((row, idx) => (
           <div
             key={idx}
-            className="border border-gray-200 rounded-2xl bg-white shadow-sm p-4 min-[400px]:px-6"
+            className="border border-gray-200 rounded-2xl bg-white shadow-sm p-4"
           >
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-200">
               <span className="font-semibold text-gray-900">
@@ -63,7 +63,7 @@ export default function FlightTable({
                 {row.note}
               </span>
             </div>
-            <dl className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-y-1.5 min-[400px]:gap-x-8 text-sm">
+            <dl className="space-y-1.5 text-sm">
               {[
                 [h.type, row.type],
                 [h.capacity, row.capacity],
