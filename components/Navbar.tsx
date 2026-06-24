@@ -67,7 +67,7 @@ export default function Navbar({ locale }: NavbarProps) {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 w-full bg-[#707070] text-white"
+      className="sticky top-0 z-50 w-full bg-chrome text-white"
     >
       <div className="container-page">
         <div className="flex items-stretch h-14">
@@ -95,7 +95,7 @@ export default function Navbar({ locale }: NavbarProps) {
             <div className="relative flex-1 min-w-0 self-stretch">
               {canScrollLeft && (
                 <>
-                  <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
+                  <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-chrome to-transparent z-10 pointer-events-none lg:hidden" />
                   <button
                     onClick={() => scrollNav("left")}
                     className="absolute left-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden"
@@ -152,7 +152,7 @@ export default function Navbar({ locale }: NavbarProps) {
 
               {canScrollRight && (
                 <>
-                  <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#707070] to-transparent z-10 pointer-events-none lg:hidden" />
+                  <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-chrome to-transparent z-10 pointer-events-none lg:hidden" />
                   <button
                     onClick={() => scrollNav("right")}
                     className="absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden"
@@ -240,57 +240,63 @@ export default function Navbar({ locale }: NavbarProps) {
       </div>
 
       {/* Mobile dropdown menu */}
-      {menuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-[#5a5a5a] border-t border-black/20 shadow-lg">
-          {navItems.map((item) => {
-            const isActive = normalizedPath === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className={`block px-6 py-3 text-sm border-b border-black/10 transition-colors ${
-                  isActive
-                    ? "text-white font-medium bg-black/30"
-                    : "text-gray-200 hover:text-white hover:bg-black/20"
-                }`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      <div
+        className={`md:hidden absolute top-full left-0 w-full overflow-hidden bg-chrome-panel border-t border-black/20 shadow-lg transition-all duration-300 ease-in-out z-10 ${
+          menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        {navItems.map((item) => {
+          const isActive = normalizedPath === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMenuOpen(false)}
+              className={`block px-6 py-3 text-sm border-b border-black/10 transition-colors ${
+                isActive
+                  ? "text-white font-medium bg-black/30"
+                  : "text-gray-200 hover:text-white hover:bg-black/20"
+              }`}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
 
       {/* Mobile breadcrumb: cho biết đang ở trang nào vì navbar mobile không hiện active tab */}
-      {activeItem && !menuOpen && (
-        <div className="md:hidden px-4 pt-4 absolute w-full">
-          <div
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
-            bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
-          >
-            <Link
-              href={`/${locale}`}
-              className="text-gray-700 hover:text-gray-950"
+      {activeItem && (
+        <div className="md:hidden absolute w-full">
+          <div className="relative px-4 pt-4 pb-6">
+            {/* Fade nội dung phía dưới breadcrumb vào màu nền trang */}
+            <div className="absolute inset-x-0 top-0 h-11 bg-gradient-to-t from-transparent to-page pointer-events-none" />
+            <div
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+              bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
             >
-              {t("home")}
-            </Link>
+              <Link
+                href={`/${locale}`}
+                className="text-gray-700 hover:text-gray-950"
+              >
+                {t("home")}
+              </Link>
 
-            <svg
-              className="w-3 h-3 text-gray-400 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+              <svg
+                className="w-3 h-3 text-gray-400 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
 
-            <span className="font-medium truncate">{activeItem.label}</span>
+              <span className="font-medium truncate">{activeItem.label}</span>
+            </div>
           </div>
         </div>
       )}

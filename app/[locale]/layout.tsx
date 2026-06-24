@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RememberLocale from "@/components/RememberLocale";
+import { COLORS } from "@/lib/theme-colors";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#707070",
+  themeColor: COLORS.chrome,
 };
 
 export function generateStaticParams() {
@@ -49,7 +50,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <RememberLocale locale={locale} />
-          <div className="flex flex-col min-h-screen bg-gray-50">
+          <div className="flex flex-col min-h-screen bg-page">
             <Navbar locale={locale} />
             <main className="flex-1">{children}</main>
             <Footer />

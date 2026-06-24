@@ -1,3 +1,5 @@
+const { COLORS } = require("./lib/theme-colors");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   future: {
@@ -15,10 +17,12 @@ module.exports = {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       colors: {
-        dark: {
-          DEFAULT: "#1a1a1a",
-          nav: "#5a5a5a",
+        chrome: {
+          DEFAULT: COLORS.chrome,
+          panel: COLORS.chromePanel,
+          panelHover: COLORS.chromePanelHover,
         },
+        page: COLORS.page,
       },
     },
   },

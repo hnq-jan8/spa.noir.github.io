@@ -181,7 +181,7 @@ export function DesktopLanguageSelector({
         />
       </button>
       <div
-        className={`absolute top-full left-0 w-full bg-[#5f5f5f] shadow-lg transition-all duration-150 z-50 ${
+        className={`absolute top-full left-0 w-full bg-chrome-panelHover shadow-lg transition-all duration-150 z-50 ${
           open
             ? "opacity-100 visible"
             : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
@@ -239,7 +239,7 @@ export function MobileLanguageSelector({
         />
       </button>
       {open && (
-        <div className="absolute top-full right-0 w-full bg-[#5a5a5a] shadow-lg z-50">
+        <div className="absolute top-full right-0 w-full bg-chrome-panel shadow-lg z-50">
           <LanguageDropdownLinks
             locale={locale}
             pathWithoutLocale={pathWithoutLocale}

@@ -11,7 +11,7 @@ export default function Footer() {
   const isHome = /^\/(vi|en)\/?$/.test(pathname);
 
   return (
-    <footer className="bg-[#707070] text-white mt-16">
+    <footer className="bg-chrome text-white mt-16">
       <div className={`container-page ${isHome ? "py-8" : "pb-8 pt-10"}`}>
         {/* Logo */}
         <div className={isHome ? "mb-6" : "mb-8"}>
