@@ -45,7 +45,8 @@ export interface Flight {
   flight_no: string;
   aircraft_type: string | null;
   capacity: number | null;
-  route: string | null;
+  dep: string | null;
+  arr: string | null;
   srtd: string | null;
   atd: string | null;
   note: string | null;

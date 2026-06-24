@@ -5,7 +5,8 @@ export interface FlightRow {
   type: string;
   capacity: number | string;
   flightNo: string;
-  route: string;
+  departure: string;
+  arrival: string;
   srtd: string;
   atd: string;
   note: string;
@@ -53,10 +54,6 @@ export default function FlightTable({
       {/* Mobile: stacked cards, one card per flight; 2 cards per row when wide enough */}
       <div className="md:hidden grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
         {rows.map((row, idx) => {
-          const [origin, destination] = row.route
-            .split("-")
-            .map((part) => part.trim());
-
           return (
             <div
               key={idx}
@@ -73,28 +70,22 @@ export default function FlightTable({
                   </span>
                 </div>
 
-                {origin && destination ? (
-                  <div className="flex items-center justify-between gap-3 pt-4 pb-6 mb-1 border-b border-gray-200">
-                    <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                      {origin}
-                    </span>
-                    <div className="flex-1 flex items-center gap-2">
-                      <div className="flex-1 border-t border-dashed border-gray-300" />
-                      <Plane
-                        className="w-4 h-4 text-gray-400 flex-shrink-0 rotate-45"
-                        strokeWidth={2}
-                      />
-                      <div className="flex-1 border-t border-dashed border-gray-300" />
-                    </div>
-                    <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                      {destination}
-                    </span>
+                <div className="flex items-center justify-between gap-3 pt-4 pb-6 mb-1 border-b border-gray-200">
+                  <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                    {row.departure}
+                  </span>
+                  <div className="flex-1 flex items-center gap-2">
+                    <div className="flex-1 border-t border-dashed border-gray-300" />
+                    <Plane
+                      className="w-4 h-4 text-gray-400 flex-shrink-0 rotate-45"
+                      strokeWidth={2}
+                    />
+                    <div className="flex-1 border-t border-dashed border-gray-300" />
                   </div>
-                ) : (
-                  <p className="text-sm font-medium text-gray-700 py-4 mb-3 border-b-2 border-gray-200">
-                    {row.route}
-                  </p>
-                )}
+                  <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                    {row.arrival}
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm text-center pt-2">
@@ -166,7 +157,9 @@ export default function FlightTable({
                 <td className="py-3 pr-8 text-gray-600">{row.type}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.capacity}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.flightNo}</td>
-                <td className="py-3 pr-8 text-gray-600">{row.route}</td>
+                <td className="py-3 pr-8 text-gray-600">
+                  {row.departure} - {row.arrival}
+                </td>
                 <td className="py-3 pr-8 text-gray-600">{row.srtd}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.atd}</td>
                 <td className="py-3 pr-8 text-gray-500">
