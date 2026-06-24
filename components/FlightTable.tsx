@@ -1,3 +1,5 @@
+import { Plane, Tag, Users } from "lucide-react";
+
 export interface FlightRow {
   no: number | string;
   type: string;
@@ -49,36 +51,91 @@ export default function FlightTable({
       <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
 
       {/* Mobile: stacked cards, one card per flight; 2 cards per row when wide enough */}
-      <div className="md:hidden grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
-        {rows.map((row, idx) => (
-          <div
-            key={idx}
-            className="border border-gray-200 rounded-2xl bg-white shadow-sm p-4"
-          >
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-200">
-              <span className="font-semibold text-gray-900">
-                {row.flightNo}
-              </span>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                {row.note}
-              </span>
-            </div>
-            <dl className="space-y-1.5 text-sm">
-              {[
-                [h.type, row.type],
-                [h.capacity, row.capacity],
-                [h.srtd, row.srtd],
-                [h.atd, row.atd],
-                [h.route, row.route],
-              ].map(([label, value]) => (
-                <div key={label} className="flex items-center justify-between">
-                  <dt className="text-gray-400">{label}</dt>
-                  <dd className="text-gray-700 font-medium">{value}</dd>
+      <div className="md:hidden grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+        {rows.map((row, idx) => {
+          const [origin, destination] = row.route
+            .split("-")
+            .map((part) => part.trim());
+
+          return (
+            <div
+              key={idx}
+              className="border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden"
+            >
+              <div className="px-4 pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="flex items-center gap-1.5 font-semibold text-gray-900">
+                    <Plane className="w-4 h-4 text-gray-400" strokeWidth={2} />
+                    {row.flightNo}
+                  </span>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {row.note}
+                  </span>
                 </div>
-              ))}
-            </dl>
-          </div>
-        ))}
+
+                {origin && destination ? (
+                  <div className="flex items-center justify-between gap-3 pt-4 pb-6 mb-1 border-b border-gray-200">
+                    <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                      {origin}
+                    </span>
+                    <div className="flex-1 flex items-center gap-2">
+                      <div className="flex-1 border-t border-dashed border-gray-300" />
+                      <Plane
+                        className="w-4 h-4 text-gray-400 flex-shrink-0 rotate-45"
+                        strokeWidth={2}
+                      />
+                      <div className="flex-1 border-t border-dashed border-gray-300" />
+                    </div>
+                    <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                      {destination}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-sm font-medium text-gray-700 py-4 mb-3 border-b-2 border-gray-200">
+                    {row.route}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm text-center py-2">
+                <div className="flex flex-col justify-center">
+                  <p className="text-xs text-gray-400 mb-1">{h.srtd}</p>
+                  <p className="text-lg font-bold text-gray-900">{row.srtd}</p>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <p className="text-xs text-gray-400 mb-1">{h.atd}</p>
+                  <p className="text-lg font-bold text-gray-900">{row.atd}</p>
+                </div>
+              </div>
+
+              <div className="mx-4 border-b border-gray-200" />
+
+              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm py-4">
+                <div className="flex items-center justify-center gap-2">
+                  <Tag
+                    className="w-4 h-4 text-gray-400 flex-shrink-0"
+                    strokeWidth={2}
+                  />
+                  <div>
+                    <p className="text-gray-400 text-xs">{h.type}</p>
+                    <p className="font-medium text-gray-700">{row.type}</p>
+                  </div>
+                  <div className="w-3 flex-shrink-0" aria-hidden="true" />
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Users
+                    className="w-4 h-4 text-gray-400 flex-shrink-0"
+                    strokeWidth={2}
+                  />
+                  <div>
+                    <p className="text-gray-400 text-xs">{h.capacity}</p>
+                    <p className="font-medium text-gray-700">{row.capacity}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Desktop / tablet: table */}
