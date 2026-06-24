@@ -35,7 +35,7 @@ export default async function PressReleases({
     getAssetUrl(latest.cover_image) ?? `${basePath}/images/airplane.jpg`;
 
   return (
-    <div className="container-page pt-16 pb-8 md:py-8">
+    <div className="container-page pt-4 pb-8 md:py-8">
       <div className="md:bg-white md:border md:border-gray-200 md:rounded-2xl md:shadow-sm md:p-8">
         <ArticleContent
           title={translation.title}

@@ -65,10 +65,11 @@ export default function Navbar({ locale }: NavbarProps) {
   };
 
   return (
-    <header
-      ref={headerRef}
-      className="sticky top-0 z-50 w-full bg-chrome text-white"
-    >
+    <>
+      <header
+        ref={headerRef}
+        className="sticky top-0 z-50 w-full bg-chrome text-white"
+      >
       <div className="container-page">
         <div className="flex items-stretch h-14">
           {/* Logo */}
@@ -264,42 +265,44 @@ export default function Navbar({ locale }: NavbarProps) {
         })}
       </div>
 
-      {/* Mobile breadcrumb: cho biết đang ở trang nào vì navbar mobile không hiện active tab */}
+      </header>
+
+      {/* Mobile breadcrumb: sticky ngay dưới navbar trong lúc cuộn nội dung;
+          cùng containing block với navbar (kết thúc trước footer) nhưng nằm thấp hơn
+          nên tự nhả sticky sớm hơn navbar khi cuộn gần tới footer */}
       {activeItem && (
-        <div className="md:hidden absolute w-full">
-          <div className="relative px-4 pt-4 pb-6">
-            {/* Fade nội dung phía dưới breadcrumb vào màu nền trang */}
-            <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
-            <div
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
-              bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
+        <div className="md:hidden sticky top-14 z-10 px-4 pt-4 pb-6">
+          {/* Fade nội dung phía dưới breadcrumb vào màu nền trang khi nó trôi qua bên dưới */}
+          <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
+          <div
+            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+            bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
+          >
+            <Link
+              href={`/${locale}`}
+              className="text-gray-700 hover:text-gray-950"
             >
-              <Link
-                href={`/${locale}`}
-                className="text-gray-700 hover:text-gray-950"
-              >
-                {t("home")}
-              </Link>
+              {t("home")}
+            </Link>
 
-              <svg
-                className="w-3 h-3 text-gray-400 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+            <svg
+              className="w-3 h-3 text-gray-400 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
 
-              <span className="font-medium truncate">{activeItem.label}</span>
-            </div>
+            <span className="font-medium truncate">{activeItem.label}</span>
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }

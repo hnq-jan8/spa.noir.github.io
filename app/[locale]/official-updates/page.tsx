@@ -31,7 +31,7 @@ export default async function OfficialUpdates({
   });
 
   return (
-    <div className="container-page pt-12 pb-8 md:py-8">
+    <div className="container-page pt-4 pb-8 md:py-8">
       <div className="mx-1 sm:mx-1.5 lg:mx-2">
         <TimelineCarousel items={items} />
       </div>

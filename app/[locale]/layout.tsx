@@ -51,8 +51,15 @@ export default async function LocaleLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <RememberLocale locale={locale} />
           <div className="flex flex-col min-h-screen bg-page">
-            <Navbar locale={locale} />
-            <main className="flex-1">{children}</main>
+            {/* Navbar sticky chỉ trong phạm vi khối này, nhả ra trước khi tới footer.
+                Khoảng cách trước footer đặt ở đây (thay vì margin trên Footer) để nó
+                vẫn nằm trong containing block của navbar, không tạo "vùng chết" lệch
+                pha với hiệu ứng sticky. Tô cùng màu chrome với header/footer để
+                navbar trôi đi không để lộ khoảng trắng giữa đường. */}
+            <div className="flex flex-col flex-1">
+              <Navbar locale={locale} />
+              <main className="flex-1">{children}</main>
+            </div>
             <Footer />
           </div>
         </NextIntlClientProvider>
