@@ -109,7 +109,7 @@ export default function FlightTable({
                   />
                   <div>
                     <p className="text-gray-400 text-xs">{h.type}</p>
-                    <p className="font-medium text-gray-700">{row.type}</p>
+                    <p className="font-medium text-gray-900">{row.type}</p>
                   </div>
                   <div className="w-3 flex-shrink-0" aria-hidden="true" />
                 </div>
@@ -120,7 +120,7 @@ export default function FlightTable({
                   />
                   <div>
                     <p className="text-gray-400 text-xs">{h.capacity}</p>
-                    <p className="font-medium text-gray-700">{row.capacity}</p>
+                    <p className="font-medium text-gray-900">{row.capacity}</p>
                   </div>
                 </div>
               </div>
