@@ -39,7 +39,7 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
   };
 
   return (
-    <div className="py-8 md:py-12">
+    <div>
       {/* ── Desktop layout (lg+): horizontal scroll ── */}
       <div className="hidden lg:block relative">
         {/* Left fade gradient — width matches scroll padding (px-8 = 32px = w-8) */}
