@@ -269,7 +269,7 @@ export default function Navbar({ locale }: NavbarProps) {
         <div className="md:hidden absolute w-full">
           <div className="relative px-4 pt-4 pb-6">
             {/* Fade nội dung phía dưới breadcrumb vào màu nền trang */}
-            <div className="absolute inset-x-0 top-0 h-11 bg-gradient-to-t from-transparent to-page pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
             <div
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
               bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full"
