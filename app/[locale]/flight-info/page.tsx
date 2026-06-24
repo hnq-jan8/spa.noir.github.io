@@ -64,7 +64,7 @@ export default async function FlightInfo({
         />
         <div className="mt-10">
           <h2 className="section-title">{t("policy")}</h2>
-          <p className="text-sm text-gray-700 leading-relaxed max-w-3xl">
+          <p className="text-sm text-gray-700 leading-relaxed max-w-3xl whitespace-pre-line">
             {flightPolicy}
           </p>
         </div>
