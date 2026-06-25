@@ -74,7 +74,7 @@ export default async function Home({
             <Megaphone className="w-4 h-4" strokeWidth={2} />
             {tHome("officialUpdateBadge")}
           </p>
-          <h2 className="font-bold text-lg mb-2">{tHome("officialUpdateTitle")}</h2>
+          <h2 className="font-bold text-lg mb-2">{latestTr.title}</h2>
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
             {latestTr.description}
           </p>

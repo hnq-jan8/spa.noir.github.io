@@ -160,7 +160,9 @@ export default function FlightTable({
                 <td className="py-3 pr-8 text-gray-600">{row.capacity}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.flightNo}</td>
                 <td className="py-3 pr-8 text-gray-600">
-                  {row.departure} - {row.arrival}
+                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    {row.departure} - {row.arrival}
+                  </span>
                 </td>
                 <td className="py-3 pr-8 text-gray-600">{row.srtd}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.atd}</td>
