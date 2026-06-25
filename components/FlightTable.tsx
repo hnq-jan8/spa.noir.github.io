@@ -70,8 +70,8 @@ export default function FlightTable({
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 pt-4 pb-6 mb-1 border-b border-gray-200">
-                  <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                <div className="flex gap-3 max-w-xs px-2 py-3 mx-auto items-center justify-center">
+                  <span className="text-3xl font-semibold text-gray-900 tracking-tight">
                     {row.departure}
                   </span>
                   <div className="flex-1 flex items-center gap-2">
@@ -82,13 +82,15 @@ export default function FlightTable({
                     />
                     <div className="flex-1 border-t border-dashed border-gray-300" />
                   </div>
-                  <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                  <span className="text-3xl font-semibold text-gray-900 tracking-tight">
                     {row.arrival}
                   </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm text-center pt-2">
+              <div className="mx-4 border-b pt-4 border-gray-200" />
+
+              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm text-center pt-4">
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-400 mb-1">{h.srtd}</p>
                   <p className="text-lg font-bold text-gray-900">{row.srtd}</p>
