@@ -55,13 +55,20 @@ export default async function Home({
 
   return (
     <div className="container-page py-8 md:py-11 max-w-3xl mx-auto">
-      {/* As-of timestamp */}
-      <div className="flex items-start gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-2xl px-4 py-3 mb-4">
-        <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5" />
-        <p className="flex flex-wrap gap-x-1">
-          <span>{tHome("asOf")}:</span>
-          <span className="whitespace-nowrap">{asOf}</span>
-        </p>
+      {/* As-of timestamp: sticky ngay dưới navbar khi cuộn, giống hành vi breadcrumb */}
+      <div className="sticky top-16 z-10 mb-4">
+        {/* Fade nội dung phía dưới vào màu nền trang khi nó trôi qua bên dưới */}
+        <div className="absolute inset-x-0 -top-2 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
+        <div
+          className="relative flex -top-0 items-start gap-2 text-sm text-gray-500 rounded-2xl px-4 py-3 bg-white/75
+                     backdrop-blur-md shadow-md shadow-gray-200/50 border border-gray-200"
+        >
+          <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5 animate-pulse" />
+          <p className="flex flex-wrap gap-x-1">
+            <span>{tHome("asOf")}:</span>
+            <span className="whitespace-nowrap">{asOf}</span>
+          </p>
+        </div>
       </div>
 
       {/* Official update preview */}

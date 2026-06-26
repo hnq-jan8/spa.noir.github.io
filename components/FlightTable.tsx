@@ -90,7 +90,7 @@ export default function FlightTable({
 
               <div className="mx-4 border-b pt-4 border-gray-200" />
 
-              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm text-center pt-4">
+              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm text-center pt-3">
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-400 mb-1">{h.srtd}</p>
                   <p className="text-lg font-bold text-gray-900">{row.srtd}</p>
