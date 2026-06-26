@@ -1,4 +1,4 @@
-import { Plane, Tag, Users } from "lucide-react";
+import { ArrowRight, Plane, Tag, Users } from "lucide-react";
 
 export interface FlightRow {
   no: number | string;
@@ -132,40 +132,62 @@ export default function FlightTable({
       </div>
 
       {/* Desktop / tablet: table */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead>
+      <div className="hidden md:block -mx-6 overflow-x-auto max-h-[70vh] px-6">
+        <table className="w-full min-w-[760px] text-sm text-left whitespace-nowrap">
+          <thead className="sticky top-0 bg-white z-10">
             <tr className="border-b border-gray-200">
-              {[
-                h.no,
-                h.type,
-                h.capacity,
-                h.flightNo,
-                h.route,
-                h.srtd,
-                h.atd,
-                h.note,
-              ].map((label) => (
-                <th key={label} className="py-2 pr-8 font-bold text-gray-900">
-                  {label}
-                </th>
-              ))}
+              <th className="py-2 pr-8 font-bold text-gray-900 text-center">
+                {h.no}
+              </th>
+              <th className="py-2 pr-8 font-bold text-gray-900">{h.type}</th>
+              <th className="py-2 pr-8 font-bold text-gray-900">
+                {h.capacity}
+              </th>
+              <th className="py-2 pr-8 font-bold text-gray-900">
+                {h.flightNo}
+              </th>
+              <th className="py-2 pr-8 font-bold text-gray-900">{h.route}</th>
+              <th className="py-2 pr-8 font-bold text-gray-900 text-center">
+                {h.srtd}
+              </th>
+              <th className="py-2 pr-8 font-bold text-gray-900 text-center">
+                {h.atd}
+              </th>
+              <th className="py-2 pr-8 font-bold text-gray-900">{h.note}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, idx) => (
               <tr key={idx} className="border-b border-gray-100">
-                <td className="py-3 pr-8 text-gray-600">{row.no}</td>
+                <td className="py-3 pr-8 text-gray-600 text-center">
+                  {row.no}
+                </td>
                 <td className="py-3 pr-8 text-gray-600">{row.type}</td>
                 <td className="py-3 pr-8 text-gray-600">{row.capacity}</td>
-                <td className="py-3 pr-8 text-gray-600">{row.flightNo}</td>
-                <td className="py-3 pr-8 text-gray-600">
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                    {row.departure} - {row.arrival}
+                <td className="py-3 pr-8 font-semibold text-gray-700">
+                  {row.flightNo}
+                </td>
+                <td className="py-3 pr-8">
+                  <span className="inline-flex items-center gap-2 text-xs bg-gray-100 px-2 py-1 rounded">
+                    <Plane
+                      className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
+                      strokeWidth={2}
+                    />
+                    <span className="font-semibold text-gray-700">
+                      {row.departure}
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                    <span className="font-semibold text-gray-700">
+                      {row.arrival}
+                    </span>
                   </span>
                 </td>
-                <td className="py-3 pr-8 text-gray-600">{row.srtd}</td>
-                <td className="py-3 pr-8 text-gray-600">{row.atd}</td>
+                <td className="py-3 pr-8 text-gray-600 text-center">
+                  {row.srtd}
+                </td>
+                <td className="py-3 pr-8 text-gray-600 text-center">
+                  {row.atd}
+                </td>
                 <td className="py-3 pr-8 text-gray-500">
                   <span className="text-xs bg-gray-100 px-2 py-1 rounded">
                     {row.note}
