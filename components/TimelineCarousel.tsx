@@ -74,7 +74,7 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         {/* Scrollable row — padding inside so start/end content stays visible at scroll edges */}
         <div
           ref={scrollRef}
-          className="flex overflow-x-auto gap-0 px-8 overflow-y-clip"
+          className="flex overflow-x-auto gap-1 px-8 overflow-y-clip"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
@@ -82,11 +82,11 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
           }}
         >
           {items.map((item, idx) => (
-            <div key={idx} className="flex flex-col flex-shrink-0 w-64">
+            <div key={idx} className="flex flex-col flex-shrink-0 w-80">
               {/* Card */}
               <div className="timeline-card">
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                   {item.description}
                 </p>
               </div>
@@ -143,7 +143,7 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
             </div>
             <div className="flex-1 pb-2">
               <h3 className="text-lg font-bold mb-1">{item.title}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-1">
+              <p className="text-sm text-gray-600 leading-relaxed mb-1 whitespace-pre-line">
                 {item.description}
               </p>
               {item.date && (

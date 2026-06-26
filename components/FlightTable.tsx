@@ -101,9 +101,9 @@ export default function FlightTable({
                 </div>
               </div>
 
-              <div className="mx-4 border-b pt-4 border-gray-200" />
+              <div className="mx-4 border-b pt-3 border-gray-200" />
 
-              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm py-4 min-h-[72px]">
+              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm py-3 min-h-[74px]">
                 <div className="flex items-center justify-center gap-2">
                   <Tag
                     className="w-4 h-4 text-gray-400 flex-shrink-0"
