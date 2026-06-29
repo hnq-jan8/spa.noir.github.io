@@ -133,10 +133,7 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   return get("/items/site_config/1?fields=*,translations.*");
 }
 
-export async function getAppSetting(): Promise<AppSetting> {
-  // Cổng bật/tắt toàn bộ build — luôn đọc giá trị mới nhất từ Directus, phá
-  // cache fetch của Next (force-cache theo URL) để tránh đổi active xong build
-  // lại vẫn đọc giá trị cũ.
+export async function getIsActiveFromAppSetting(): Promise<AppSetting> {
   return get("/items/app_setting?fields=active", { bustCache: true });
 }
 

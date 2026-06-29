@@ -1,4 +1,4 @@
-import { getAppSetting, getSiteConfig } from "@/lib/directus";
+import { getIsActiveFromAppSetting, getSiteConfig } from "@/lib/directus";
 
 export interface BuildMode {
   active: boolean;
@@ -12,7 +12,7 @@ let cached: BuildMode | null = null;
 export async function getBuildMode(): Promise<BuildMode> {
   if (cached) return cached;
   const [setting, config] = await Promise.all([
-    getAppSetting(),
+    getIsActiveFromAppSetting(),
     getSiteConfig(),
   ]);
   cached = {
