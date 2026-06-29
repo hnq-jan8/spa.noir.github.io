@@ -7,7 +7,9 @@ interface FaqItem {
 }
 
 export default function FaqAccordion({ items }: { items: FaqItem[] }) {
-  const [openSet, setOpenSet] = useState<Set<number>>(new Set([0]));
+  const [openSet, setOpenSet] = useState<Set<number>>(
+    () => new Set(items.map((_, i) => i)),
+  );
 
   const toggle = (i: number) => {
     setOpenSet((prev) => {
