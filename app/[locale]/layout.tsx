@@ -6,7 +6,9 @@ import { routing } from "@/i18n/routing";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RememberLocale from "@/components/RememberLocale";
+import RedirectToOfficial from "@/components/RedirectToOfficial";
 import { COLORS } from "@/lib/theme-colors";
+import { getBuildMode } from "@/lib/buildMode";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -42,6 +44,20 @@ export default async function LocaleLayout({
 
   // Required for static export: tells next-intl locale without reading headers()
   setRequestLocale(locale);
+
+  const { active, officialSiteUrl } = await getBuildMode();
+  if (!active) {
+    return (
+      <html lang={locale}>
+        <head>
+          <meta httpEquiv="refresh" content={`0;url=${officialSiteUrl}`} />
+        </head>
+        <body>
+          <RedirectToOfficial url={officialSiteUrl} />
+        </body>
+      </html>
+    );
+  }
 
   const messages = (await import(`../../messages/${locale}.json`)).default;
 

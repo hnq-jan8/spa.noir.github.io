@@ -86,6 +86,10 @@ export interface SiteConfig {
   translations: SiteConfigTranslation[];
 }
 
+export interface AppSetting {
+  active: boolean;
+}
+
 // ─── Fetch functions (một lần gọi, đủ tất cả locale) ─────────────────────────
 
 export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
@@ -116,6 +120,10 @@ export async function getPressReleases(): Promise<PressRelease[]> {
 
 export async function getSiteConfig(): Promise<SiteConfig> {
   return get("/items/site_config/1?fields=*,translations.*");
+}
+
+export async function getAppSetting(): Promise<AppSetting> {
+  return get("/items/app_setting?fields=active");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
