@@ -79,7 +79,7 @@ export default async function Home({
       {latestUpdate && latestTr && (
         <Link
           href={`/${locale}/official-updates`}
-          className="block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow mb-4"
+          className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:outline hover:outline-[1.5px] hover:-outline-offset-[1.5px] hover:outline-amber-600 transition-colors mb-4"
         >
           <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
             <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -93,7 +93,10 @@ export default async function Home({
             <span className="text-gray-400">{latestUpdate.date}</span>
             <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
               {tHome("viewAll")}
-              <ChevronRight className="w-3.5 h-3.5" strokeWidth={2} />
+              <ChevronRight
+                className="w-3.5 h-4 pt-0.5 transition-transform group-hover:translate-x-1"
+                strokeWidth={2}
+              />
             </span>
           </div>
         </Link>
@@ -125,7 +128,7 @@ export default async function Home({
           <Link
             key={page.href}
             href={page.href}
-            className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
+            className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:outline hover:outline-[1.5px] hover:-outline-offset-[1.5px] hover:outline-gray-400 transition-colors p-6"
           >
             <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
               <page.Icon
@@ -140,7 +143,7 @@ export default async function Home({
               </div>
             </div>
             <ChevronRight
-              className="w-5 h-5 text-gray-300 flex-shrink-0"
+              className="w-5 h-5 text-gray-300 flex-shrink-0 transition-colors group-hover:text-gray-400"
               strokeWidth={2}
             />
           </Link>
@@ -150,7 +153,7 @@ export default async function Home({
       {/* Press releases */}
       <Link
         href={`/${locale}/press-releases`}
-        className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
+        className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:outline hover:outline-[1.5px] hover:-outline-offset-[1.5px] hover:outline-gray-400 transition-colors p-6"
       >
         <div className="flex items-center gap-4">
           <FileText
@@ -165,7 +168,7 @@ export default async function Home({
           </div>
         </div>
         <ChevronRight
-          className="w-5 h-5 text-gray-300 flex-shrink-0"
+          className="w-5 h-5 text-gray-300 flex-shrink-0 transition-colors group-hover:text-gray-400"
           strokeWidth={2}
         />
       </Link>
