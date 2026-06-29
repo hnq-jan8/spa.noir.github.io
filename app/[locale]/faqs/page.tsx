@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import FaqAccordion from "@/components/FaqAccordion";
 import { getFaqs, t as tr } from "@/lib/directus";
+import { getBuildMode } from "@/lib/buildMode";
 
 export async function generateMetadata({
   params,
@@ -19,6 +20,9 @@ export default async function Faqs({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const { active } = await getBuildMode();
+  if (!active) return null;
 
   const faqs = await getFaqs();
   const items = faqs.map((faq) => {

@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ArticleContent from "@/components/ArticleContent";
 import { getPressReleases, getAssetUrl, t as tr } from "@/lib/directus";
+import { getBuildMode } from "@/lib/buildMode";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -21,6 +22,9 @@ export default async function PressReleases({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const { active } = await getBuildMode();
+  if (!active) return null;
 
   const releases = await getPressReleases();
   const latest = releases[0];

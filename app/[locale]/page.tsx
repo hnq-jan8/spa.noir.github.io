@@ -14,6 +14,7 @@ import {
   t as tr,
 } from "@/lib/directus";
 import { getBuildTimestamp } from "@/lib/siteData";
+import { getBuildMode } from "@/lib/buildMode";
 
 export default async function Home({
   params,
@@ -22,6 +23,9 @@ export default async function Home({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const { active } = await getBuildMode();
+  if (!active) return null;
 
   const [tHome, tNav, tSupport] = await Promise.all([
     getTranslations({ locale, namespace: "home" }),

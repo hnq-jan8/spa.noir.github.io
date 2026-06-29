@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import FlightTable from "@/components/FlightTable";
 import { getFlights, getSiteConfig, t as tr } from "@/lib/directus";
+import { getBuildMode } from "@/lib/buildMode";
 
 function formatTime(time: string | null): string {
   if (!time) return "–";
@@ -24,6 +25,9 @@ export default async function FlightInfo({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const { active } = await getBuildMode();
+  if (!active) return null;
 
   const [t, flights, config] = await Promise.all([
     getTranslations({ locale, namespace: "flightInfo" }),

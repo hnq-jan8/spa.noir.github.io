@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import TimelineCarousel from "@/components/TimelineCarousel";
 import { getOfficialUpdates, t as tr } from "@/lib/directus";
+import { getBuildMode } from "@/lib/buildMode";
 
 export async function generateMetadata({
   params,
@@ -19,6 +20,9 @@ export default async function OfficialUpdates({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const { active } = await getBuildMode();
+  if (!active) return null;
 
   const updates = await getOfficialUpdates();
   const items = updates.map((u) => {
