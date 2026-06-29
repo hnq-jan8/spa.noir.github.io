@@ -1,8 +1,19 @@
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
 
-async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+// Một giá trị duy nhất cho cả lần build, dùng để "phá cache" cho những query
+// cần đọc dữ liệu mới nhất (ví dụ app_setting) mà vẫn giữ route ở dạng static
+// (dùng cache: "no-store" sẽ khiến Next coi route là dynamic, không export được).
+const BUILD_NONCE = Date.now().toString();
+
+async function get<T>(
+  path: string,
+  opts?: { bustCache?: boolean },
+): Promise<T> {
+  const url = opts?.bustCache
+    ? `${BASE}${path}${path.includes("?") ? "&" : "?"}_=${BUILD_NONCE}`
+    : `${BASE}${path}`;
+  const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${TOKEN}`,
       "ngrok-skip-browser-warning": "true",
@@ -123,7 +134,10 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 }
 
 export async function getAppSetting(): Promise<AppSetting> {
-  return get("/items/app_setting?fields=active");
+  // Cổng bật/tắt toàn bộ build — luôn đọc giá trị mới nhất từ Directus, phá
+  // cache fetch của Next (force-cache theo URL) để tránh đổi active xong build
+  // lại vẫn đọc giá trị cũ.
+  return get("/items/app_setting?fields=active", { bustCache: true });
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
