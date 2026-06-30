@@ -1,13 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import RememberLocale from "@/components/RememberLocale";
-import RedirectToOfficial from "@/components/RedirectToOfficial";
-import ActivePoller from "@/components/ActivePoller";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import RememberLocale from "@/components/sys/RememberLocale";
+import RedirectToOfficial from "@/components/sys/RedirectToOfficial";
+import ActivePoller from "@/components/sys/ActivePoller";
 import { COLORS } from "@/lib/theme-colors";
 import { getBuildMode } from "@/lib/buildMode";
 import "../globals.css";
@@ -43,7 +42,6 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  // Required for static export: tells next-intl locale without reading headers()
   setRequestLocale(locale);
 
   const { active, officialSiteUrl } = await getBuildMode();
@@ -60,22 +58,18 @@ export default async function LocaleLayout({
     );
   }
 
-  const messages = (await import(`../../messages/${locale}.json`)).default;
-
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <RememberLocale locale={locale} />
-          <ActivePoller officialSiteUrl={officialSiteUrl} />
-          <div className="flex flex-col min-h-screen bg-page">
-            <div className="flex flex-col flex-1">
-              <Navbar locale={locale} />
-              <main className="flex-1">{children}</main>
-            </div>
-            <Footer />
+        <RememberLocale />
+        <ActivePoller officialSiteUrl={officialSiteUrl} />
+        <div className="flex flex-col min-h-screen bg-page">
+          <div className="flex flex-col flex-1">
+            <Navbar />
+            <main className="flex-1">{children}</main>
           </div>
-        </NextIntlClientProvider>
+          <Footer />
+        </div>
       </body>
     </html>
   );

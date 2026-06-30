@@ -1,19 +1,19 @@
 "use client";
+
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { supportContacts } from "@/lib/siteData";
+import { useContentData } from "@/hooks/useContentData";
 
 export default function Footer() {
-  const t = useTranslations("footer");
-  const ts = useTranslations("support");
   const pathname = usePathname();
   const isHome = /^\/(vi|en)\/?$/.test(pathname);
+  const data = useContentData();
+  const footer = data?.labels["footer"];
+  const support = data?.labels["support"];
 
   return (
     <footer className="bg-chrome text-white">
       <div className={`container-page ${isHome ? "py-8" : "pb-8 pt-10"}`}>
-        {/* Logo */}
         <div className={isHome ? "mb-6" : "mb-8"}>
           <Image
             src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`}
@@ -24,13 +24,13 @@ export default function Footer() {
           />
         </div>
 
-        {/* Contact info — moved onto the page itself for the homepage */}
-        {!isHome && (
+        {/* Contact info — chỉ hiện ở các trang con, trang chủ đã có riêng */}
+        {!isHome && data && support && (
           <div className="grid grid-cols-1 min-[510px]:grid-cols-2 lg:grid-cols-4 gap-6">
-            {supportContacts.map((card) => (
+            {data.contacts.map((card) => (
               <div key={card.key}>
                 <p className="text-xs text-gray-300 mb-1 uppercase tracking-wide">
-                  {ts(card.key)}
+                  {support[card.key]}
                 </p>
                 <p className="text-sm font-semibold text-white">{card.value}</p>
               </div>
@@ -38,7 +38,6 @@ export default function Footer() {
           </div>
         )}
 
-        {/* Bottom bar */}
         <div
           className={`${
             isHome ? "mt-0" : "mt-10 pt-6 border-t border-white/20"
@@ -53,22 +52,12 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 transition-colors text-white text-sm px-5 py-2 rounded-xl shadow-sm"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
               <polyline points="15 3 21 3 21 9" />
               <line x1="10" y1="14" x2="21" y2="3" />
             </svg>
-            {t("officialSite")}
+            {footer?.["officialSite"]}
           </a>
         </div>
       </div>

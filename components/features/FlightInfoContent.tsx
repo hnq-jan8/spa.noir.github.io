@@ -1,0 +1,39 @@
+"use client";
+
+import FlightTable from "@/components/ui/FlightTable";
+import { useContentData } from "@/hooks/useContentData";
+
+export default function FlightInfoContent() {
+  const data = useContentData();
+
+  if (!data) return null;
+
+  const fi = data.labels["flightInfo"];
+
+  return (
+    <div className="container-page pt-4 pb-8 md:py-8">
+      <div className="md:bg-white md:border md:border-gray-200 md:rounded-2xl md:shadow-sm md:p-6">
+        <FlightTable
+          title={fi["title"]}
+          rows={data.flights}
+          headers={{
+            no: fi["no"],
+            type: fi["type"],
+            capacity: fi["capacity"],
+            flightNo: fi["flightNo"],
+            route: fi["route"],
+            srtd: fi["srtd"],
+            atd: fi["atd"],
+            note: fi["note"],
+          }}
+        />
+        <div className="mt-10">
+          <h2 className="section-title">{fi["policy"]}</h2>
+          <p className="text-sm text-gray-700 leading-relaxed max-w-3xl whitespace-pre-line">
+            {data.flightPolicy}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
