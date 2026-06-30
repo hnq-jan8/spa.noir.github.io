@@ -9,7 +9,7 @@ import {
   MobileLanguageSelector,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
-import { useContentData } from "@/hooks/useContentData";
+import { useContentData, invalidateContent } from "@/hooks/useContentData";
 
 export default function Navbar() {
   const params = useParams();
@@ -108,6 +108,7 @@ export default function Navbar() {
                       <Link
                         key={item.href}
                         href={item.href}
+                        onClick={isActive ? () => invalidateContent() : undefined}
                         className={`text-xs whitespace-nowrap px-4 flex items-center transition-colors relative flex-shrink-0 ${
                           isActive ? "text-white font-medium bg-black/30" : "text-gray-200 hover:text-white hover:bg-black/20"
                         }`}
@@ -174,7 +175,7 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setMenuOpen(false)}
+                onClick={() => { setMenuOpen(false); if (isActive) invalidateContent(); }}
                 className={`block px-6 py-3 text-sm border-b border-black/10 transition-colors ${
                   isActive ? "text-white font-medium bg-black/30" : "text-gray-200 hover:text-white hover:bg-black/20"
                 }`}

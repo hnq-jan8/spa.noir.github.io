@@ -10,6 +10,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 let cachedPromise: Promise<ContentPayload> | null = null;
 let cachedPath: string | null = null;
+const listeners = new Set<() => void>();
 
 function fetchPayload(path: string): Promise<ContentPayload> {
   if (cachedPromise && cachedPath === path) return cachedPromise;
@@ -23,11 +24,24 @@ function fetchPayload(path: string): Promise<ContentPayload> {
   return cachedPromise;
 }
 
+export function invalidateContent() {
+  cachedPromise = null;
+  cachedPath = null;
+  listeners.forEach((l) => l());
+}
+
 export function useContentData(): ContentData | null {
   const params = useParams();
   const locale = (params?.locale as string) ?? routing.defaultLocale;
   const pathname = usePathname();
   const [data, setData] = useState<ContentData | null>(null);
+  const [version, setVersion] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setVersion((v) => v + 1);
+    listeners.add(bump);
+    return () => { listeners.delete(bump); };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,10 +50,8 @@ export function useContentData(): ContentData | null {
         if (!cancelled) setData(resolveLocale(payload, locale));
       })
       .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [locale, pathname]);
+    return () => { cancelled = true; };
+  }, [locale, pathname, version]);
 
   return data;
 }
