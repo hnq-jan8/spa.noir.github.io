@@ -1,11 +1,9 @@
-name: Deploy to GitHub Pages
+name: Deploy layout
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-  repository_dispatch:
-    types: [directus-content-update]
 
 permissions:
   contents: read
@@ -17,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -48,6 +46,13 @@ jobs:
         env:
           DIRECTUS_URL: ${{ vars.DIRECTUS_URL }}
           DIRECTUS_STATIC_TOKEN: ${{ secrets.DIRECTUS_STATIC_TOKEN }}
+
+      - name: Save built site for content updates
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-site
+          path: out
+          retention-days: 90
 
       - uses: actions/configure-pages@v5
 
