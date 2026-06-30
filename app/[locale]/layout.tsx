@@ -5,7 +5,6 @@ import { routing } from "@/i18n/routing";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import RememberLocale from "@/components/sys/RememberLocale";
-import RedirectToOfficial from "@/components/sys/RedirectToOfficial";
 import ActivePoller from "@/components/sys/ActivePoller";
 import { COLORS } from "@/lib/theme-colors";
 import { getBuildMode } from "@/lib/buildMode";
@@ -44,19 +43,7 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  const { active, officialSiteUrl } = await getBuildMode();
-  if (!active) {
-    return (
-      <html lang={locale}>
-        <head>
-          <meta httpEquiv="refresh" content={`0;url=${officialSiteUrl}`} />
-        </head>
-        <body>
-          <RedirectToOfficial url={officialSiteUrl} />
-        </body>
-      </html>
-    );
-  }
+  const { officialSiteUrl } = await getBuildMode();
 
   return (
     <html lang={locale}>
