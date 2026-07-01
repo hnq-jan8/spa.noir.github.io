@@ -3,6 +3,8 @@ import { getIsActiveFromAppSetting, getSiteConfig } from "@/lib/directus";
 export interface BuildMode {
   active: boolean;
   officialSiteUrl: string;
+  seoTitle: Record<string, string>;
+  seoDescription: Record<string, string>;
 }
 
 let cached: BuildMode | null = null;
@@ -18,6 +20,12 @@ export async function getBuildMode(): Promise<BuildMode> {
   cached = {
     active: Boolean(setting.active),
     officialSiteUrl: config.official_site_url,
+    seoTitle: Object.fromEntries(
+      config.translations.map((t) => [t.languages_code, t.seo_title]),
+    ),
+    seoDescription: Object.fromEntries(
+      config.translations.map((t) => [t.languages_code, t.seo_description]),
+    ),
   };
   return cached;
 }

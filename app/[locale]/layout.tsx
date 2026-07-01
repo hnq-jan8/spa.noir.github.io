@@ -10,13 +10,20 @@ import { COLORS } from "@/lib/theme-colors";
 import { getBuildMode } from "@/lib/buildMode";
 import "../globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "Sun PhuQuoc Airways",
-    template: "%s | Sun PhuQuoc Airways",
-  },
-  description: "Official information from Sun PhuQuoc Airways",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const { seoTitle, seoDescription } = await getBuildMode();
+  const title = seoTitle[locale] ?? seoTitle[routing.defaultLocale];
+  const description = seoDescription[locale] ?? seoDescription[routing.defaultLocale];
+  return {
+    title: { default: title, template: `%s | ${title}` },
+    description,
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",

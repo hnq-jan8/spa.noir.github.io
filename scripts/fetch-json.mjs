@@ -6,7 +6,7 @@
  * Usage: node scripts/fetch-json.mjs
  * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN, NEXT_PUBLIC_BASE_PATH
  */
-import { readFileSync, writeFileSync } from "fs";
+import { writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -41,35 +41,36 @@ async function getActive() {
   return Boolean((await res.json()).data.active);
 }
 
-// ─── Build labels từ messages/*.json (không cần next-intl) ──────────────────
+// ─── Build labels từ Directus `ui_labels` (không cần messages/*.json / next-intl) ──
 
-function buildLabels() {
-  const vi = JSON.parse(readFileSync(resolve(root, "messages/vi.json"), "utf8"));
-  const en = JSON.parse(readFileSync(resolve(root, "messages/en.json"), "utf8"));
-  const localeMap = { vi, en };
+function buildLabels(languages, labelRows) {
   const labels = {};
-  for (const ns of Object.keys(vi)) {
-    labels[ns] = {};
-    for (const key of Object.keys(vi[ns])) {
-      labels[ns][key] = Object.fromEntries(
-        Object.entries(localeMap).map(([locale, msgs]) => [locale, msgs[ns]?.[key] ?? ""])
-      );
-    }
+  for (const row of labelRows) {
+    labels[row.namespace] ??= {};
+    labels[row.namespace][row.key] = Object.fromEntries(
+      languages.map((code) => [
+        code,
+        row.translations.find((t) => t.languages_code === code)?.value ?? "",
+      ]),
+    );
   }
   return labels;
 }
 
 // ─── Fetch all data in parallel ──────────────────────────────────────────────
 
-const [rawUpdates, contacts, flights, faqs, releases, config, active] = await Promise.all([
-  get("/items/official_updates?fields=*,translations.*&sort=-date&filter[status][_eq]=published"),
-  get("/items/support_contacts?sort=id&filter[status][_eq]=published"),
-  get("/items/flights?sort=sort&filter[status][_eq]=published"),
-  get("/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published"),
-  get("/items/press_releases?fields=*,translations.*&sort=sort&filter[status][_eq]=published"),
-  get("/items/site_config/1?fields=*,translations.*"),
-  getActive(),
-]);
+const [rawUpdates, contacts, flights, faqs, releases, config, active, languageRows, labelRows] =
+  await Promise.all([
+    get("/items/official_updates?fields=*,translations.*&sort=-date&filter[status][_eq]=published"),
+    get("/items/support_contacts?sort=id&filter[status][_eq]=published"),
+    get("/items/flights?sort=sort&filter[status][_eq]=published"),
+    get("/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published"),
+    get("/items/press_releases?fields=*,translations.*&sort=sort&filter[status][_eq]=published"),
+    get("/items/site_config/1?fields=*,translations.*"),
+    getActive(),
+    get("/items/languages?fields=code&sort=sort"),
+    get("/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1"),
+  ]);
 
 // ─── Build content.json payload (mirrors lib/contentData.ts) ─────────────────
 
@@ -109,7 +110,7 @@ const contentPayload = {
       }
     : null,
   flightPolicy: Object.fromEntries(config.translations.map((t) => [t.languages_code, t.flight_policy])),
-  labels: buildLabels(),
+  labels: buildLabels(languageRows.map((l) => l.code), labelRows),
 };
 
 // ─── Write output ─────────────────────────────────────────────────────────────

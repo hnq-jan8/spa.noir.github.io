@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+/**
+ * Fetches i18n config from Directus (single source of truth for which
+ * locales the site supports + the UI label catalog) and writes:
+ *   - i18n/locales.generated.json   (locales, defaultLocale, language meta)
+ *   - messages/{code}.json          (one file per locale, next-intl format)
+ * Runs before `next dev` / `next build` — i18n/routing.ts and lib/contentData.ts
+ * read the generated output instead of hardcoding locales/labels.
+ *
+ * Usage: node scripts/generate-i18n.mjs
+ * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN
+ */
+import { writeFileSync, mkdirSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = resolve(__dirname, "..");
+
+// Chạy trước `next dev`/`next build` như 1 process Node riêng, nên không được
+// Next.js tự nạp .env.local giúp — tự nạp ở đây (bỏ qua nếu file không tồn tại,
+// vd trên CI thì DIRECTUS_URL/DIRECTUS_STATIC_TOKEN đã có sẵn trong env thật).
+try {
+  process.loadEnvFile(resolve(root, ".env.local"));
+} catch {}
+
+const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
+const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
+
+async function get(path) {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "ngrok-skip-browser-warning": "true",
+    },
+  });
+  if (!res.ok) throw new Error(`Directus ${path} → ${res.status}`);
+  return (await res.json()).data;
+}
+
+const [languageRows, labelRows] = await Promise.all([
+  get("/items/languages?fields=code,name,direction,locale_tag&sort=sort"),
+  get(
+    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1",
+  ),
+]);
+if (!languageRows.length) throw new Error("Directus languages collection is empty");
+
+const languages = languageRows.map((r) => ({
+  code: r.code,
+  name: r.name,
+  direction: r.direction,
+  localeTag: r.locale_tag ?? r.code,
+}));
+
+const localesPayload = {
+  locales: languages.map((l) => l.code),
+  defaultLocale: languages[0].code,
+  languages,
+};
+
+writeFileSync(
+  resolve(root, "i18n/locales.generated.json"),
+  JSON.stringify(localesPayload, null, 2),
+);
+console.log(
+  `✓ i18n/locales.generated.json  (locales: ${localesPayload.locales.join(", ")}, default: ${localesPayload.defaultLocale})`,
+);
+
+// ─── messages/{code}.json — namespace → key → value, theo từng locale ────────
+
+const messagesDir = resolve(root, "messages");
+mkdirSync(messagesDir, { recursive: true });
+
+for (const { code } of languages) {
+  const messages = {};
+  for (const row of labelRows) {
+    const value = row.translations.find((t) => t.languages_code === code)?.value ?? "";
+    messages[row.namespace] ??= {};
+    messages[row.namespace][row.key] = value;
+  }
+  writeFileSync(resolve(messagesDir, `${code}.json`), JSON.stringify(messages, null, 2));
+  console.log(`✓ messages/${code}.json  (${labelRows.length} keys)`);
+}

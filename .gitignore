@@ -5,6 +5,10 @@
 /.next/
 /out/
 
+# sinh lúc build từ Directus (scripts/generate-i18n.mjs)
+/i18n/locales.generated.json
+/messages/*.json
+
 # local preview của GitHub Pages (tạo bởi npm run preview)
 /.preview/
 

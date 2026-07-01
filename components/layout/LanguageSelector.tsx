@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { languages as configuredLanguages } from "@/i18n/routing";
 
 export function useDismissOnOutside(
   containerRef: RefObject<HTMLElement | null>,
@@ -25,10 +26,10 @@ export function useDismissOnOutside(
   }, [containerRef, open, onClose]);
 }
 
-export const languages = [
-  { code: "vi", label: "VI" },
-  { code: "en", label: "EN" },
-] as const;
+export const languages = configuredLanguages.map((lang) => ({
+  code: lang.code,
+  label: lang.code.toUpperCase(),
+}));
 
 function ChevronDownIcon() {
   return (

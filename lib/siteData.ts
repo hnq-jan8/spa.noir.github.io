@@ -1,6 +1,11 @@
+import { routing, languages } from "@/i18n/routing";
+
 export function formatTimestamp(iso: string, locale: string) {
   const date = new Date(iso);
-  const intlLocale = locale === "vi" ? "vi-VN" : "en-US";
+  const intlLocale =
+    languages.find((lang) => lang.code === locale)?.localeTag ??
+    languages.find((lang) => lang.code === routing.defaultLocale)?.localeTag ??
+    locale;
   const datePart = new Intl.DateTimeFormat(intlLocale, {
     timeZone: "Asia/Ho_Chi_Minh",
     day: "2-digit",

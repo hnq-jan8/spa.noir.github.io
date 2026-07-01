@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { routing } from "@/i18n/routing";
+import { routing, languages } from "@/i18n/routing";
 import { getSavedLocale } from "@/i18n/preference";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -44,8 +44,12 @@ export default function LocaleRedirect() {
 
   return (
     <noscript>
-      <a href={`${basePath}/vi/`}>Tiếng Việt</a> |{" "}
-      <a href={`${basePath}/en/`}>English</a>
+      {languages.map((lang, i) => (
+        <span key={lang.code}>
+          {i > 0 && " | "}
+          <a href={`${basePath}/${lang.code}/`}>{lang.name}</a>
+        </span>
+      ))}
     </noscript>
   );
 }

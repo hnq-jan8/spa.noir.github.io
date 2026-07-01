@@ -13,10 +13,11 @@ import {
 import { useContentData } from "@/hooks/useContentData";
 import { formatTimestamp } from "@/lib/siteData";
 import MarkdownContent from "@/components/ui/MarkdownContent";
+import { routing } from "@/i18n/routing";
 
 export default function HomeContent() {
   const params = useParams();
-  const locale = (params?.locale as string) ?? "vi";
+  const locale = (params?.locale as string) ?? routing.defaultLocale;
   const data = useContentData();
 
   if (!data) return null;

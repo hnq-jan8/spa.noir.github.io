@@ -24,7 +24,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            messages
             scripts
           sparse-checkout-cone-mode: false
 

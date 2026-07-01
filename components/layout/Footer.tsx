@@ -3,10 +3,13 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useContentData } from "@/hooks/useContentData";
+import { routing } from "@/i18n/routing";
+
+const homePathPattern = new RegExp(`^/(${routing.locales.join("|")})/?$`);
 
 export default function Footer() {
   const pathname = usePathname();
-  const isHome = /^\/(vi|en)\/?$/.test(pathname);
+  const isHome = homePathPattern.test(pathname);
   const data = useContentData();
   const footer = data?.labels["footer"];
   const support = data?.labels["support"];

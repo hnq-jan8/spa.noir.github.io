@@ -90,6 +90,8 @@ export interface PressRelease {
 export interface SiteConfigTranslation {
   languages_code: string;
   flight_policy: string;
+  seo_title: string;
+  seo_description: string;
 }
 export interface SiteConfig {
   id: number;

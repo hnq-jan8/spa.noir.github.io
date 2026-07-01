@@ -10,10 +10,13 @@ import {
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
+import { routing } from "@/i18n/routing";
+
+const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
 
 export default function Navbar() {
   const params = useParams();
-  const locale = (params?.locale as string) ?? "vi";
+  const locale = (params?.locale as string) ?? routing.defaultLocale;
   const pathname = usePathname();
   const data = useContentData();
   const nav = data?.labels["nav"];
@@ -36,7 +39,7 @@ export default function Navbar() {
       ]
     : [];
 
-  const pathWithoutLocale = pathname.replace(/^\/(vi|en)/, "") || "/";
+  const pathWithoutLocale = pathname.replace(localeSegmentPattern, "") || "/";
   const normalizedPath = pathname.replace(/\/$/, "") || "/";
   const activeItem = navItems.find((item) => item.href === normalizedPath);
 

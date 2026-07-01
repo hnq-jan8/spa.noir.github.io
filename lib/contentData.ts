@@ -8,8 +8,6 @@ import {
   t as tr,
 } from "@/lib/directus";
 import { routing } from "@/i18n/routing";
-import viMessages from "@/messages/vi.json";
-import enMessages from "@/messages/en.json";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -90,15 +88,16 @@ function formatTime(time: string | null): string {
   return time.slice(0, 5);
 }
 
-function buildLabels(): ContentPayload["labels"] {
-  const localeMap: Record<string, Record<string, Record<string, string>>> = {
-    vi: viMessages as Record<string, Record<string, string>>,
-    en: enMessages as Record<string, Record<string, string>>,
-  };
+async function buildLabels(): Promise<ContentPayload["labels"]> {
+  const localeMap: Record<string, Record<string, Record<string, string>>> = {};
+  for (const locale of routing.locales) {
+    localeMap[locale] = (await import(`@/messages/${locale}.json`))
+      .default as Record<string, Record<string, string>>;
+  }
   const labels: ContentPayload["labels"] = {};
-  for (const ns of Object.keys(viMessages)) {
+  for (const ns of Object.keys(localeMap[routing.defaultLocale])) {
     labels[ns] = {};
-    for (const key of Object.keys((viMessages as Record<string, Record<string, string>>)[ns])) {
+    for (const key of Object.keys(localeMap[routing.defaultLocale][ns])) {
       labels[ns][key] = Object.fromEntries(
         Object.entries(localeMap).map(([locale, msgs]) => [
           locale,
@@ -111,7 +110,7 @@ function buildLabels(): ContentPayload["labels"] {
 }
 
 export async function buildContentPayload(): Promise<ContentPayload> {
-  const [rawUpdates, contacts, flights, faqs, releases, config] =
+  const [rawUpdates, contacts, flights, faqs, releases, config, labels] =
     await Promise.all([
       getOfficialUpdates(),
       getSupportContacts(),
@@ -119,6 +118,7 @@ export async function buildContentPayload(): Promise<ContentPayload> {
       getFaqs(),
       getPressReleases(),
       getSiteConfig(),
+      buildLabels(),
     ]);
 
   const latestRelease = releases[0];
@@ -161,7 +161,7 @@ export async function buildContentPayload(): Promise<ContentPayload> {
     flightPolicy: Object.fromEntries(
       config.translations.map((t) => [t.languages_code, t.flight_policy]),
     ),
-    labels: buildLabels(),
+    labels,
   };
 }
 
