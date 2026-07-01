@@ -5,14 +5,11 @@ import {
   getFaqs,
   getPressReleases,
   getSiteConfig,
-  getAssetUrl,
   t as tr,
 } from "@/lib/directus";
 import { routing } from "@/i18n/routing";
 import viMessages from "@/messages/vi.json";
 import enMessages from "@/messages/en.json";
-
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -53,10 +50,8 @@ export interface ContentFaq {
 }
 
 export interface ContentPressRelease {
-  imageSrc: string;
   title: I18n<string>;
   body: I18n<string>;
-  imageAlt: I18n<string>;
 }
 
 export interface ContentPayload {
@@ -80,10 +75,8 @@ export interface ContentData {
   updates: { date: string; title: string; description: string }[];
   faqs: { question: string; answer: string }[];
   pressRelease: {
-    imageSrc: string;
     title: string;
     body: string;
-    imageAlt: string;
   } | null;
   flightPolicy: string;
   /** UI labels đã resolve theo locale hiện tại. */
@@ -157,17 +150,11 @@ export async function buildContentPayload(): Promise<ContentPayload> {
     })),
     pressRelease: latestRelease
       ? {
-          imageSrc:
-            getAssetUrl(latestRelease.cover_image) ??
-            `${basePath}/images/airplane.jpg`,
           title: Object.fromEntries(
             latestRelease.translations.map((t) => [t.languages_code, t.title]),
           ),
           body: Object.fromEntries(
             latestRelease.translations.map((t) => [t.languages_code, t.body]),
-          ),
-          imageAlt: Object.fromEntries(
-            latestRelease.translations.map((t) => [t.languages_code, t.image_alt ?? ""]),
           ),
         }
       : null,
@@ -194,10 +181,8 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
     })),
     pressRelease: payload.pressRelease
       ? {
-          imageSrc: payload.pressRelease.imageSrc,
           title: pick(payload.pressRelease.title, locale),
           body: pick(payload.pressRelease.body, locale),
-          imageAlt: pick(payload.pressRelease.imageAlt, locale),
         }
       : null,
     flightPolicy: pick(payload.flightPolicy, locale),

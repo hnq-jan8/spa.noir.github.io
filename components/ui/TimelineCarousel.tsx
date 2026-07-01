@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState, useEffect, useCallback } from "react";
+import MarkdownContent from "@/components/ui/MarkdownContent";
 
 interface TimelineItem {
   title: string;
@@ -86,9 +87,10 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
               {/* Card */}
               <div className="timeline-card">
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                  {item.description}
-                </p>
+                <MarkdownContent
+                  content={item.description}
+                  className="text-sm text-gray-600"
+                />
               </div>
               {/* Dot + date */}
               <div className="flex justify-start -ml-[7px] relative z-10">
@@ -143,9 +145,10 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
             </div>
             <div className="flex-1 pb-2">
               <h3 className="text-lg font-bold mb-1">{item.title}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-1 whitespace-pre-line">
-                {item.description}
-              </p>
+              <MarkdownContent
+                content={item.description}
+                className="text-sm text-gray-600 mb-1"
+              />
               {item.date && (
                 <p className="text-xs text-gray-500">{item.date}</p>
               )}

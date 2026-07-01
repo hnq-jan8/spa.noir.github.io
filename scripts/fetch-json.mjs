@@ -15,7 +15,6 @@ const root = resolve(__dirname, "..");
 
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 // ─── Directus helpers ────────────────────────────────────────────────────────
 
@@ -105,14 +104,8 @@ const contentPayload = {
   })),
   pressRelease: latestRelease
     ? {
-        imageSrc: latestRelease.cover_image
-          ? `${BASE}/assets/${latestRelease.cover_image}`
-          : `${BASE_PATH}/images/airplane.jpg`,
         title: Object.fromEntries(latestRelease.translations.map((t) => [t.languages_code, t.title])),
         body: Object.fromEntries(latestRelease.translations.map((t) => [t.languages_code, t.body])),
-        imageAlt: Object.fromEntries(
-          latestRelease.translations.map((t) => [t.languages_code, t.image_alt ?? ""])
-        ),
       }
     : null,
   flightPolicy: Object.fromEntries(config.translations.map((t) => [t.languages_code, t.flight_policy])),
