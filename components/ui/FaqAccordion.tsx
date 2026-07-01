@@ -30,7 +30,8 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
             className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
           >
             <button
-              className={`w-full flex items-center justify-between pl-[22px] pr-6 py-4 text-left transition-colors hover:bg-gray-50 ${isOpen ? "bg-gray-100" : ""}`}
+              className={`w-full flex items-center justify-between pl-[22px] pr-6 py-4 text-left transition-colors
+                        ${isOpen ? "hover:bg-gray-100 bg-gray-200" : "hover:bg-gray-50"}`}
               onClick={() => toggle(i)}
             >
               <span className="font-semibold text-gray-900 pr-4">
