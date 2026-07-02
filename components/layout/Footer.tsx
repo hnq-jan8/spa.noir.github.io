@@ -30,12 +30,12 @@ export default function Footer() {
         {/* Contact info — chỉ hiện ở các trang con, trang chủ đã có riêng */}
         {!isHome && data && support && (
           <div className="grid grid-cols-1 min-[510px]:grid-cols-2 lg:grid-cols-4 gap-6">
-            {data.contacts.map((card) => (
-              <div key={card.key}>
+            {Object.entries(data.contacts).map(([key, value]) => (
+              <div key={key}>
                 <p className="text-xs text-gray-300 mb-1 uppercase tracking-wide">
-                  {support[card.key]}
+                  {support[key]}
                 </p>
-                <p className="text-sm font-semibold text-white">{card.value}</p>
+                <p className="text-sm font-semibold text-white">{value}</p>
               </div>
             ))}
           </div>

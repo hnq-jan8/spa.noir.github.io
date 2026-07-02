@@ -94,13 +94,13 @@ export default function HomeContent() {
           {home["supportTitle"]}
         </p>
         <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
-          {data.contacts.map((contact) => (
-            <div key={contact.key}>
+          {Object.entries(data.contacts).map(([key, value]) => (
+            <div key={key}>
               <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
-                {support[contact.key]}
+                {support[key]}
               </p>
               <p className="text-sm font-semibold text-gray-900">
-                {contact.value}
+                {value}
               </p>
             </div>
           ))}

@@ -25,9 +25,11 @@ export interface ContentUpdate {
   description: I18n<string>;
 }
 
-export interface ContentContact {
-  key: "passengerHotline" | "familyHotline" | "supportEmail" | "mediaContact";
-  value: string;
+export interface ContentContacts {
+  passengerHotline: string;
+  familyHotline: string;
+  supportEmail: string;
+  mediaContact: string;
 }
 
 export interface ContentFlightRow {
@@ -59,7 +61,7 @@ export interface ContentLanguage {
 
 export interface ContentPayload {
   generatedAt: string;
-  contacts: ContentContact[];
+  contacts: ContentContacts;
   flights: ContentFlightRow[];
   updates: ContentUpdate[];
   faqs: ContentFaq[];
@@ -73,7 +75,7 @@ export interface ContentPayload {
 
 export interface ContentData {
   generatedAt: string;
-  contacts: ContentContact[];
+  contacts: ContentContacts;
   flights: ContentFlightRow[];
   updates: { date: string; title: string; description: string }[];
   faqs: { question: string; answer: string }[];
@@ -131,12 +133,12 @@ export async function buildContentPayload(): Promise<ContentPayload> {
 
   return {
     generatedAt: new Date().toISOString(),
-    contacts: [
-      { key: "passengerHotline", value: config.passenger_hotline },
-      { key: "familyHotline", value: config.family_hotline },
-      { key: "supportEmail", value: config.support_email },
-      { key: "mediaContact", value: config.media_contact },
-    ],
+    contacts: {
+      passengerHotline: config.passenger_hotline,
+      familyHotline: config.family_hotline,
+      supportEmail: config.support_email,
+      mediaContact: config.media_contact,
+    },
     flights: flights.map((f, i) => ({
       no: i + 1,
       type: f.aircraft_type ?? "–",
