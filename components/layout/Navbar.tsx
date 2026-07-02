@@ -46,6 +46,7 @@ export default function Navbar() {
   const pathWithoutLocale = pathname.replace(localeSegmentPattern, "") || "/";
   const normalizedPath = pathname.replace(/\/$/, "") || "/";
   const activeItem = navItems.find((item) => item.href === normalizedPath);
+  const isHomeActive = normalizedPath === `/${locale}`;
 
   const updateScrollState = useCallback(() => {
     const el = navRef.current;
@@ -79,7 +80,11 @@ export default function Navbar() {
             <Link
               href={`/${locale}`}
               className="group flex items-center flex-shrink-0 mr-2 py-1"
-              onClick={(e) => { setMenuOpen(false); e.currentTarget.blur(); }}
+              onClick={(e) => {
+                setMenuOpen(false);
+                e.currentTarget.blur();
+                if (isHomeActive) invalidateContent();
+              }}
             >
               <Image
                 src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`}
@@ -206,7 +211,13 @@ export default function Navbar() {
             <svg className="w-3 h-3 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <span className="font-medium truncate">{activeItem.label}</span>
+            <Link
+              href={activeItem.href}
+              onClick={() => invalidateContent()}
+              className="font-medium truncate"
+            >
+              {activeItem.label}
+            </Link>
           </div>
         </div>
       )}
