@@ -5,31 +5,65 @@ import {
   getPressReleases,
   getSiteConfig,
   getLanguages,
-  t as tr,
 } from "@/lib/directus";
 import { routing } from "@/i18n/routing";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type I18n<T> = Record<string, T>;
+export type I18n<T> = Record<string, T>;
 
 function pick<T>(map: I18n<T>, locale: string): T {
   return map[locale] ?? map[routing.defaultLocale];
 }
 
-// ─── Payload types (shape của file content.json) ──────────────────────────────
+type LabelMap = Record<string, Record<string, I18n<string>>>;
+type ResolvedLabelMap = Record<string, Record<string, string>>;
 
-export interface ContentUpdate {
-  date: string;
-  title: I18n<string>;
-  description: I18n<string>;
+function resolveLabels(labels: LabelMap, locale: string): ResolvedLabelMap {
+  return Object.fromEntries(
+    Object.entries(labels).map(([ns, keys]) => [
+      ns,
+      Object.fromEntries(Object.entries(keys).map(([key, i18n]) => [key, pick(i18n, locale)])),
+    ]),
+  );
 }
+
+async function buildLabels(namespaces: string[]): Promise<LabelMap> {
+  const localeMap: Record<string, Record<string, Record<string, string>>> = {};
+  for (const locale of routing.locales) {
+    localeMap[locale] = (await import(`@/messages/${locale}.json`))
+      .default as Record<string, Record<string, string>>;
+  }
+  const labels: LabelMap = {};
+  for (const ns of namespaces) {
+    labels[ns] = {};
+    for (const key of Object.keys(localeMap[routing.defaultLocale][ns] ?? {})) {
+      labels[ns][key] = Object.fromEntries(
+        Object.entries(localeMap).map(([locale, msgs]) => [locale, msgs[ns]?.[key] ?? ""]),
+      );
+    }
+  }
+  return labels;
+}
+
+function formatTime(time: string | null): string {
+  if (!time) return "–";
+  return time.slice(0, 5);
+}
+
+// ─── Shared value types ────────────────────────────────────────────────────────
 
 export interface ContentContacts {
   passengerHotline: string;
   familyHotline: string;
   supportEmail: string;
   mediaContact: string;
+}
+
+export interface ContentUpdate {
+  date: string;
+  title: I18n<string>;
+  description: I18n<string>;
 }
 
 export interface ContentFlightRow {
@@ -59,158 +93,205 @@ export interface ContentLanguage {
   name: string;
 }
 
+// ─── Payload types (content.json cấu trúc theo từng route) ────────────────────
+
 export interface ContentPayload {
   generatedAt: string;
-  contacts: ContentContacts;
-  flights: ContentFlightRow[];
-  updates: ContentUpdate[];
-  faqs: ContentFaq[];
-  pressRelease: ContentPressRelease | null;
-  flightPolicy: I18n<string>;
-  labels: Record<string, Record<string, I18n<string>>>;
-  languages: ContentLanguage[];
+  /** Dùng chung bởi Navbar + Footer, không thuộc riêng route nào. */
+  common: {
+    contacts: ContentContacts;
+    languages: ContentLanguage[];
+    labels: LabelMap;
+  };
+  /** Trang chủ "/" */
+  home: {
+    latestUpdate: ContentUpdate | null;
+    labels: LabelMap;
+  };
+  /** "/faqs" */
+  faqs: {
+    faqs: ContentFaq[];
+  };
+  /** "/flight-info" */
+  flightInfo: {
+    flights: ContentFlightRow[];
+    flightPolicy: I18n<string>;
+    labels: LabelMap;
+  };
+  /** "/official-updates" */
+  officialUpdates: {
+    updates: ContentUpdate[];
+  };
+  /** "/press-releases" */
+  pressReleases: {
+    pressRelease: ContentPressRelease | null;
+  };
 }
 
-// ─── Resolved types (hook trả về sau khi pick locale) ────────────────────────
+// ─── Resolved types (sau khi pick locale) ──────────────────────────────────────
 
 export interface ContentData {
   generatedAt: string;
-  contacts: ContentContacts;
-  flights: ContentFlightRow[];
-  updates: { date: string; title: string; description: string }[];
-  faqs: { question: string; answer: string }[];
-  pressRelease: {
-    title: string;
-    body: string;
-  } | null;
-  flightPolicy: string;
-  /** UI labels đã resolve theo locale hiện tại. */
-  labels: Record<string, Record<string, string>>;
-  languages: ContentLanguage[];
+  common: {
+    contacts: ContentContacts;
+    languages: ContentLanguage[];
+    labels: ResolvedLabelMap;
+  };
+  home: {
+    latestUpdate: { date: string; title: string; description: string } | null;
+    labels: ResolvedLabelMap;
+  };
+  faqs: {
+    faqs: { question: string; answer: string }[];
+  };
+  flightInfo: {
+    flights: ContentFlightRow[];
+    flightPolicy: string;
+    labels: ResolvedLabelMap;
+  };
+  officialUpdates: {
+    updates: { date: string; title: string; description: string }[];
+  };
+  pressReleases: {
+    pressRelease: { title: string; body: string } | null;
+  };
 }
 
-// ─── Builder ──────────────────────────────────────────────────────────────────
-
-function formatTime(time: string | null): string {
-  if (!time) return "–";
-  return time.slice(0, 5);
-}
-
-async function buildLabels(): Promise<ContentPayload["labels"]> {
-  const localeMap: Record<string, Record<string, Record<string, string>>> = {};
-  for (const locale of routing.locales) {
-    localeMap[locale] = (await import(`@/messages/${locale}.json`))
-      .default as Record<string, Record<string, string>>;
-  }
-  const labels: ContentPayload["labels"] = {};
-  for (const ns of Object.keys(localeMap[routing.defaultLocale])) {
-    labels[ns] = {};
-    for (const key of Object.keys(localeMap[routing.defaultLocale][ns])) {
-      labels[ns][key] = Object.fromEntries(
-        Object.entries(localeMap).map(([locale, msgs]) => [
-          locale,
-          msgs[ns]?.[key] ?? "",
-        ]),
-      );
-    }
-  }
-  return labels;
-}
+// ─── Builder ────────────────────────────────────────────────────────────────────
 
 export async function buildContentPayload(): Promise<ContentPayload> {
-  const [rawUpdates, flights, faqs, releases, config, labels, languages] =
+  const [rawUpdates, flights, faqs, releases, config, languages, commonLabels, homeLabels, flightInfoLabels] =
     await Promise.all([
       getOfficialUpdates(),
       getFlights(),
       getFaqs(),
       getPressReleases(),
       getSiteConfig(),
-      buildLabels(),
       getLanguages(),
+      buildLabels(["nav", "footer", "support"]),
+      buildLabels(["home"]),
+      buildLabels(["flightInfo"]),
     ]);
 
+  const latestUpdate = rawUpdates[0];
   const latestRelease = releases[0];
 
   return {
     generatedAt: new Date().toISOString(),
-    contacts: {
-      passengerHotline: config.passenger_hotline,
-      familyHotline: config.family_hotline,
-      supportEmail: config.support_email,
-      mediaContact: config.media_contact,
+    common: {
+      contacts: {
+        passengerHotline: config.passenger_hotline,
+        familyHotline: config.family_hotline,
+        supportEmail: config.support_email,
+        mediaContact: config.media_contact,
+      },
+      languages: languages.map((l) => ({ code: l.code, name: l.name })),
+      labels: commonLabels,
     },
-    flights: flights.map((f, i) => ({
-      no: i + 1,
-      type: f.aircraft_type ?? "–",
-      capacity: f.capacity ?? "–",
-      flightNo: f.flight_no,
-      departure: f.dep ?? "–",
-      arrival: f.arr ?? "–",
-      srtd: formatTime(f.srtd),
-      atd: formatTime(f.atd),
-      note: f.note ?? "–",
-    })),
-    updates: rawUpdates.map((u) => ({
-      date: u.date,
-      title: Object.fromEntries(u.translations.map((t) => [t.languages_code, t.title])),
-      description: Object.fromEntries(
-        u.translations.map((t) => [t.languages_code, t.description]),
+    home: {
+      latestUpdate: latestUpdate
+        ? {
+            date: latestUpdate.date,
+            title: Object.fromEntries(
+              latestUpdate.translations.map((t) => [t.languages_code, t.title]),
+            ),
+            description: Object.fromEntries(
+              latestUpdate.translations.map((t) => [t.languages_code, t.description]),
+            ),
+          }
+        : null,
+      labels: homeLabels,
+    },
+    faqs: {
+      faqs: faqs.map((faq) => ({
+        question: Object.fromEntries(faq.translations.map((t) => [t.languages_code, t.question])),
+        answer: Object.fromEntries(faq.translations.map((t) => [t.languages_code, t.answer])),
+      })),
+    },
+    flightInfo: {
+      flights: flights.map((f, i) => ({
+        no: i + 1,
+        type: f.aircraft_type ?? "–",
+        capacity: f.capacity ?? "–",
+        flightNo: f.flight_no,
+        departure: f.dep ?? "–",
+        arrival: f.arr ?? "–",
+        srtd: formatTime(f.srtd),
+        atd: formatTime(f.atd),
+        note: f.note ?? "–",
+      })),
+      flightPolicy: Object.fromEntries(
+        config.translations.map((t) => [t.languages_code, t.flight_policy]),
       ),
-    })),
-    faqs: faqs.map((faq) => ({
-      question: Object.fromEntries(faq.translations.map((t) => [t.languages_code, t.question])),
-      answer: Object.fromEntries(faq.translations.map((t) => [t.languages_code, t.answer])),
-    })),
-    pressRelease: latestRelease
-      ? {
-          title: Object.fromEntries(
-            latestRelease.translations.map((t) => [t.languages_code, t.title]),
-          ),
-          body: Object.fromEntries(
-            latestRelease.translations.map((t) => [t.languages_code, t.body]),
-          ),
-        }
-      : null,
-    flightPolicy: Object.fromEntries(
-      config.translations.map((t) => [t.languages_code, t.flight_policy]),
-    ),
-    labels,
-    languages: languages.map((l) => ({
-      code: l.code,
-      name: l.name,
-    })),
+      labels: flightInfoLabels,
+    },
+    officialUpdates: {
+      updates: rawUpdates.map((u) => ({
+        date: u.date,
+        title: Object.fromEntries(u.translations.map((t) => [t.languages_code, t.title])),
+        description: Object.fromEntries(
+          u.translations.map((t) => [t.languages_code, t.description]),
+        ),
+      })),
+    },
+    pressReleases: {
+      pressRelease: latestRelease
+        ? {
+            title: Object.fromEntries(
+              latestRelease.translations.map((t) => [t.languages_code, t.title]),
+            ),
+            body: Object.fromEntries(
+              latestRelease.translations.map((t) => [t.languages_code, t.body]),
+            ),
+          }
+        : null,
+    },
   };
 }
 
 export function resolveLocale(payload: ContentPayload, locale: string): ContentData {
   return {
     generatedAt: payload.generatedAt,
-    contacts: payload.contacts,
-    flights: payload.flights,
-    updates: payload.updates.map((u) => ({
-      date: u.date,
-      title: pick(u.title, locale),
-      description: pick(u.description, locale),
-    })),
-    faqs: payload.faqs.map((f) => ({
-      question: pick(f.question, locale),
-      answer: pick(f.answer, locale),
-    })),
-    pressRelease: payload.pressRelease
-      ? {
-          title: pick(payload.pressRelease.title, locale),
-          body: pick(payload.pressRelease.body, locale),
-        }
-      : null,
-    flightPolicy: pick(payload.flightPolicy, locale),
-    labels: Object.fromEntries(
-      Object.entries(payload.labels).map(([ns, keys]) => [
-        ns,
-        Object.fromEntries(
-          Object.entries(keys).map(([key, i18n]) => [key, pick(i18n, locale)]),
-        ),
-      ]),
-    ),
-    languages: payload.languages,
+    common: {
+      contacts: payload.common.contacts,
+      languages: payload.common.languages,
+      labels: resolveLabels(payload.common.labels, locale),
+    },
+    home: {
+      latestUpdate: payload.home.latestUpdate
+        ? {
+            date: payload.home.latestUpdate.date,
+            title: pick(payload.home.latestUpdate.title, locale),
+            description: pick(payload.home.latestUpdate.description, locale),
+          }
+        : null,
+      labels: resolveLabels(payload.home.labels, locale),
+    },
+    faqs: {
+      faqs: payload.faqs.faqs.map((f) => ({
+        question: pick(f.question, locale),
+        answer: pick(f.answer, locale),
+      })),
+    },
+    flightInfo: {
+      flights: payload.flightInfo.flights,
+      flightPolicy: pick(payload.flightInfo.flightPolicy, locale),
+      labels: resolveLabels(payload.flightInfo.labels, locale),
+    },
+    officialUpdates: {
+      updates: payload.officialUpdates.updates.map((u) => ({
+        date: u.date,
+        title: pick(u.title, locale),
+        description: pick(u.description, locale),
+      })),
+    },
+    pressReleases: {
+      pressRelease: payload.pressReleases.pressRelease
+        ? {
+            title: pick(payload.pressReleases.pressRelease.title, locale),
+            body: pick(payload.pressReleases.pressRelease.body, locale),
+          }
+        : null,
+    },
   };
 }

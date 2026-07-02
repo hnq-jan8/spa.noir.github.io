@@ -6,9 +6,9 @@ import { useContentData } from "@/hooks/useContentData";
 export default function PressReleasesContent() {
   const data = useContentData();
 
-  if (!data || !data.pressRelease) return null;
+  if (!data || !data.pressReleases.pressRelease) return null;
 
-  const { title, body } = data.pressRelease;
+  const { title, body } = data.pressReleases.pressRelease;
   if (!body && !title) return null;
 
   return (

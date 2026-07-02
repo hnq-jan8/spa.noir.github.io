@@ -22,8 +22,10 @@ export default function HomeContent() {
 
   if (!data) return null;
 
-  const { nav, home, support } = data.labels;
-  const latestUpdate = data.updates[0];
+  const nav = data.common.labels["nav"];
+  const home = data.home.labels["home"];
+  const support = data.common.labels["support"];
+  const latestUpdate = data.home.latestUpdate;
   const asOf = formatTimestamp(data.generatedAt, locale);
 
   const gridPages = [
@@ -94,7 +96,7 @@ export default function HomeContent() {
           {home["supportTitle"]}
         </p>
         <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
-          {Object.entries(data.contacts).map(([key, value]) => (
+          {Object.entries(data.common.contacts).map(([key, value]) => (
             <div key={key}>
               <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
                 {support[key]}

@@ -19,8 +19,8 @@ export default function Navbar() {
   const locale = (params?.locale as string) ?? routing.defaultLocale;
   const pathname = usePathname();
   const data = useContentData();
-  const nav = data?.labels["nav"];
-  const liveLanguages = data?.languages.map((lang) => ({
+  const nav = data?.common.labels["nav"];
+  const liveLanguages = data?.common.languages.map((lang) => ({
     code: lang.code,
     label: lang.code.toUpperCase(),
   }));

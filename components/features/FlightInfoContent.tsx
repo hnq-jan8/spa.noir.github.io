@@ -9,14 +9,14 @@ export default function FlightInfoContent() {
 
   if (!data) return null;
 
-  const fi = data.labels["flightInfo"];
+  const fi = data.flightInfo.labels["flightInfo"];
 
   return (
     <div className="container-page pt-4 pb-8 md:py-8">
       <div className="md:bg-white md:border md:border-gray-200 md:rounded-2xl md:shadow-sm md:p-6">
         <FlightTable
           title={fi["title"]}
-          rows={data.flights}
+          rows={data.flightInfo.flights}
           headers={{
             no: fi["no"],
             type: fi["type"],
@@ -31,7 +31,7 @@ export default function FlightInfoContent() {
         <div className="mt-10">
           <h2 className="section-title">{fi["policy"]}</h2>
           <MarkdownContent
-            content={data.flightPolicy}
+            content={data.flightInfo.flightPolicy}
             className="text-sm text-gray-700 max-w-3xl"
           />
         </div>

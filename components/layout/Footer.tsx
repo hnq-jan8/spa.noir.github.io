@@ -11,8 +11,8 @@ export default function Footer() {
   const pathname = usePathname();
   const isHome = homePathPattern.test(pathname);
   const data = useContentData();
-  const footer = data?.labels["footer"];
-  const support = data?.labels["support"];
+  const footer = data?.common.labels["footer"];
+  const support = data?.common.labels["support"];
 
   return (
     <footer className="bg-chrome text-white">
@@ -30,7 +30,7 @@ export default function Footer() {
         {/* Contact info — chỉ hiện ở các trang con, trang chủ đã có riêng */}
         {!isHome && data && support && (
           <div className="grid grid-cols-1 min-[510px]:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Object.entries(data.contacts).map(([key, value]) => (
+            {Object.entries(data.common.contacts).map(([key, value]) => (
               <div key={key}>
                 <p className="text-xs text-gray-300 mb-1 uppercase tracking-wide">
                   {support[key]}
