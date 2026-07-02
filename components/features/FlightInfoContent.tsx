@@ -1,6 +1,7 @@
 "use client";
 
 import FlightTable from "@/components/ui/FlightTable";
+import MarkdownContent from "@/components/ui/MarkdownContent";
 import { useContentData } from "@/hooks/useContentData";
 
 export default function FlightInfoContent() {
@@ -29,9 +30,10 @@ export default function FlightInfoContent() {
         />
         <div className="mt-10">
           <h2 className="section-title">{fi["policy"]}</h2>
-          <p className="text-sm text-gray-700 leading-relaxed max-w-3xl whitespace-pre-line">
-            {data.flightPolicy}
-          </p>
+          <MarkdownContent
+            content={data.flightPolicy}
+            className="text-sm text-gray-700 max-w-3xl"
+          />
         </div>
       </div>
     </div>
