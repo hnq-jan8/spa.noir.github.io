@@ -31,6 +31,11 @@ export const languages = configuredLanguages.map((lang) => ({
   label: lang.code.toUpperCase(),
 }));
 
+export interface LanguageOption {
+  code: string;
+  label: string;
+}
+
 function ChevronDownIcon() {
   return (
     <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,12 +45,14 @@ function ChevronDownIcon() {
 }
 
 function LanguageDropdownLinks({
+  languages: options,
   locale,
   pathWithoutLocale,
   compact = false,
   onSelect,
   itemClassName = "py-3",
 }: {
+  languages: LanguageOption[];
   locale: string;
   pathWithoutLocale: string;
   compact?: boolean;
@@ -54,7 +61,7 @@ function LanguageDropdownLinks({
 }) {
   return (
     <>
-      {languages
+      {options
         .filter((lang) => lang.code !== locale)
         .map((lang) => (
           <Link
@@ -73,15 +80,17 @@ function LanguageDropdownLinks({
 }
 
 function LanguageTriggerContent({
+  languages: options,
   locale,
   compact = false,
   className,
 }: {
+  languages: LanguageOption[];
   locale: string;
   compact?: boolean;
   className?: string;
 }) {
-  const current = languages.find((lang) => lang.code === locale)!;
+  const current = options.find((lang) => lang.code === locale) ?? options[0];
   return (
     <span className={className}>
       <span className={compact ? "flex-1 text-left font-medium" : "flex-1 text-left whitespace-nowrap"}>
@@ -92,10 +101,18 @@ function LanguageTriggerContent({
   );
 }
 
-function LanguageWidthSizer({ compact = false, className }: { compact?: boolean; className?: string }) {
+function LanguageWidthSizer({
+  languages: options,
+  compact = false,
+  className,
+}: {
+  languages: LanguageOption[];
+  compact?: boolean;
+  className?: string;
+}) {
   return (
     <span className={`invisible grid text-xs ${className ?? ""}`} aria-hidden="true">
-      {languages.map((lang) => (
+      {options.map((lang) => (
         <span key={lang.code} className="col-start-1 row-start-1 flex items-center gap-1.5 whitespace-nowrap">
           <span>{compact ? lang.code.toUpperCase() : lang.label}</span>
           <ChevronDownIcon />
@@ -108,9 +125,12 @@ function LanguageWidthSizer({ compact = false, className }: { compact?: boolean;
 interface LanguageSelectorProps {
   locale: string;
   pathWithoutLocale: string;
+  /** Danh sách ngôn ngữ hiện tại (từ content.json) — fallback về danh sách build-time nếu chưa fetch xong. */
+  languages?: LanguageOption[];
 }
 
-export function DesktopLanguageSelector({ locale, pathWithoutLocale }: LanguageSelectorProps) {
+export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: liveLanguages }: LanguageSelectorProps) {
+  const options = liveLanguages ?? languages;
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   useDismissOnOutside(containerRef, open, () => setOpen(false));
@@ -122,10 +142,10 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale }: LanguageS
         onClick={() => setOpen((o) => !o)}
         className="relative flex items-center px-2 lg:px-3 text-xs text-gray-200 hover:text-white hover:bg-black/10 transition-colors h-full w-full"
       >
-        <LanguageWidthSizer compact className="lg:hidden" />
-        <LanguageWidthSizer className="hidden lg:grid" />
-        <LanguageTriggerContent locale={locale} compact className="absolute inset-0 flex items-center gap-1.5 px-2 lg:hidden" />
-        <LanguageTriggerContent locale={locale} className="absolute inset-0 hidden lg:flex items-center gap-1.5 px-3" />
+        <LanguageWidthSizer languages={options} compact className="lg:hidden" />
+        <LanguageWidthSizer languages={options} className="hidden lg:grid" />
+        <LanguageTriggerContent languages={options} locale={locale} compact className="absolute inset-0 flex items-center gap-1.5 px-2 lg:hidden" />
+        <LanguageTriggerContent languages={options} locale={locale} className="absolute inset-0 hidden lg:flex items-center gap-1.5 px-3" />
       </button>
       <div
         className={`absolute top-full left-0 w-full bg-chrome-panelHover shadow-lg transition-all duration-150 z-50 ${
@@ -133,10 +153,10 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale }: LanguageS
         }`}
       >
         <div className="lg:hidden">
-          <LanguageDropdownLinks locale={locale} pathWithoutLocale={pathWithoutLocale} compact itemClassName="h-14" onSelect={() => setOpen(false)} />
+          <LanguageDropdownLinks languages={options} locale={locale} pathWithoutLocale={pathWithoutLocale} compact itemClassName="h-14" onSelect={() => setOpen(false)} />
         </div>
         <div className="hidden lg:block">
-          <LanguageDropdownLinks locale={locale} pathWithoutLocale={pathWithoutLocale} itemClassName="h-14" onSelect={() => setOpen(false)} />
+          <LanguageDropdownLinks languages={options} locale={locale} pathWithoutLocale={pathWithoutLocale} itemClassName="h-14" onSelect={() => setOpen(false)} />
         </div>
       </div>
     </div>
@@ -146,10 +166,12 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale }: LanguageS
 export function MobileLanguageSelector({
   locale,
   pathWithoutLocale,
+  languages: liveLanguages,
   open,
   onToggle,
   onClose,
 }: LanguageSelectorProps & { open: boolean; onToggle: () => void; onClose: () => void }) {
+  const options = liveLanguages ?? languages;
   const containerRef = useRef<HTMLDivElement>(null);
   useDismissOnOutside(containerRef, open, onClose);
 
@@ -160,12 +182,12 @@ export function MobileLanguageSelector({
         className="relative flex items-center gap-1 px-2 h-full text-xs text-gray-200 hover:text-white"
         aria-label="Language"
       >
-        <LanguageWidthSizer compact />
-        <LanguageTriggerContent locale={locale} compact className="absolute inset-0 flex items-center gap-1 px-2" />
+        <LanguageWidthSizer languages={options} compact />
+        <LanguageTriggerContent languages={options} locale={locale} compact className="absolute inset-0 flex items-center gap-1 px-2" />
       </button>
       {open && (
         <div className="absolute top-full right-0 w-full bg-chrome-panel shadow-lg z-50">
-          <LanguageDropdownLinks locale={locale} pathWithoutLocale={pathWithoutLocale} compact onSelect={onClose} />
+          <LanguageDropdownLinks languages={options} locale={locale} pathWithoutLocale={pathWithoutLocale} compact onSelect={onClose} />
         </div>
       )}
     </div>

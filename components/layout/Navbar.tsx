@@ -20,6 +20,10 @@ export default function Navbar() {
   const pathname = usePathname();
   const data = useContentData();
   const nav = data?.labels["nav"];
+  const liveLanguages = data?.languages.map((lang) => ({
+    code: lang.code,
+    label: lang.code.toUpperCase(),
+  }));
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -137,12 +141,13 @@ export default function Navbar() {
 
             <div className="flex-1 md:hidden" />
 
-            <DesktopLanguageSelector locale={locale} pathWithoutLocale={pathWithoutLocale} />
+            <DesktopLanguageSelector locale={locale} pathWithoutLocale={pathWithoutLocale} languages={liveLanguages} />
 
             <div className="flex md:hidden items-stretch gap-1">
               <MobileLanguageSelector
                 locale={locale}
                 pathWithoutLocale={pathWithoutLocale}
+                languages={liveLanguages}
                 open={langOpen}
                 onToggle={() => { setLangOpen((o) => !o); setMenuOpen(false); }}
                 onClose={() => setLangOpen(false)}

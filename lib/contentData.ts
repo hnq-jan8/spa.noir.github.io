@@ -1,10 +1,10 @@
 import {
   getOfficialUpdates,
-  getSupportContacts,
   getFlights,
   getFaqs,
   getPressReleases,
   getSiteConfig,
+  getLanguages,
   t as tr,
 } from "@/lib/directus";
 import { routing } from "@/i18n/routing";
@@ -52,6 +52,11 @@ export interface ContentPressRelease {
   body: I18n<string>;
 }
 
+export interface ContentLanguage {
+  code: string;
+  name: string;
+}
+
 export interface ContentPayload {
   generatedAt: string;
   contacts: ContentContact[];
@@ -60,8 +65,8 @@ export interface ContentPayload {
   faqs: ContentFaq[];
   pressRelease: ContentPressRelease | null;
   flightPolicy: I18n<string>;
-  /** UI labels từ messages/*.json — có thể edit trong file tĩnh sau khi export. */
   labels: Record<string, Record<string, I18n<string>>>;
+  languages: ContentLanguage[];
 }
 
 // ─── Resolved types (hook trả về sau khi pick locale) ────────────────────────
@@ -79,6 +84,7 @@ export interface ContentData {
   flightPolicy: string;
   /** UI labels đã resolve theo locale hiện tại. */
   labels: Record<string, Record<string, string>>;
+  languages: ContentLanguage[];
 }
 
 // ─── Builder ──────────────────────────────────────────────────────────────────
@@ -110,22 +116,27 @@ async function buildLabels(): Promise<ContentPayload["labels"]> {
 }
 
 export async function buildContentPayload(): Promise<ContentPayload> {
-  const [rawUpdates, contacts, flights, faqs, releases, config, labels] =
+  const [rawUpdates, flights, faqs, releases, config, labels, languages] =
     await Promise.all([
       getOfficialUpdates(),
-      getSupportContacts(),
       getFlights(),
       getFaqs(),
       getPressReleases(),
       getSiteConfig(),
       buildLabels(),
+      getLanguages(),
     ]);
 
   const latestRelease = releases[0];
 
   return {
     generatedAt: new Date().toISOString(),
-    contacts: contacts.map((c) => ({ key: c.key, value: c.value })),
+    contacts: [
+      { key: "passengerHotline", value: config.passenger_hotline },
+      { key: "familyHotline", value: config.family_hotline },
+      { key: "supportEmail", value: config.support_email },
+      { key: "mediaContact", value: config.media_contact },
+    ],
     flights: flights.map((f, i) => ({
       no: i + 1,
       type: f.aircraft_type ?? "–",
@@ -162,6 +173,10 @@ export async function buildContentPayload(): Promise<ContentPayload> {
       config.translations.map((t) => [t.languages_code, t.flight_policy]),
     ),
     labels,
+    languages: languages.map((l) => ({
+      code: l.code,
+      name: l.name,
+    })),
   };
 }
 
@@ -194,5 +209,6 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
         ),
       ]),
     ),
+    languages: payload.languages,
   };
 }

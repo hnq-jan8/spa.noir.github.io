@@ -45,12 +45,6 @@ export interface OfficialUpdate {
   translations: OfficialUpdateTranslation[];
 }
 
-export interface SupportContact {
-  id: number;
-  key: "passengerHotline" | "familyHotline" | "supportEmail" | "mediaContact";
-  value: string;
-}
-
 export interface Flight {
   id: number;
   flight_no: string;
@@ -90,13 +84,25 @@ export interface PressRelease {
 export interface SiteConfigTranslation {
   languages_code: string;
   flight_policy: string;
-  seo_title: string;
-  seo_description: string;
 }
 export interface SiteConfig {
   id: number;
-  official_site_url: string;
+  passenger_hotline: string;
+  family_hotline: string;
+  support_email: string;
+  media_contact: string;
   translations: SiteConfigTranslation[];
+}
+
+export interface SeoSettingsTranslation {
+  languages_code: string;
+  seo_title: string;
+  seo_description: string;
+}
+export interface SeoSettings {
+  id: number;
+  official_site_url: string;
+  translations: SeoSettingsTranslation[];
 }
 
 export interface AppSetting {
@@ -109,10 +115,6 @@ export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
   return get(
     "/items/official_updates?fields=*,translations.*&sort=-date&filter[status][_eq]=published",
   );
-}
-
-export async function getSupportContacts(): Promise<SupportContact[]> {
-  return get("/items/support_contacts?sort=id&filter[status][_eq]=published");
 }
 
 export async function getFlights(): Promise<Flight[]> {
@@ -135,8 +137,16 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   return get("/items/site_config/1?fields=*,translations.*");
 }
 
+export async function getSeoSettings(): Promise<SeoSettings> {
+  return get("/items/seo_settings/1?fields=*,translations.*");
+}
+
 export async function getIsActiveFromAppSetting(): Promise<AppSetting> {
   return get("/items/app_setting?fields=active", { bustCache: true });
+}
+
+export async function getLanguages(): Promise<Language[]> {
+  return get("/items/languages?fields=code,name,direction&sort=sort");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

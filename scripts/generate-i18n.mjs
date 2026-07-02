@@ -39,7 +39,7 @@ async function get(path) {
 }
 
 const [languageRows, labelRows] = await Promise.all([
-  get("/items/languages?fields=code,name,direction,locale_tag&sort=sort"),
+  get("/items/languages?fields=code,name,direction&sort=sort"),
   get(
     "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1",
   ),
@@ -50,7 +50,6 @@ const languages = languageRows.map((r) => ({
   code: r.code,
   name: r.name,
   direction: r.direction,
-  localeTag: r.locale_tag ?? r.code,
 }));
 
 const localesPayload = {
