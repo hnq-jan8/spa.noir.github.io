@@ -73,20 +73,26 @@ const [
   labelRows,
 ] = await Promise.all([
   get(
-    "/items/official_updates?fields=*,translations.*&sort=-date&filter[status][_eq]=published",
-  ),
-  get("/items/flights?sort=sort&filter[status][_eq]=published"),
-  get(
-    "/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+    "/items/official_updates?fields=date,translations.languages_code,translations.title,translations.description&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   ),
   get(
-    "/items/press_releases?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+    "/items/flights?fields=flight_no,aircraft_type,capacity,dep,arr,srtd,atd,note&sort=sort&filter[deleted_at][_null]=true",
   ),
-  get("/items/site_config/1?fields=*,translations.*"),
+  get(
+    "/items/faqs?fields=translations.languages_code,translations.question,translations.answer&sort=sort&filter[deleted_at][_null]=true",
+  ),
+  get(
+    "/items/press_releases?fields=translations.languages_code,translations.title,translations.body&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
+  ),
+  get(
+    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,translations.languages_code,translations.flight_policy",
+  ),
   getActive(),
-  get("/items/languages?fields=code,name&sort=sort"),
   get(
-    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1",
+    "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true",
+  ),
+  get(
+    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true",
   ),
 ]);
 

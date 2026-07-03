@@ -39,9 +39,11 @@ async function get(path) {
 }
 
 const [languageRows, labelRows] = await Promise.all([
-  get("/items/languages?fields=code,name,direction&sort=sort"),
   get(
-    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1",
+    "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true",
+  ),
+  get(
+    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true",
   ),
 ]);
 if (!languageRows.length) throw new Error("Directus languages collection is empty");
@@ -49,7 +51,6 @@ if (!languageRows.length) throw new Error("Directus languages collection is empt
 const languages = languageRows.map((r) => ({
   code: r.code,
   name: r.name,
-  direction: r.direction,
 }));
 
 const localesPayload = {

@@ -30,7 +30,6 @@ async function get<T>(
 export interface Language {
   code: string;
   name: string;
-  direction: "ltr" | "rtl";
 }
 
 export interface OfficialUpdateTranslation {
@@ -39,14 +38,11 @@ export interface OfficialUpdateTranslation {
   description: string;
 }
 export interface OfficialUpdate {
-  id: number;
   date: string;
-  status: string;
   translations: OfficialUpdateTranslation[];
 }
 
 export interface Flight {
-  id: number;
   flight_no: string;
   aircraft_type: string | null;
   capacity: number | null;
@@ -63,7 +59,6 @@ export interface FaqTranslation {
   answer: string;
 }
 export interface Faq {
-  id: number;
   translations: FaqTranslation[];
 }
 
@@ -71,13 +66,8 @@ export interface PressReleaseTranslation {
   languages_code: string;
   title: string;
   body: string;
-  image_alt: string | null;
 }
 export interface PressRelease {
-  id: number;
-  slug: string;
-  published_at: string;
-  cover_image: string | null;
   translations: PressReleaseTranslation[];
 }
 
@@ -86,7 +76,6 @@ export interface SiteConfigTranslation {
   flight_policy: string;
 }
 export interface SiteConfig {
-  id: number;
   passenger_hotline: string;
   family_hotline: string;
   support_email: string;
@@ -100,7 +89,6 @@ export interface SeoSettingsTranslation {
   seo_description: string;
 }
 export interface SeoSettings {
-  id: number;
   official_site_url: string;
   translations: SeoSettingsTranslation[];
 }
@@ -113,32 +101,38 @@ export interface AppSetting {
 
 export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
   return get(
-    "/items/official_updates?fields=*,translations.*&sort=-date&filter[status][_eq]=published",
+    "/items/official_updates?fields=date,translations.languages_code,translations.title,translations.description&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   );
 }
 
 export async function getFlights(): Promise<Flight[]> {
-  return get("/items/flights?sort=sort&filter[status][_eq]=published");
+  return get(
+    "/items/flights?fields=flight_no,aircraft_type,capacity,dep,arr,srtd,atd,note&sort=sort&filter[deleted_at][_null]=true",
+  );
 }
 
 export async function getFaqs(): Promise<Faq[]> {
   return get(
-    "/items/faqs?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+    "/items/faqs?fields=translations.languages_code,translations.question,translations.answer&sort=sort&filter[deleted_at][_null]=true",
   );
 }
 
 export async function getPressReleases(): Promise<PressRelease[]> {
   return get(
-    "/items/press_releases?fields=*,translations.*&sort=sort&filter[status][_eq]=published",
+    "/items/press_releases?fields=translations.languages_code,translations.title,translations.body&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   );
 }
 
 export async function getSiteConfig(): Promise<SiteConfig> {
-  return get("/items/site_config/1?fields=*,translations.*");
+  return get(
+    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,translations.languages_code,translations.flight_policy",
+  );
 }
 
 export async function getSeoSettings(): Promise<SeoSettings> {
-  return get("/items/seo_settings/1?fields=*,translations.*");
+  return get(
+    "/items/seo_settings/1?fields=official_site_url,translations.languages_code,translations.seo_title,translations.seo_description",
+  );
 }
 
 export async function getIsActiveFromAppSetting(): Promise<AppSetting> {
@@ -146,7 +140,9 @@ export async function getIsActiveFromAppSetting(): Promise<AppSetting> {
 }
 
 export async function getLanguages(): Promise<Language[]> {
-  return get("/items/languages?fields=code,name,direction&sort=sort");
+  return get(
+    "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true",
+  );
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -159,8 +155,4 @@ export function t<T extends { translations: { languages_code: string }[] }>(
     item.translations.find((tr) => tr.languages_code === locale) ??
     item.translations[0]
   );
-}
-
-export function getAssetUrl(fileId: string | null): string | null {
-  return fileId ? `${BASE}/assets/${fileId}` : null;
 }
