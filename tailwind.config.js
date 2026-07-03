@@ -23,6 +23,7 @@ module.exports = {
           panelHover: COLORS.chromePanelHover,
         },
         page: COLORS.page,
+        surface: COLORS.surface,
       },
     },
   },

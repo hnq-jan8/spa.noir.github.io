@@ -39,9 +39,21 @@ export default function Navbar() {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!menuOpen) setLangExpanded(false);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const html = document.documentElement;
+    const prev = html.style.cssText;
+    html.style.setProperty("overflow", "hidden", "important");
+    html.style.setProperty("height", "100%", "important");
+    return () => {
+      html.style.cssText = prev;
+    };
   }, [menuOpen]);
 
   useDismissOnOutside(headerRef, menuOpen, () => setMenuOpen(false));
@@ -88,9 +100,11 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Spacer to compensate for the fixed header being taken out of flow */}
+      <div className="h-14" aria-hidden />
       <header
         ref={headerRef}
-        className="sticky top-0 z-50 w-full bg-chrome text-white"
+        className="fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
       >
         <div className="container-page">
           <div className="flex items-stretch h-14">
@@ -252,7 +266,8 @@ export default function Navbar() {
 
         {/* Mobile full-screen menu */}
         <div
-          className={`md:hidden fixed inset-x-0 top-14 bottom-0 z-40 bg-chrome overflow-y-auto transition-[clip-path] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          ref={drawerRef}
+          className={`md:hidden fixed inset-x-0 top-14 bottom-0 z-40 bg-white overflow-y-auto overscroll-contain transition-[clip-path] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
             menuOpen
               ? "[clip-path:inset(0_0_0_0)] pointer-events-auto"
               : "[clip-path:inset(0_0_100%_0)] pointer-events-none"
@@ -273,8 +288,8 @@ export default function Navbar() {
                   }}
                   className={`px-6 py-4 text-xl transition-colors ${
                     isActive
-                      ? "text-white font-semibold bg-black/10"
-                      : "text-gray-300 font-medium hover:text-white hover:bg-black/10"
+                      ? "text-gray-900 font-semibold"
+                      : "text-gray-600 font-medium hover:text-gray-900"
                   }`}
                 >
                   {item.label}
@@ -286,7 +301,7 @@ export default function Navbar() {
           <div className="mt-1">
             <button
               onClick={() => setLangExpanded((o) => !o)}
-              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white hover:bg-black/10 transition-colors`}
+              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-gray-900" : "text-gray-600"} hover:text-gray-900 transition-colors`}
               aria-expanded={langExpanded}
             >
               <svg
@@ -336,26 +351,11 @@ export default function Navbar() {
                       onClick={() => setMenuOpen(false)}
                       className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
                         isActive
-                          ? "text-white font-semibold"
-                          : "text-gray-400 hover:text-white hover:bg-black/10"
+                          ? "text-gray-900 font-semibold"
+                          : "text-gray-500 hover:text-gray-900"
                       }`}
                     >
                       <span>{lang.label}</span>
-                      {isActive && (
-                        <svg
-                          className="w-4 h-4 flex-shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
                     </Link>
                   );
                 })}

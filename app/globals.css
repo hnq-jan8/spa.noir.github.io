@@ -4,13 +4,16 @@
 
 @layer base {
   html {
-    font-family: system-ui, -apple-system, sans-serif;
-    @apply bg-chrome;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+    @apply bg-page;
     overflow-x: clip;
   }
 
   body {
-    @apply bg-chrome text-gray-900 min-h-screen;
+    @apply bg-page text-gray-900 min-h-screen;
     overflow-x: clip;
   }
 }
