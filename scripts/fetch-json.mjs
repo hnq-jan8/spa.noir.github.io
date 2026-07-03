@@ -90,68 +90,104 @@ const [
   ),
 ]);
 
-// ─── Build content.json payload (mirrors lib/contentData.ts) ─────────────────
+// ─── Build content.json payload (mirrors lib/contentData.ts, cấu trúc theo route) ──
 
 function formatTime(time) {
   return time ? time.slice(0, 5) : "–";
 }
 
+const latestUpdate = rawUpdates[0];
 const latestRelease = releases[0];
+
+const labelsByNs = buildLabels(
+  languageRows.map((l) => l.code),
+  labelRows,
+);
+
+function pickNs(...namespaces) {
+  const out = {};
+  for (const ns of namespaces) {
+    if (labelsByNs[ns]) out[ns] = labelsByNs[ns];
+  }
+  return out;
+}
 
 const contentPayload = {
   generatedAt: new Date().toISOString(),
-  contacts: [
-    { key: "passengerHotline", value: config.passenger_hotline },
-    { key: "familyHotline", value: config.family_hotline },
-    { key: "supportEmail", value: config.support_email },
-    { key: "mediaContact", value: config.media_contact },
-  ],
-  flights: flights.map((f, i) => ({
-    no: i + 1,
-    type: f.aircraft_type ?? "–",
-    capacity: f.capacity ?? "–",
-    flightNo: f.flight_no,
-    departure: f.dep ?? "–",
-    arrival: f.arr ?? "–",
-    srtd: formatTime(f.srtd),
-    atd: formatTime(f.atd),
-    note: f.note ?? "–",
-  })),
-  updates: rawUpdates.map((u) => ({
-    date: u.date,
-    title: Object.fromEntries(
-      u.translations.map((t) => [t.languages_code, t.title]),
+  common: {
+    contacts: {
+      passengerHotline: config.passenger_hotline,
+      familyHotline: config.family_hotline,
+      supportEmail: config.support_email,
+      mediaContact: config.media_contact,
+    },
+    languages: languageRows.map((l) => ({ code: l.code, name: l.name })),
+    labels: pickNs("nav", "footer", "support"),
+  },
+  home: {
+    latestUpdate: latestUpdate
+      ? {
+          date: latestUpdate.date,
+          title: Object.fromEntries(
+            latestUpdate.translations.map((t) => [t.languages_code, t.title]),
+          ),
+          description: Object.fromEntries(
+            latestUpdate.translations.map((t) => [t.languages_code, t.description]),
+          ),
+        }
+      : null,
+    labels: pickNs("home"),
+  },
+  faqs: {
+    faqs: faqs.map((faq) => ({
+      question: Object.fromEntries(
+        faq.translations.map((t) => [t.languages_code, t.question]),
+      ),
+      answer: Object.fromEntries(
+        faq.translations.map((t) => [t.languages_code, t.answer]),
+      ),
+    })),
+  },
+  flightInfo: {
+    flights: flights.map((f, i) => ({
+      no: i + 1,
+      type: f.aircraft_type ?? "–",
+      capacity: f.capacity ?? "–",
+      flightNo: f.flight_no,
+      departure: f.dep ?? "–",
+      arrival: f.arr ?? "–",
+      srtd: formatTime(f.srtd),
+      atd: formatTime(f.atd),
+      note: f.note ?? "–",
+    })),
+    flightPolicy: Object.fromEntries(
+      config.translations.map((t) => [t.languages_code, t.flight_policy]),
     ),
-    description: Object.fromEntries(
-      u.translations.map((t) => [t.languages_code, t.description]),
-    ),
-  })),
-  faqs: faqs.map((faq) => ({
-    question: Object.fromEntries(
-      faq.translations.map((t) => [t.languages_code, t.question]),
-    ),
-    answer: Object.fromEntries(
-      faq.translations.map((t) => [t.languages_code, t.answer]),
-    ),
-  })),
-  pressRelease: latestRelease
-    ? {
-        title: Object.fromEntries(
-          latestRelease.translations.map((t) => [t.languages_code, t.title]),
-        ),
-        body: Object.fromEntries(
-          latestRelease.translations.map((t) => [t.languages_code, t.body]),
-        ),
-      }
-    : null,
-  flightPolicy: Object.fromEntries(
-    config.translations.map((t) => [t.languages_code, t.flight_policy]),
-  ),
-  labels: buildLabels(
-    languageRows.map((l) => l.code),
-    labelRows,
-  ),
-  languages: languageRows.map((l) => ({ code: l.code, name: l.name })),
+    labels: pickNs("flightInfo"),
+  },
+  officialUpdates: {
+    updates: rawUpdates.map((u) => ({
+      date: u.date,
+      title: Object.fromEntries(
+        u.translations.map((t) => [t.languages_code, t.title]),
+      ),
+      description: Object.fromEntries(
+        u.translations.map((t) => [t.languages_code, t.description]),
+      ),
+    })),
+  },
+  pressReleases: {
+    pressRelease: latestRelease
+      ? {
+          title: Object.fromEntries(
+            latestRelease.translations.map((t) => [t.languages_code, t.title]),
+          ),
+          body: Object.fromEntries(
+            latestRelease.translations.map((t) => [t.languages_code, t.body]),
+          ),
+        }
+      : null,
+  },
 };
 
 // ─── Write output ─────────────────────────────────────────────────────────────
