@@ -6,11 +6,10 @@ import { usePathname, useParams } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   DesktopLanguageSelector,
-  MobileLanguageSelector,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
-import { routing } from "@/i18n/routing";
+import { routing, languages as routingLanguages } from "@/i18n/routing";
 
 const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
 
@@ -25,12 +24,25 @@ export default function Navbar() {
     label: lang.code.toUpperCase(),
   }));
 
+  const languageOptions = (data?.common.languages ?? routingLanguages).map(
+    (lang) => ({
+      code: lang.code,
+      label: lang.name,
+    }),
+  );
+  const currentLanguage =
+    languageOptions.find((lang) => lang.code === locale) ?? languageOptions[0];
+
   const [menuOpen, setMenuOpen] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
+  const [langExpanded, setLangExpanded] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) setLangExpanded(false);
+  }, [menuOpen]);
 
   useDismissOnOutside(headerRef, menuOpen, () => setMenuOpen(false));
 
@@ -198,22 +210,8 @@ export default function Navbar() {
             />
 
             <div className="flex md:hidden items-stretch gap-1">
-              <MobileLanguageSelector
-                locale={locale}
-                pathWithoutLocale={pathWithoutLocale}
-                languages={liveLanguages}
-                open={langOpen}
-                onToggle={() => {
-                  setLangOpen((o) => !o);
-                  setMenuOpen(false);
-                }}
-                onClose={() => setLangOpen(false)}
-              />
               <button
-                onClick={() => {
-                  setMenuOpen((o) => !o);
-                  setLangOpen(false);
-                }}
+                onClick={() => setMenuOpen((o) => !o)}
                 className="h-full px-2 flex items-center text-gray-200 hover:text-white"
                 aria-label="Toggle menu"
               >
@@ -284,6 +282,86 @@ export default function Navbar() {
               );
             })}
           </nav>
+
+          <div className="mt-1">
+            <button
+              onClick={() => setLangExpanded((o) => !o)}
+              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white hover:bg-black/10 transition-colors`}
+              aria-expanded={langExpanded}
+            >
+              <svg
+                className="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="flex-1 text-left">
+                {langExpanded
+                  ? nav?.["selectLanguage"]
+                  : currentLanguage?.label}
+              </span>
+              <svg
+                className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${langExpanded ? "rotate-90" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+            <div
+              className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                langExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              }`}
+            >
+              <div className="overflow-hidden">
+                {languageOptions.map((lang) => {
+                  const isActive = lang.code === locale;
+                  return (
+                    <Link
+                      key={lang.code}
+                      href={`/${lang.code}${pathWithoutLocale}`}
+                      onClick={() => setMenuOpen(false)}
+                      className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
+                        isActive
+                          ? "text-white font-semibold"
+                          : "text-gray-400 hover:text-white hover:bg-black/10"
+                      }`}
+                    >
+                      <span>{lang.label}</span>
+                      {isActive && (
+                        <svg
+                          className="w-4 h-4 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 

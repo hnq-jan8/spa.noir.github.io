@@ -162,34 +162,3 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
     </div>
   );
 }
-
-export function MobileLanguageSelector({
-  locale,
-  pathWithoutLocale,
-  languages: liveLanguages,
-  open,
-  onToggle,
-  onClose,
-}: LanguageSelectorProps & { open: boolean; onToggle: () => void; onClose: () => void }) {
-  const options = liveLanguages ?? languages;
-  const containerRef = useRef<HTMLDivElement>(null);
-  useDismissOnOutside(containerRef, open, onClose);
-
-  return (
-    <div ref={containerRef} className="relative w-max flex items-stretch">
-      <button
-        onClick={onToggle}
-        className="relative flex items-center gap-1 px-2 h-full text-xs text-gray-200 hover:text-white"
-        aria-label="Language"
-      >
-        <LanguageWidthSizer languages={options} compact />
-        <LanguageTriggerContent languages={options} locale={locale} compact className="absolute inset-0 flex items-center gap-1 px-2" />
-      </button>
-      {open && (
-        <div className="absolute top-full right-0 w-full bg-chrome-panel shadow-lg z-50">
-          <LanguageDropdownLinks languages={options} locale={locale} pathWithoutLocale={pathWithoutLocale} compact onSelect={onClose} />
-        </div>
-      )}
-    </div>
-  );
-}
