@@ -16,12 +16,13 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const { seoTitle, seoDescription } = await getBuildMode();
+  const { seoTitle, seoDescription, favicon } = await getBuildMode();
   const title = seoTitle[locale] ?? seoTitle[routing.defaultLocale];
   const description = seoDescription[locale] ?? seoDescription[routing.defaultLocale];
   return {
     title: { default: title, template: `%s | ${title}` },
     description,
+    icons: favicon ? { icon: favicon } : undefined,
   };
 }
 

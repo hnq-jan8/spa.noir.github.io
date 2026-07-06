@@ -5,10 +5,11 @@ import { routing } from "@/i18n/routing";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { seoTitle, seoDescription } = await getBuildMode();
+  const { seoTitle, seoDescription, favicon } = await getBuildMode();
   return {
     title: seoTitle[routing.defaultLocale],
     description: seoDescription[routing.defaultLocale],
+    icons: favicon ? { icon: favicon } : undefined,
   };
 }
 

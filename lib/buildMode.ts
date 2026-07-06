@@ -1,10 +1,11 @@
-import { getIsActiveFromAppSetting, getSeoSettings } from "@/lib/directus";
+import { getIsActiveFromAppSetting, getSiteMetadata, assetUrl } from "@/lib/directus";
 
 export interface BuildMode {
   active: boolean;
   officialSiteUrl: string;
   seoTitle: Record<string, string>;
   seoDescription: Record<string, string>;
+  favicon: string | null;
 }
 
 let cached: BuildMode | null = null;
@@ -13,19 +14,20 @@ let cached: BuildMode | null = null;
 // official_site_url, không build nội dung Dark Site thật.
 export async function getBuildMode(): Promise<BuildMode> {
   if (cached) return cached;
-  const [setting, seo] = await Promise.all([
+  const [setting, meta] = await Promise.all([
     getIsActiveFromAppSetting(),
-    getSeoSettings(),
+    getSiteMetadata(),
   ]);
   cached = {
     active: Boolean(setting.active),
-    officialSiteUrl: seo.official_site_url,
+    officialSiteUrl: meta.official_site_url,
     seoTitle: Object.fromEntries(
-      seo.translations.map((t) => [t.languages_code, t.seo_title]),
+      meta.translations.map((t) => [t.languages_code, t.seo_title]),
     ),
     seoDescription: Object.fromEntries(
-      seo.translations.map((t) => [t.languages_code, t.seo_description]),
+      meta.translations.map((t) => [t.languages_code, t.seo_description]),
     ),
+    favicon: assetUrl(meta.favicon),
   };
   return cached;
 }

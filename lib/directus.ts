@@ -85,14 +85,15 @@ export interface SiteConfig {
   translations: SiteConfigTranslation[];
 }
 
-export interface SeoSettingsTranslation {
+export interface SiteMetadataTranslation {
   languages_code: string;
   seo_title: string;
   seo_description: string;
 }
-export interface SeoSettings {
+export interface SiteMetadata {
   official_site_url: string;
-  translations: SeoSettingsTranslation[];
+  favicon: string | null;
+  translations: SiteMetadataTranslation[];
 }
 
 export interface AppSetting {
@@ -131,9 +132,9 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   );
 }
 
-export async function getSeoSettings(): Promise<SeoSettings> {
+export async function getSiteMetadata(): Promise<SiteMetadata> {
   return get(
-    "/items/seo_settings/1?fields=official_site_url,translations.languages_code,translations.seo_title,translations.seo_description",
+    "/items/site_metadata/1?fields=official_site_url,favicon,translations.languages_code,translations.seo_title,translations.seo_description",
   );
 }
 
