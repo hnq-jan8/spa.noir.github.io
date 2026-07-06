@@ -19,11 +19,14 @@ export default function Footer() {
       <div className={`container-page ${isHome ? "py-8" : "pb-8 pt-10"}`}>
         <div className={isHome ? "mb-6" : "mb-8"}>
           <Image
-            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`}
+            src={
+              data?.common.logoOnWhite ||
+              `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`
+            }
             alt="Sun Phu Quoc Airways"
             width={180}
             height={60}
-            className="object-contain invert opacity-80"
+            className={`object-contain opacity-80 ${data?.common.logoOnWhite ? "" : "invert"}`}
           />
         </div>
 

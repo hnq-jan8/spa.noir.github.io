@@ -80,6 +80,8 @@ export interface SiteConfig {
   family_hotline: string;
   support_email: string;
   media_contact: string;
+  logo_on_black: string | null;
+  logo_on_white: string | null;
   translations: SiteConfigTranslation[];
 }
 
@@ -125,7 +127,7 @@ export async function getPressReleases(): Promise<PressRelease[]> {
 
 export async function getSiteConfig(): Promise<SiteConfig> {
   return get(
-    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,translations.languages_code,translations.flight_policy",
+    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,logo_on_black,logo_on_white,translations.languages_code,translations.flight_policy",
   );
 }
 
@@ -146,6 +148,10 @@ export async function getLanguages(): Promise<Language[]> {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+export function assetUrl(id: string | null): string | null {
+  return id ? `${BASE}/assets/${id}` : null;
+}
 
 export function t<T extends { translations: { languages_code: string }[] }>(
   item: T,

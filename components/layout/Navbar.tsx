@@ -119,7 +119,10 @@ export default function Navbar() {
               }}
             >
               <Image
-                src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`}
+                src={
+                  data?.common.logoOnBlack ||
+                  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`
+                }
                 alt="SUN PhuQuoc Airways"
                 width={1024}
                 height={251}

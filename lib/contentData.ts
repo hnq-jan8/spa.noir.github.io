@@ -5,6 +5,7 @@ import {
   getPressReleases,
   getSiteConfig,
   getLanguages,
+  assetUrl,
 } from "@/lib/directus";
 import { routing } from "@/i18n/routing";
 
@@ -100,6 +101,8 @@ export interface ContentPayload {
   /** Dùng chung bởi Navbar + Footer, không thuộc riêng route nào. */
   common: {
     contacts: ContentContacts;
+    logoOnBlack: string | null;
+    logoOnWhite: string | null;
     languages: ContentLanguage[];
     labels: LabelMap;
   };
@@ -134,6 +137,8 @@ export interface ContentData {
   generatedAt: string;
   common: {
     contacts: ContentContacts;
+    logoOnBlack: string | null;
+    logoOnWhite: string | null;
     languages: ContentLanguage[];
     labels: ResolvedLabelMap;
   };
@@ -185,6 +190,8 @@ export async function buildContentPayload(): Promise<ContentPayload> {
         supportEmail: config.support_email,
         mediaContact: config.media_contact,
       },
+      logoOnBlack: assetUrl(config.logo_on_black),
+      logoOnWhite: assetUrl(config.logo_on_white),
       languages: languages.map((l) => ({ code: l.code, name: l.name })),
       labels: commonLabels,
     },
@@ -254,6 +261,8 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
     generatedAt: payload.generatedAt,
     common: {
       contacts: payload.common.contacts,
+      logoOnBlack: payload.common.logoOnBlack,
+      logoOnWhite: payload.common.logoOnWhite,
       languages: payload.common.languages,
       labels: resolveLabels(payload.common.labels, locale),
     },

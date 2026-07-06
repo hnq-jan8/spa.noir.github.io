@@ -44,6 +44,10 @@ async function getActive() {
   return Boolean((await res.json()).data.active);
 }
 
+function assetUrl(id) {
+  return id ? `${BASE}/assets/${id}` : null;
+}
+
 // ─── Build labels từ Directus `ui_labels` (không cần messages/*.json / next-intl) ──
 
 function buildLabels(languages, labelRows) {
@@ -85,7 +89,7 @@ const [
     "/items/press_releases?fields=translations.languages_code,translations.title,translations.body&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   ),
   get(
-    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,translations.languages_code,translations.flight_policy",
+    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,logo_on_black,logo_on_white,translations.languages_code,translations.flight_policy",
   ),
   getActive(),
   get(
@@ -127,6 +131,8 @@ const contentPayload = {
       supportEmail: config.support_email,
       mediaContact: config.media_contact,
     },
+    logoOnBlack: assetUrl(config.logo_on_black),
+    logoOnWhite: assetUrl(config.logo_on_white),
     languages: languageRows.map((l) => ({ code: l.code, name: l.name })),
     labels: pickNs("nav", "footer", "support"),
   },
