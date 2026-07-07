@@ -53,6 +53,21 @@ export default function MarkdownContent({ content, className = "" }: MarkdownCon
               className="w-full rounded object-cover"
             />
           ),
+          table: ({ children }) => (
+            <div className="overflow-x-auto">
+              <table className="border-collapse border border-gray-300">{children}</table>
+            </div>
+          ),
+          thead: ({ children }) => <thead>{children}</thead>,
+          tr: ({ children }) => <tr>{children}</tr>,
+          th: ({ children }) => (
+            <th className="border border-gray-300 px-3 py-2 text-left font-bold">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="border border-gray-300 px-3 py-2">{children}</td>
+          ),
         }}
       >
         {content}
