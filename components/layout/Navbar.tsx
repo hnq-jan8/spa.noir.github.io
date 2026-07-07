@@ -45,6 +45,7 @@ export default function Navbar() {
     if (!menuOpen) setLangExpanded(false);
   }, [menuOpen]);
 
+
   useEffect(() => {
     if (!menuOpen) return;
     const html = document.documentElement;
@@ -270,10 +271,10 @@ export default function Navbar() {
         {/* Mobile full-screen menu */}
         <div
           ref={drawerRef}
-          className={`md:hidden fixed inset-x-0 top-14 bottom-0 z-40 bg-white overflow-y-auto overscroll-contain transition-[clip-path] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          className={`md:hidden fixed inset-x-0 top-14 h-[calc(100dvh-3.5rem)] z-40 bg-chrome text-white overflow-y-auto overscroll-contain ${
             menuOpen
-              ? "[clip-path:inset(0_0_0_0)] pointer-events-auto"
-              : "[clip-path:inset(0_0_100%_0)] pointer-events-none"
+              ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
+              : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
           }`}
           role="dialog"
           aria-modal="true"
@@ -291,8 +292,8 @@ export default function Navbar() {
                   }}
                   className={`px-6 py-4 text-xl transition-colors ${
                     isActive
-                      ? "text-gray-900 font-semibold"
-                      : "text-gray-600 font-medium hover:text-gray-900"
+                      ? "text-white font-semibold bg-black/20"
+                      : "text-gray-200 font-medium hover:text-white hover:bg-black/10"
                   }`}
                 >
                   {item.label}
@@ -304,7 +305,7 @@ export default function Navbar() {
           <div className="mt-1">
             <button
               onClick={() => setLangExpanded((o) => !o)}
-              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-gray-900" : "text-gray-600"} hover:text-gray-900 transition-colors`}
+              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-200"} hover:text-white transition-colors`}
               aria-expanded={langExpanded}
             >
               <svg
@@ -354,8 +355,8 @@ export default function Navbar() {
                       onClick={() => setMenuOpen(false)}
                       className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
                         isActive
-                          ? "text-gray-900 font-semibold"
-                          : "text-gray-500 hover:text-gray-900"
+                          ? "text-white font-semibold"
+                          : "text-gray-300 hover:text-white"
                       }`}
                     >
                       <span>{lang.label}</span>
