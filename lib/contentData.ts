@@ -49,7 +49,9 @@ async function buildLabels(namespaces: string[]): Promise<LabelMap> {
 
 function formatTime(time: string | null): string {
   if (!time) return "–";
-  return time.slice(0, 5);
+  const [hours = "", minutes = ""] = time.split(":");
+  if (!hours || !minutes) return "–";
+  return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
 }
 
 // ─── Shared value types ────────────────────────────────────────────────────────
