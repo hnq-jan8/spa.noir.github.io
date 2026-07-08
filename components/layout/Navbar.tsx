@@ -45,6 +45,7 @@ export default function Navbar() {
     if (!menuOpen) setLangExpanded(false);
   }, [menuOpen]);
 
+
   useEffect(() => {
     if (!menuOpen) return;
     const html = document.documentElement;
@@ -174,12 +175,9 @@ export default function Navbar() {
                         }
                         className={`text-xs whitespace-nowrap px-4 flex items-center transition-colors relative flex-shrink-0 ${
                           isActive
-                            ? "text-white font-medium before:opacity-100"
-                            : "text-gray-200 hover:text-white hover:before:opacity-60"
-                        }
-                          before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/50
-                          before:to-transparent before:opacity-0 before:pointer-events-none
-                          before:transition-opacity before:duration-200 `}
+                            ? "text-white font-medium bg-black/30"
+                            : "text-gray-200 hover:text-white hover:bg-black/20"
+                        }`}
                       >
                         <span
                           className="invisible font-medium"
