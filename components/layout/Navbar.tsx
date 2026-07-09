@@ -8,7 +8,7 @@ import {
   DesktopLanguageSelector,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
-import { useContentData } from "@/hooks/useContentData";
+import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { routing, languages as routingLanguages } from "@/i18n/routing";
 
 const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
@@ -45,7 +45,6 @@ export default function Navbar() {
     if (!menuOpen) setLangExpanded(false);
   }, [menuOpen]);
 
-
   useEffect(() => {
     if (!menuOpen) return;
     const html = document.documentElement;
@@ -71,6 +70,7 @@ export default function Navbar() {
   const pathWithoutLocale = pathname.replace(localeSegmentPattern, "") || "/";
   const normalizedPath = pathname.replace(/\/$/, "") || "/";
   const activeItem = navItems.find((item) => item.href === normalizedPath);
+  const isHomeActive = normalizedPath === `/${locale}`;
 
   const updateScrollState = useCallback(() => {
     const el = navRef.current;
@@ -115,6 +115,7 @@ export default function Navbar() {
               onClick={(e) => {
                 setMenuOpen(false);
                 e.currentTarget.blur();
+                if (isHomeActive) invalidateContent();
               }}
             >
               <Image
@@ -168,6 +169,9 @@ export default function Navbar() {
                       <Link
                         key={item.href}
                         href={item.href}
+                        onClick={
+                          isActive ? () => invalidateContent() : undefined
+                        }
                         className={`text-xs whitespace-nowrap px-4 flex items-center transition-colors relative flex-shrink-0 ${
                           isActive
                             ? "text-white font-medium bg-black/30"
@@ -281,7 +285,10 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    if (isActive) invalidateContent();
+                  }}
                   className={`px-6 py-4 text-xl transition-colors ${
                     isActive
                       ? "text-white font-semibold bg-black/20"
@@ -387,6 +394,7 @@ export default function Navbar() {
             </svg>
             <Link
               href={activeItem.href}
+              onClick={() => invalidateContent()}
               className="font-medium truncate"
             >
               {activeItem.label}
