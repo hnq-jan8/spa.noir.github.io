@@ -15,7 +15,7 @@ export default function OfficialUpdatesContent() {
   return (
     <div className="container-page pt-4 pb-8 md:pb-8 md:pt-14">
       {updates.length === 0 ? (
-        <EmptyState title={es["title"]} description={es["description"]} />
+        <EmptyState title={es?.["title"]} description={es?.["description"]} />
       ) : (
         <div className="mx-1 sm:mx-1.5 lg:mx-2">
           <TimelineCarousel items={updates} />

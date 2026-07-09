@@ -100,6 +100,16 @@ export interface AppSetting {
   active: boolean;
 }
 
+export interface UiLabelTranslation {
+  languages_code: string;
+  value: string;
+}
+export interface UiLabel {
+  namespace: string;
+  key: string;
+  translations: UiLabelTranslation[];
+}
+
 // ─── Fetch functions (một lần gọi, đủ tất cả locale) ─────────────────────────
 
 export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
@@ -145,6 +155,12 @@ export async function getIsActiveFromAppSetting(): Promise<AppSetting> {
 export async function getLanguages(): Promise<Language[]> {
   return get(
     "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true",
+  );
+}
+
+export async function getUiLabels(): Promise<UiLabel[]> {
+  return get(
+    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true",
   );
 }
 

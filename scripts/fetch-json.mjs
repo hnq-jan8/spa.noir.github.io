@@ -9,6 +9,7 @@
 import { writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { assembleContentPayload } from "./content-payload.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -48,22 +49,6 @@ function assetUrl(id) {
   return id ? `${BASE}/assets/${id}` : null;
 }
 
-// ─── Build labels từ Directus `ui_labels` (không cần messages/*.json / next-intl) ──
-
-function buildLabels(languages, labelRows) {
-  const labels = {};
-  for (const row of labelRows) {
-    labels[row.namespace] ??= {};
-    labels[row.namespace][row.key] = Object.fromEntries(
-      languages.map((code) => [
-        code,
-        row.translations.find((t) => t.languages_code === code)?.value ?? "",
-      ]),
-    );
-  }
-  return labels;
-}
-
 // ─── Fetch all data in parallel ──────────────────────────────────────────────
 
 const [
@@ -100,107 +85,19 @@ const [
   ),
 ]);
 
-// ─── Build content.json payload (mirrors lib/contentData.ts, cấu trúc theo route) ──
+// ─── Build content.json payload (dùng chung scripts/content-payload.mjs) ──────
 
-function formatTime(time) {
-  return time ? time.slice(0, 5) : "–";
-}
-
-const latestUpdate = rawUpdates[0];
-const latestRelease = releases[0];
-
-const labelsByNs = buildLabels(
-  languageRows.map((l) => l.code),
-  labelRows,
-);
-
-function pickNs(...namespaces) {
-  const out = {};
-  for (const ns of namespaces) {
-    if (labelsByNs[ns]) out[ns] = labelsByNs[ns];
-  }
-  return out;
-}
-
-const contentPayload = {
+const contentPayload = assembleContentPayload({
   generatedAt: new Date().toISOString(),
-  common: {
-    contacts: {
-      passengerHotline: config.passenger_hotline,
-      familyHotline: config.family_hotline,
-      supportEmail: config.support_email,
-      mediaContact: config.media_contact,
-    },
-    logoOnBlack: assetUrl(config.logo_on_black),
-    logoOnWhite: assetUrl(config.logo_on_white),
-    languages: languageRows.map((l) => ({ code: l.code, name: l.name })),
-    labels: pickNs("nav", "footer", "support"),
-  },
-  home: {
-    latestUpdate: latestUpdate
-      ? {
-          date: latestUpdate.date,
-          title: Object.fromEntries(
-            latestUpdate.translations.map((t) => [t.languages_code, t.title]),
-          ),
-          description: Object.fromEntries(
-            latestUpdate.translations.map((t) => [t.languages_code, t.description]),
-          ),
-        }
-      : null,
-    labels: pickNs("home"),
-  },
-  faqs: {
-    faqs: faqs.map((faq) => ({
-      question: Object.fromEntries(
-        faq.translations.map((t) => [t.languages_code, t.question]),
-      ),
-      answer: Object.fromEntries(
-        faq.translations.map((t) => [t.languages_code, t.answer]),
-      ),
-    })),
-  },
-  flightInfo: {
-    flights: flights.map((f, i) => ({
-      no: i + 1,
-      type: f.aircraft_type ?? "–",
-      capacity: f.capacity ?? "–",
-      flightNo: f.flight_no,
-      departure: f.dep ?? "–",
-      arrival: f.arr ?? "–",
-      srtd: formatTime(f.srtd),
-      atd: formatTime(f.atd),
-      note: f.note ?? "–",
-    })),
-    flightPolicy: Object.fromEntries(
-      config.translations.map((t) => [t.languages_code, t.flight_policy]),
-    ),
-    labels: pickNs("flightInfo"),
-  },
-  officialUpdates: {
-    updates: rawUpdates.map((u) => ({
-      date: u.date,
-      title: Object.fromEntries(
-        u.translations.map((t) => [t.languages_code, t.title]),
-      ),
-      description: Object.fromEntries(
-        u.translations.map((t) => [t.languages_code, t.description]),
-      ),
-    })),
-  },
-  pressReleases: {
-    pressRelease: latestRelease
-      ? {
-          title: Object.fromEntries(
-            latestRelease.translations.map((t) => [t.languages_code, t.title]),
-          ),
-          body: Object.fromEntries(
-            latestRelease.translations.map((t) => [t.languages_code, t.body]),
-          ),
-        }
-      : null,
-  },
-};
+  officialUpdates: rawUpdates,
+  flights,
+  faqs,
+  pressReleases: releases,
+  siteConfig: config,
+  languages: languageRows,
+  labelRows,
+  assetUrl,
+});
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 

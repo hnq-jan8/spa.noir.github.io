@@ -5,8 +5,10 @@ import {
   getPressReleases,
   getSiteConfig,
   getLanguages,
+  getUiLabels,
   assetUrl,
 } from "@/lib/directus";
+import { assembleContentPayload } from "../scripts/content-payload.mjs";
 import { routing } from "@/i18n/routing";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -27,31 +29,6 @@ function resolveLabels(labels: LabelMap, locale: string): ResolvedLabelMap {
       Object.fromEntries(Object.entries(keys).map(([key, i18n]) => [key, pick(i18n, locale)])),
     ]),
   );
-}
-
-async function buildLabels(namespaces: string[]): Promise<LabelMap> {
-  const localeMap: Record<string, Record<string, Record<string, string>>> = {};
-  for (const locale of routing.locales) {
-    localeMap[locale] = (await import(`@/messages/${locale}.json`))
-      .default as Record<string, Record<string, string>>;
-  }
-  const labels: LabelMap = {};
-  for (const ns of namespaces) {
-    labels[ns] = {};
-    for (const key of Object.keys(localeMap[routing.defaultLocale][ns] ?? {})) {
-      labels[ns][key] = Object.fromEntries(
-        Object.entries(localeMap).map(([locale, msgs]) => [locale, msgs[ns]?.[key] ?? ""]),
-      );
-    }
-  }
-  return labels;
-}
-
-function formatTime(time: string | null): string {
-  if (!time) return "–";
-  const [hours = "", minutes = ""] = time.split(":");
-  if (!hours || !minutes) return "–";
-  return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
 }
 
 // ─── Shared value types ────────────────────────────────────────────────────────
@@ -167,7 +144,7 @@ export interface ContentData {
 // ─── Builder ────────────────────────────────────────────────────────────────────
 
 export async function buildContentPayload(): Promise<ContentPayload> {
-  const [rawUpdates, flights, faqs, releases, config, languages, commonLabels, homeLabels, flightInfoLabels] =
+  const [rawUpdates, flights, faqs, releases, config, languages, labelRows] =
     await Promise.all([
       getOfficialUpdates(),
       getFlights(),
@@ -175,87 +152,20 @@ export async function buildContentPayload(): Promise<ContentPayload> {
       getPressReleases(),
       getSiteConfig(),
       getLanguages(),
-      buildLabels(["nav", "footer", "support", "emptyState"]),
-      buildLabels(["home"]),
-      buildLabels(["flightInfo"]),
+      getUiLabels(),
     ]);
 
-  const latestUpdate = rawUpdates[0];
-  const latestRelease = releases[0];
-
-  return {
+  return assembleContentPayload({
     generatedAt: new Date().toISOString(),
-    common: {
-      contacts: {
-        passengerHotline: config.passenger_hotline,
-        familyHotline: config.family_hotline,
-        supportEmail: config.support_email,
-        mediaContact: config.media_contact,
-      },
-      logoOnBlack: assetUrl(config.logo_on_black),
-      logoOnWhite: assetUrl(config.logo_on_white),
-      languages: languages.map((l) => ({ code: l.code, name: l.name })),
-      labels: commonLabels,
-    },
-    home: {
-      latestUpdate: latestUpdate
-        ? {
-            date: latestUpdate.date,
-            title: Object.fromEntries(
-              latestUpdate.translations.map((t) => [t.languages_code, t.title]),
-            ),
-            description: Object.fromEntries(
-              latestUpdate.translations.map((t) => [t.languages_code, t.description]),
-            ),
-          }
-        : null,
-      labels: homeLabels,
-    },
-    faqs: {
-      faqs: faqs.map((faq) => ({
-        question: Object.fromEntries(faq.translations.map((t) => [t.languages_code, t.question])),
-        answer: Object.fromEntries(faq.translations.map((t) => [t.languages_code, t.answer])),
-      })),
-    },
-    flightInfo: {
-      flights: flights.map((f, i) => ({
-        no: i + 1,
-        type: f.aircraft_type ?? "–",
-        capacity: f.capacity ?? "–",
-        flightNo: f.flight_no,
-        departure: f.dep ?? "–",
-        arrival: f.arr ?? "–",
-        srtd: formatTime(f.srtd),
-        atd: formatTime(f.atd),
-        note: f.note ?? "–",
-      })),
-      flightPolicy: Object.fromEntries(
-        config.translations.map((t) => [t.languages_code, t.flight_policy]),
-      ),
-      labels: flightInfoLabels,
-    },
-    officialUpdates: {
-      updates: rawUpdates.map((u) => ({
-        date: u.date,
-        title: Object.fromEntries(u.translations.map((t) => [t.languages_code, t.title])),
-        description: Object.fromEntries(
-          u.translations.map((t) => [t.languages_code, t.description]),
-        ),
-      })),
-    },
-    pressReleases: {
-      pressRelease: latestRelease
-        ? {
-            title: Object.fromEntries(
-              latestRelease.translations.map((t) => [t.languages_code, t.title]),
-            ),
-            body: Object.fromEntries(
-              latestRelease.translations.map((t) => [t.languages_code, t.body]),
-            ),
-          }
-        : null,
-    },
-  };
+    officialUpdates: rawUpdates,
+    flights,
+    faqs,
+    pressReleases: releases,
+    siteConfig: config,
+    languages,
+    labelRows,
+    assetUrl,
+  });
 }
 
 export function resolveLocale(payload: ContentPayload, locale: string): ContentData {
