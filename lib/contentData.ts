@@ -175,7 +175,7 @@ export async function buildContentPayload(): Promise<ContentPayload> {
       getPressReleases(),
       getSiteConfig(),
       getLanguages(),
-      buildLabels(["nav", "footer", "support"]),
+      buildLabels(["nav", "footer", "support", "emptyState"]),
       buildLabels(["home"]),
       buildLabels(["flightInfo"]),
     ]);
