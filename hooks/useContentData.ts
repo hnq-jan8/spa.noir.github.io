@@ -9,16 +9,20 @@ import { routing } from "@/i18n/routing";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 let cachedPromise: Promise<ContentPayload> | null = null;
-// Theo dõi pathname ở module scope (dùng chung cho mọi instance của hook)
-// để mỗi lần chuyển route chỉ invalidate đúng một lần, bất kể bao nhiêu
-// component đang gọi useContentData() cùng lúc.
+let cachedPayload: ContentPayload | null = null;
 let lastPathname: string | null = null;
 const listeners = new Set<() => void>();
 
 function fetchPayload(): Promise<ContentPayload> {
   if (cachedPromise) return cachedPromise;
-  cachedPromise = fetch(`${basePath}/content.json?_=${Date.now()}`, { cache: "no-store" })
+  cachedPromise = fetch(`${basePath}/content.json?_=${Date.now()}`, {
+    cache: "no-store",
+  })
     .then((res) => res.json() as Promise<ContentPayload>)
+    .then((payload) => {
+      cachedPayload = payload;
+      return payload;
+    })
     .catch((err) => {
       cachedPromise = null;
       throw err;
@@ -27,6 +31,8 @@ function fetchPayload(): Promise<ContentPayload> {
 }
 
 export function invalidateContent() {
+  // Chỉ xoá promise để lần fetch tới đi thẳng ra network; giữ lại
+  // cachedPayload để UI vẫn có dữ liệu cũ hiển thị trong lúc revalidate.
   cachedPromise = null;
   listeners.forEach((l) => l());
 }
@@ -35,7 +41,11 @@ export function useContentData(): ContentData | null {
   const params = useParams();
   const pathname = usePathname();
   const locale = (params?.locale as string) ?? routing.defaultLocale;
-  const [data, setData] = useState<ContentData | null>(null);
+  // Khởi tạo bằng dữ liệu stale (nếu có) để trang mới render tức thì,
+  // không bị khoảng trắng chờ fetch sau mỗi lần chuyển route.
+  const [data, setData] = useState<ContentData | null>(() =>
+    cachedPayload ? resolveLocale(cachedPayload, locale) : null,
+  );
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
@@ -47,8 +57,6 @@ export function useContentData(): ContentData | null {
   }, []);
 
   useEffect(() => {
-    // Bỏ qua lần mount đầu tiên của cả session (lastPathname === null) —
-    // chỉ invalidate khi route thực sự đổi, để lấy content.json mới nhất.
     if (lastPathname !== null && lastPathname !== pathname) {
       invalidateContent();
     }
