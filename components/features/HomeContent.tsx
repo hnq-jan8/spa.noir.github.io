@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useCallback, useRef, useState } from "react";
 import {
   Megaphone,
   Phone,
@@ -20,6 +21,24 @@ export default function HomeContent() {
   const params = useParams();
   const locale = (params?.locale as string) ?? routing.defaultLocale;
   const data = useContentData();
+
+  const [isCompact, setIsCompact] = useState(false);
+  const [transitionsReady, setTransitionsReady] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
+    if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
+    if (!node) return;
+    setIsCompact(node.getBoundingClientRect().top < 56);
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => setIsCompact(!entry.isIntersecting),
+      { rootMargin: "-64px 0px 0px 0px", threshold: 0 },
+    );
+    observerRef.current.observe(node);
+    settleTimerRef.current = setTimeout(() => setTransitionsReady(true), 500);
+  }, []);
 
   if (!data) return null;
 
@@ -45,12 +64,25 @@ export default function HomeContent() {
   ];
 
   return (
-    <div className="container-page py-8 md:py-11 max-w-3xl mx-auto">
+    <div className="container-page pt-4 pb-8 md:pt-7 md:pb-11 max-w-3xl mx-auto">
       {/* As-of timestamp */}
-      <div className="sticky top-16 z-10 mb-4">
-        <div className="absolute inset-x-0 -top-2 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
-        <div className="relative flex -top-0 items-start gap-2 text-sm text-gray-500 rounded-2xl px-4 py-3 bg-white/75 backdrop-blur-md shadow-md shadow-gray-200/50 border border-gray-200">
-          <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5 animate-pulse" />
+      <div ref={sentinelRef} className="h-px" aria-hidden="true" />
+      <div className="sticky top-14 z-10 pt-4 mb-4">
+        <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
+        <div
+          className={`relative flex gap-2 text-gray-500 border border-gray-200 ${
+            transitionsReady ? "transition-all duration-200" : ""
+          } ${
+            isCompact
+              ? "items-center text-xs px-3 py-1.5 rounded-3xl bg-white/50 backdrop-blur-md shadow-md shadow-gray-200/50"
+              : "items-start text-sm px-4 py-3 rounded-2xl bg-white"
+          }`}
+        >
+          <span
+            className={`rounded-full bg-red-500 flex-shrink-0 animate-pulse ${
+              transitionsReady ? "transition-all duration-100" : ""
+            } ${isCompact ? "w-1.5 h-1.5" : "w-2 h-2 mt-1.5"}`}
+          />
           <p className="flex flex-wrap gap-x-1">
             <span>{home["asOf"]}:</span>
             <span className="whitespace-nowrap">{asOf}</span>
