@@ -96,16 +96,25 @@ export default function HomeContent() {
           {home["supportTitle"]}
         </p>
         <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
-          {Object.entries(data.common.contacts).map(([key, value]) => (
-            <div key={key}>
-              <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
-                {support[key]}
-              </p>
-              <p className="text-sm font-semibold text-gray-900">
-                {value}
-              </p>
-            </div>
-          ))}
+          {Object.entries(data.common.contacts).map(([key, value]) => {
+            const isEmail = value.includes("@");
+            const href = isEmail
+              ? `mailto:${value}`
+              : `tel:${value.replace(/[^+\d]/g, "")}`;
+            return (
+              <div key={key}>
+                <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
+                  {support[key]}
+                </p>
+                <a
+                  href={href}
+                  className="text-sm font-semibold text-gray-900 hover:text-amber-700 transition-colors"
+                >
+                  {value}
+                </a>
+              </div>
+            );
+          })}
         </div>
       </div>
 
