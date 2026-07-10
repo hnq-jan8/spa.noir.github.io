@@ -9,6 +9,7 @@ import {
   HelpCircle,
   FileText,
   ChevronRight,
+  Info,
 } from "lucide-react";
 import { useContentData } from "@/hooks/useContentData";
 import { formatTimestamp } from "@/lib/siteData";
@@ -90,32 +91,45 @@ export default function HomeContent() {
       )}
 
       {/* Support hotlines */}
-      <div className="bg-gray-100 border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
-        <p className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold uppercase tracking-wide mb-4">
-          <Phone className="w-4 h-4" strokeWidth={2} />
-          {home["supportTitle"]}
-        </p>
-        <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
-          {Object.entries(data.common.contacts).map(([key, value]) => {
-            const isEmail = value.includes("@");
-            const href = isEmail
-              ? `mailto:${value}`
-              : `tel:${value.replace(/[^+\d]/g, "")}`;
-            return (
-              <div key={key}>
-                <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
-                  {support[key]}
-                </p>
-                <a
-                  href={href}
-                  className="text-sm font-semibold text-gray-900 hover:text-amber-700 transition-colors"
-                >
-                  {value}
-                </a>
-              </div>
-            );
-          })}
+      <div className="relative mb-4">
+        <div className="relative z-[2] bg-gray-100 border border-gray-200 rounded-2xl shadow-sm p-6">
+          <p className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold uppercase tracking-wide mb-4">
+            <Phone className="w-4 h-4" strokeWidth={2} />
+            {home["supportTitle"]}
+          </p>
+          <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
+            {Object.entries(data.common.contacts).map(([key, value]) => {
+              const isEmail = value.includes("@");
+              const href = isEmail
+                ? `mailto:${value}`
+                : `tel:${value.replace(/[^+\d]/g, "")}`;
+              return (
+                <div key={key}>
+                  <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
+                    {support[key]}
+                  </p>
+                  <a
+                    href={href}
+                    className="text-sm font-semibold text-gray-900 hover:text-amber-700 transition-colors"
+                  >
+                    {value}
+                  </a>
+                </div>
+              );
+            })}
+          </div>
         </div>
+        {home["mediaNotice"] && (
+          <div className="relative z-[1] -mt-3.5 rounded-b-2xl bg-gray-200 px-6 pt-5 pb-2.5 flex gap-2.5 items-center">
+            <Info
+              className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5"
+              strokeWidth={2}
+            />
+            <p className="text-xs text-gray-600 leading-relaxed mt-[4px]">
+              {home["mediaNotice"]}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Grid: flight info / faqs */}
