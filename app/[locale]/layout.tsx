@@ -54,18 +54,16 @@ export default async function LocaleLayout({
   const { officialSiteUrl } = await getBuildMode();
 
   return (
-    <html lang={locale}>
-      <body>
-        <RememberLocale />
-        <ActivePoller officialSiteUrl={officialSiteUrl} />
-        <div className="flex flex-col min-h-screen bg-page">
-          <div className="flex flex-col flex-1">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-          </div>
-          <Footer />
+    <>
+      <RememberLocale />
+      <ActivePoller officialSiteUrl={officialSiteUrl} />
+      <div className="flex flex-col min-h-screen bg-page">
+        <div className="flex flex-col flex-1">
+          <Navbar />
+          <main className="flex-1">{children}</main>
         </div>
-      </body>
-    </html>
+        <Footer />
+      </div>
+    </>
   );
 }

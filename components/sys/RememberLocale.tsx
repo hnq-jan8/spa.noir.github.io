@@ -9,7 +9,9 @@ export default function RememberLocale() {
   const locale = params?.locale as string | undefined;
 
   useEffect(() => {
-    if (locale) saveLocale(locale);
+    if (!locale) return;
+    saveLocale(locale);
+    document.documentElement.lang = locale;
   }, [locale]);
 
   return null;

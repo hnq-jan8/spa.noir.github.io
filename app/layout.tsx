@@ -25,7 +25,7 @@ export default async function RootLayout({
   const earlyRedirectScript = `(function(){try{var x=new XMLHttpRequest();x.open('GET','${basePath}/status.json?_='+Date.now(),false);x.setRequestHeader('Cache-Control','no-cache, no-store');x.setRequestHeader('Pragma','no-cache');x.send(null);if(x.status===200){var s=JSON.parse(x.responseText);if(s.active===false){window.location.replace(${JSON.stringify(officialSiteUrl)});}}}catch(e){}})();`;
 
   return (
-    <html>
+    <html lang={routing.defaultLocale}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: earlyRedirectScript }} />
       </head>
