@@ -20,7 +20,9 @@ export const LABEL_NAMESPACES = {
 };
 
 export function formatTime(time) {
-  return time ? time.slice(0, 5) : "–";
+  if (!time) return "–";
+  const [h, m] = time.split(":");
+  return `${h.padStart(2, "0")}:${m}`;
 }
 
 /** ui_labels rows → { [namespace]: { [key]: { [locale]: value } } } */
@@ -47,7 +49,9 @@ function pickNamespaces(labelsByNs, namespaces) {
 }
 
 function i18nMap(translations, field) {
-  return Object.fromEntries(translations.map((t) => [t.languages_code, t[field]]));
+  return Object.fromEntries(
+    translations.map((t) => [t.languages_code, t[field]]),
+  );
 }
 
 /**
