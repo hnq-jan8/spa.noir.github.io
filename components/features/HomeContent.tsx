@@ -156,7 +156,7 @@ export default function HomeContent() {
                 </div>
               </div>
               <ChevronRight
-                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-colors group-hover:text-gray-400"
+                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1"
                 strokeWidth={2}
               />
             </Link>
@@ -183,7 +183,7 @@ export default function HomeContent() {
             </div>
           </div>
           <ChevronRight
-            className="w-5 h-5 text-gray-300 flex-shrink-0 transition-colors group-hover:text-gray-400"
+            className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1"
             strokeWidth={2}
           />
         </Link>

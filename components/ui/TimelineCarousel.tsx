@@ -1,6 +1,7 @@
 "use client";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import MarkdownContent from "@/components/ui/MarkdownContent";
+import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 
 interface TimelineItem {
   title: string;
@@ -9,35 +10,14 @@ interface TimelineItem {
 }
 
 export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const {
+    ref: scrollRef,
+    canScrollLeft,
+    canScrollRight,
+    scrollBy,
+  } = useHorizontalScroll<HTMLDivElement>();
 
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 0);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-  }, []);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    updateScrollState();
-    el.addEventListener("scroll", updateScrollState);
-    window.addEventListener("resize", updateScrollState);
-    return () => {
-      el.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
-    };
-  }, [updateScrollState]);
-
-  const scroll = (dir: "left" | "right") => {
-    scrollRef.current?.scrollBy({
-      left: dir === "left" ? -280 : 280,
-      behavior: "smooth",
-    });
-  };
+  const scroll = (dir: "left" | "right") => scrollBy(dir, 280);
 
   return (
     <div className="mb-12">
@@ -49,28 +29,18 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         <div className="absolute right-0 top-0 -bottom-16 w-8 bg-gradient-to-l from-gray-50 to-transparent z-20 pointer-events-none" />
 
         {/* Left arrow — overlays on top of gradient */}
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll("left")}
-            className="absolute -left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70
-            bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full"
-            aria-label="Scroll left"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-        )}
+        <button
+          onClick={() => scroll("left")}
+          className={`absolute -left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70
+          bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full transition-opacity duration-200 ${
+            canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          aria-label="Scroll left"
+          aria-hidden={!canScrollLeft}
+          tabIndex={canScrollLeft ? 0 : -1}
+        >
+          <ChevronLeft className="w-5 h-5" strokeWidth={2} />
+        </button>
 
         {/* Scrollable row — padding inside so start/end content stays visible at scroll edges */}
         <div
@@ -111,28 +81,18 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         </div>
 
         {/* Right arrow — overlays on top of gradient */}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll("right")}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70
-            bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full"
-            aria-label="Scroll right"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        )}
+        <button
+          onClick={() => scroll("right")}
+          className={`absolute -right-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70
+          bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full transition-opacity duration-200 ${
+            canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          aria-label="Scroll right"
+          aria-hidden={!canScrollRight}
+          tabIndex={canScrollRight ? 0 : -1}
+        >
+          <ChevronRight className="w-5 h-5" strokeWidth={2} />
+        </button>
       </div>
 
       {/* ── Mobile / Tablet layout (< lg): vertical feed ── */}

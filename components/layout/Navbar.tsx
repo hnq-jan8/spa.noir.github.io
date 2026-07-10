@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   DesktopLanguageSelector,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
+import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { routing, languages as routingLanguages } from "@/i18n/routing";
 
 const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
@@ -35,9 +37,12 @@ export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [langExpanded, setLangExpanded] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
+  const {
+    ref: navRef,
+    canScrollLeft,
+    canScrollRight,
+    scrollBy: scrollNavBy,
+  } = useHorizontalScroll<HTMLElement>();
   const headerRef = useRef<HTMLElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -72,31 +77,7 @@ export default function Navbar() {
   const activeItem = navItems.find((item) => item.href === normalizedPath);
   const isHomeActive = normalizedPath === `/${locale}`;
 
-  const updateScrollState = useCallback(() => {
-    const el = navRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 0);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-  }, []);
-
-  useEffect(() => {
-    const el = navRef.current;
-    if (!el) return;
-    updateScrollState();
-    el.addEventListener("scroll", updateScrollState);
-    window.addEventListener("resize", updateScrollState);
-    return () => {
-      el.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
-    };
-  }, [updateScrollState]);
-
-  const scrollNav = (dir: "left" | "right") => {
-    navRef.current?.scrollBy({
-      left: dir === "left" ? -120 : 120,
-      behavior: "smooth",
-    });
-  };
+  const scrollNav = (dir: "left" | "right") => scrollNavBy(dir, 120);
 
   return (
     <>
@@ -134,30 +115,25 @@ export default function Navbar() {
             {/* Tablet + Desktop nav */}
             <div className="hidden md:flex items-stretch flex-1 min-w-0 relative self-stretch ml-2">
               <div className="relative flex-1 min-w-0 self-stretch">
-                {canScrollLeft && (
-                  <>
-                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-chrome to-transparent z-10 pointer-events-none lg:hidden" />
-                    <button
-                      onClick={() => scrollNav("left")}
-                      className="absolute left-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden"
-                      aria-label="Scroll left"
-                    >
-                      <svg
-                        className="absolute left-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 19l-7-7 7-7"
-                        />
-                      </svg>
-                    </button>
-                  </>
-                )}
+                <div
+                  className={`absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-chrome to-transparent z-10 pointer-events-none lg:hidden transition-opacity duration-200 ${
+                    canScrollLeft ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+                <button
+                  onClick={() => scrollNav("left")}
+                  className={`absolute left-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
+                    canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none"
+                  }`}
+                  aria-label="Scroll left"
+                  aria-hidden={!canScrollLeft}
+                  tabIndex={canScrollLeft ? 0 : -1}
+                >
+                  <ChevronLeft
+                    className="absolute left-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
+                    strokeWidth={2}
+                  />
+                </button>
                 <nav
                   ref={navRef}
                   className="flex items-stretch overflow-x-auto overflow-y-clip scrollbar-hide h-full w-full px-2 scroll-px-5 lg:px-0 lg:scroll-px-0"
@@ -191,30 +167,25 @@ export default function Navbar() {
                     );
                   })}
                 </nav>
-                {canScrollRight && (
-                  <>
-                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-chrome to-transparent z-10 pointer-events-none lg:hidden" />
-                    <button
-                      onClick={() => scrollNav("right")}
-                      className="absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden"
-                      aria-label="Scroll right"
-                    >
-                      <svg
-                        className="absolute right-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
-                  </>
-                )}
+                <div
+                  className={`absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-chrome to-transparent z-10 pointer-events-none lg:hidden transition-opacity duration-200 ${
+                    canScrollRight ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+                <button
+                  onClick={() => scrollNav("right")}
+                  className={`absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
+                    canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none"
+                  }`}
+                  aria-label="Scroll right"
+                  aria-hidden={!canScrollRight}
+                  tabIndex={canScrollRight ? 0 : -1}
+                >
+                  <ChevronRight
+                    className="absolute right-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
+                    strokeWidth={2}
+                  />
+                </button>
               </div>
             </div>
 

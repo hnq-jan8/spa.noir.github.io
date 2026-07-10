@@ -11,12 +11,11 @@ export default function OfficialUpdatesContent() {
   if (!data) return null;
 
   const updates = data.officialUpdates.updates;
-  const es = data.common.labels["emptyState"];
 
   return (
     <div className="container-page pt-4 pb-8 md:pb-8 md:pt-8">
       {updates.length === 0 ? (
-        <EmptyState title={es?.["title"]} description={es?.["description"]} />
+        <EmptyState data={data} />
       ) : (
         <Reveal className="mx-1 sm:mx-1.5 lg:mx-2 md:mt-6">
           <TimelineCarousel items={updates} />

@@ -15,10 +15,9 @@ export default function FlightInfoContent() {
   const flights = data.flightInfo.flights;
 
   if (flights.length === 0) {
-    const es = data.common.labels["emptyState"];
     return (
       <div className="container-page pt-4 pb-8 md:py-8">
-        <EmptyState title={es?.["title"]} description={es?.["description"]} />
+        <EmptyState data={data} />
       </div>
     );
   }

@@ -34,7 +34,7 @@ export default function Reveal({
   return (
     <div
       className={`transition-all duration-200 ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       } ${className}`}
       style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
     >
