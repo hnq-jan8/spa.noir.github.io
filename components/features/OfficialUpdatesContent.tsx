@@ -1,6 +1,7 @@
 "use client";
 
 import EmptyState from "@/components/ui/EmptyState";
+import Reveal from "@/components/ui/Reveal";
 import TimelineCarousel from "@/components/ui/TimelineCarousel";
 import { useContentData } from "@/hooks/useContentData";
 
@@ -17,9 +18,9 @@ export default function OfficialUpdatesContent() {
       {updates.length === 0 ? (
         <EmptyState title={es?.["title"]} description={es?.["description"]} />
       ) : (
-        <div className="mx-1 sm:mx-1.5 lg:mx-2 md:mt-6">
+        <Reveal className="mx-1 sm:mx-1.5 lg:mx-2 md:mt-6">
           <TimelineCarousel items={updates} />
-        </div>
+        </Reveal>
       )}
     </div>
   );
