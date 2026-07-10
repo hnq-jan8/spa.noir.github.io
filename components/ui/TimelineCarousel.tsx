@@ -45,7 +45,7 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         {/* Scrollable row — padding inside so start/end content stays visible at scroll edges */}
         <div
           ref={scrollRef}
-          className="flex overflow-x-auto gap-1 px-8 overflow-y-clip"
+          className="flex items-start overflow-x-auto gap-6 px-8 overflow-y-clip"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
@@ -53,8 +53,16 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
           }}
         >
           {items.map((item, idx) => (
-            <div key={idx} className="flex flex-col flex-shrink-0 w-80">
-              {/* Card */}
+            <div key={idx} className="flex flex-col flex-shrink-0 w-96">
+              {/* Date, above the dot so its height never depends on card content */}
+              <div className="-ml-[7px] h-4 text-left text-xs text-gray-500">
+                {item.date}
+              </div>
+              {/* Dot — sits on the fixed timeline line above */}
+              <div className="-ml-[7px] relative z-10 mt-2">
+                <div className="w-4 h-4 rounded-full border-2 border-gray-400 bg-white" />
+              </div>
+              {/* Card — border starts right where the dot ends, no gap */}
               <div className="timeline-card">
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                 <MarkdownContent
@@ -62,23 +70,12 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
                   className="text-sm text-gray-600"
                 />
               </div>
-              {/* Dot + date */}
-              <div className="flex justify-start -ml-[7px] relative z-10">
-                <div className="w-4 h-4 rounded-full border-2 border-gray-400 bg-white" />
-              </div>
-              {item.date && (
-                <div className="text-left text-xs text-gray-500 mt-2">
-                  {item.date}
-                </div>
-              )}
             </div>
           ))}
         </div>
 
-        {/* Timeline line through dot centers — full width, no padding */}
-        <div className="relative -mt-[calc(1.5rem+8px)] mb-6 pointer-events-none">
-          <div className="h-px bg-gray-300 w-full" />
-        </div>
+        {/* Timeline line through dot centers — full width, reaches under the fade edges */}
+        <div className="absolute left-0 right-0 top-8 h-px bg-gray-300 pointer-events-none" />
 
         {/* Right arrow — overlays on top of gradient */}
         <button
@@ -95,23 +92,23 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
         </button>
       </div>
 
-      {/* ── Mobile / Tablet layout (< lg): vertical feed ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:hidden gap-0 px-4 sm:px-6">
+      {/* ── Mobile / Tablet layout (< lg): single-column vertical feed ── */}
+      <div className="lg:hidden px-4 sm:px-6">
         {items.map((item, idx) => (
-          <div key={idx} className="flex gap-4 pb-6">
+          <div key={idx} className="flex gap-4">
             <div className="flex flex-col items-center flex-shrink-0">
               <div className="w-3 h-3 rounded-full border-2 border-gray-400 bg-white mt-1" />
               <div className="w-px flex-1 bg-gray-300 mt-1" />
             </div>
-            <div className="flex-1 pb-2">
+            <div className="flex-1 pb-6 pt-0.5">
+              {item.date && (
+                <p className="text-xs text-gray-500 mb-1">{item.date}</p>
+              )}
               <h3 className="text-lg font-bold mb-1">{item.title}</h3>
               <MarkdownContent
                 content={item.description}
-                className="text-sm text-gray-600 mb-1"
+                className="text-sm text-gray-600"
               />
-              {item.date && (
-                <p className="text-xs text-gray-500">{item.date}</p>
-              )}
             </div>
           </div>
         ))}

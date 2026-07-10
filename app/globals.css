@@ -32,6 +32,6 @@
   }
 
   .timeline-card {
-    @apply border-l-2 border-gray-300 pl-4 pr-6 pb-6 flex-1;
+    @apply border-l border-gray-300 pl-4 pr-6 pb-6 pt-4;
   }
 }
