@@ -46,6 +46,11 @@ export declare function assembleContentPayload(input: {
     media_contact: string;
     logo_on_black: string | null;
     logo_on_white: string | null;
+    social_facebook: string | null;
+    social_instagram: string | null;
+    social_linkedin: string | null;
+    social_youtube: string | null;
+    social_tiktok: string | null;
     translations: { languages_code: string; flight_policy: string }[];
   };
   languages: { code: string; name: string }[];

@@ -74,7 +74,7 @@ const [
     "/items/press_releases?fields=translations.languages_code,translations.title,translations.body&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   ),
   get(
-    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,logo_on_black,logo_on_white,translations.languages_code,translations.flight_policy",
+    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,logo_on_black,logo_on_white,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy",
   ),
   getActive(),
   get(

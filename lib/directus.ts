@@ -82,6 +82,11 @@ export interface SiteConfig {
   media_contact: string;
   logo_on_black: string | null;
   logo_on_white: string | null;
+  social_facebook: string | null;
+  social_instagram: string | null;
+  social_linkedin: string | null;
+  social_youtube: string | null;
+  social_tiktok: string | null;
   translations: SiteConfigTranslation[];
 }
 
@@ -138,7 +143,7 @@ export async function getPressReleases(): Promise<PressRelease[]> {
 
 export async function getSiteConfig(): Promise<SiteConfig> {
   return get(
-    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,logo_on_black,logo_on_white,translations.languages_code,translations.flight_policy",
+    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,logo_on_black,logo_on_white,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy",
   );
 }
 

@@ -85,6 +85,13 @@ export function assembleContentPayload({
       },
       logoOnBlack: assetUrl(siteConfig.logo_on_black),
       logoOnWhite: assetUrl(siteConfig.logo_on_white),
+      social: {
+        facebook: siteConfig.social_facebook || null,
+        instagram: siteConfig.social_instagram || null,
+        linkedin: siteConfig.social_linkedin || null,
+        youtube: siteConfig.social_youtube || null,
+        tiktok: siteConfig.social_tiktok || null,
+      },
       languages: languages.map((l) => ({ code: l.code, name: l.name })),
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.common),
     },
