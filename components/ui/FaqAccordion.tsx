@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import Reveal from "@/components/ui/Reveal";
 
 interface FaqItem {
   question: string;
@@ -26,9 +25,8 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
       {items.map((item, i) => {
         const isOpen = openSet.has(i);
         return (
-          <Reveal
+          <div
             key={i}
-            delay={i * 50}
             className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
           >
             <button
@@ -63,7 +61,7 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
                 </div>
               </div>
             </div>
-          </Reveal>
+          </div>
         );
       })}
     </div>

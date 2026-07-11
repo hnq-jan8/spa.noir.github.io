@@ -3,6 +3,7 @@
 import EmptyState from "@/components/ui/EmptyState";
 import FaqAccordion from "@/components/ui/FaqAccordion";
 import { useContentData } from "@/hooks/useContentData";
+import Reveal from "../ui/Reveal";
 
 export default function FaqsContent() {
   const data = useContentData();
@@ -16,7 +17,9 @@ export default function FaqsContent() {
       {faqs.length === 0 ? (
         <EmptyState data={data} />
       ) : (
-        <FaqAccordion items={faqs} />
+        <Reveal>
+          <FaqAccordion items={faqs} />
+        </Reveal>
       )}
     </div>
   );
