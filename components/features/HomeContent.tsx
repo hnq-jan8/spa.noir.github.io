@@ -50,7 +50,7 @@ export default function HomeContent() {
       {/* As-of timestamp */}
       <div className="sticky top-14 z-10 pt-4 mb-4">
         <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
-        <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1.5 rounded-3xl bg-white/80 backdrop-blur-sm shadow-md shadow-gray-200/50">
+        <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-md shadow-gray-200/50">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 animate-pulse [animation-duration:1s]" />
           <p className="flex flex-wrap gap-x-1">
             <span>{home["asOf"]}:</span>
@@ -60,11 +60,11 @@ export default function HomeContent() {
       </div>
 
       {/* Latest official update */}
-      {latestUpdate && (
-        <Reveal className="mb-4">
+      <Reveal className="mb-4">
+        {latestUpdate ? (
           <Link
             href={`/${locale}/official-updates`}
-            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:outline hover:outline-[1.5px] hover:-outline-offset-[1.5px] hover:outline-amber-600 transition-colors"
+            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-px transition-[box-shadow,transform]"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -90,8 +90,13 @@ export default function HomeContent() {
               </span>
             </div>
           </Link>
-        </Reveal>
-      )}
+        ) : (
+          <div className="flex items-center gap-2 bg-gray-50 border border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400">
+            <Megaphone className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
+            <p className="text-sm">{home["noOfficialUpdate"]}</p>
+          </div>
+        )}
+      </Reveal>
 
       {/* Support hotlines */}
       <Reveal delay={50} className="relative mb-4">
@@ -141,7 +146,7 @@ export default function HomeContent() {
           <Reveal key={page.href} delay={100 + index * 50}>
             <Link
               href={page.href}
-              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:outline hover:outline-[1.5px] hover:-outline-offset-[1.5px] hover:outline-gray-400 transition-colors p-6"
+              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-px transition-[box-shadow,transform] p-6"
             >
               <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
                 <page.Icon
@@ -168,7 +173,7 @@ export default function HomeContent() {
       <Reveal delay={200}>
         <Link
           href={`/${locale}/press-releases`}
-          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:outline hover:outline-[1.5px] hover:-outline-offset-[1.5px] hover:outline-gray-400 transition-colors p-6"
+          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-px transition-[box-shadow,transform] p-6"
         >
           <div className="flex items-center gap-4">
             <FileText

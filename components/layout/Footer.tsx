@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { useContentData } from "@/hooks/useContentData";
+import { bundledLabels } from "@/i18n/labels";
 import { routing } from "@/i18n/routing";
 
 const homePathPattern = new RegExp(`^/(${routing.locales.join("|")})/?$`);
@@ -38,8 +39,13 @@ export default function Footer() {
   const pathname = usePathname();
   const isHome = homePathPattern.test(pathname);
   const data = useContentData();
-  const footer = data?.common.labels["footer"];
-  const support = data?.common.labels["support"];
+  const params = useParams();
+  const locale = (params?.locale as string) ?? routing.defaultLocale;
+  // Fallback về label bundle lúc build — hiện ngay, content.json ghi đè khi về.
+  const footer =
+    data?.common.labels["footer"] ?? bundledLabels(locale, "footer");
+  const support =
+    data?.common.labels["support"] ?? bundledLabels(locale, "support");
   const socialLinks = data
     ? (Object.keys(SOCIAL_ICONS) as (keyof typeof SOCIAL_ICONS)[])
         .map((key) => ({ ...SOCIAL_ICONS[key], href: data.common.social[key] }))
@@ -89,33 +95,36 @@ export default function Footer() {
           </div>
         )}
 
-        <div className="mt-8">
-          <p className="text-xs text-gray-500 mb-3 uppercase tracking-wide">
-            {footer?.["connectWithUs"]}
-          </p>
-          <div className="flex items-center gap-2">
-            {socialLinks.map((social) => (
-              <a
-                key={social.name}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.name}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-gray-900 hover:bg-black/10 transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`w-auto ${"size" in social ? social.size : "h-4"}`}
-                  viewBox={"viewBox" in social ? social.viewBox : "0 0 24 24"}
-                  fill="currentColor"
-                  aria-hidden="true"
+        {/* Social links */}
+        {socialLinks.length > 0 && (
+          <div className="mt-8">
+            <p className="text-xs text-gray-500 mb-3 uppercase tracking-wide">
+              {footer?.["connectWithUs"]}
+            </p>
+            <div className="flex items-center gap-2">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-gray-900 hover:bg-black/10 transition-colors"
                 >
-                  <path d={social.path} />
-                </svg>
-              </a>
-            ))}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`w-auto ${"size" in social ? social.size : "h-4"}`}
+                    viewBox={"viewBox" in social ? social.viewBox : "0 0 24 24"}
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d={social.path} />
+                  </svg>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="mt-8 pt-6 border-t border-black/10 flex flex-col items-start min-[400px]:flex-row min-[400px]:items-center justify-between gap-4">
           <p className="text-xs text-gray-500">

@@ -7,6 +7,7 @@
 
 # sinh lúc build từ Directus (scripts/generate-i18n.mjs)
 /i18n/locales.generated.json
+/i18n/messages.generated.ts
 /messages/*.json
 
 # local preview của GitHub Pages (tạo bởi npm run preview)

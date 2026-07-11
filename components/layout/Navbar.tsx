@@ -11,6 +11,7 @@ import {
 } from "@/components/layout/LanguageSelector";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
+import { bundledLabels } from "@/i18n/labels";
 import { routing, languages as routingLanguages } from "@/i18n/routing";
 
 const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
@@ -20,7 +21,9 @@ export default function Navbar() {
   const locale = (params?.locale as string) ?? routing.defaultLocale;
   const pathname = usePathname();
   const data = useContentData();
-  const nav = data?.common.labels["nav"];
+  // Fallback về label bundle lúc build để nav hiện ngay first paint,
+  // không chờ content.json; bản trong content.json ghi đè khi về.
+  const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
   const liveLanguages = data?.common.languages.map((lang) => ({
     code: lang.code,
     label: lang.code.toUpperCase(),
