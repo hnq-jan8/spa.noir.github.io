@@ -64,7 +64,7 @@ export default function HomeContent() {
         {latestUpdate ? (
           <Link
             href={`/${locale}/official-updates`}
-            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-px transition-[box-shadow,transform]"
+            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -146,7 +146,7 @@ export default function HomeContent() {
           <Reveal key={page.href} delay={100 + index * 50}>
             <Link
               href={page.href}
-              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-px transition-[box-shadow,transform] p-6"
+              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
             >
               <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
                 <page.Icon
@@ -173,7 +173,7 @@ export default function HomeContent() {
       <Reveal delay={200}>
         <Link
           href={`/${locale}/press-releases`}
-          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-px transition-[box-shadow,transform] p-6"
+          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
         >
           <div className="flex items-center gap-4">
             <FileText

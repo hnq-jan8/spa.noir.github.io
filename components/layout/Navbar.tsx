@@ -105,12 +105,12 @@ export default function Navbar() {
               <Image
                 src={
                   data?.common.logoOnBlack ||
-                  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`
+                  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`
                 }
                 alt="SUN PhuQuoc Airways"
-                width={1024}
-                height={251}
-                className="h-9 w-auto transition group-hover:drop-shadow-[0_0_12px_#000000]"
+                width={185}
+                height={43}
+                className="h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_#202020]"
                 priority
               />
             </Link>
@@ -126,7 +126,9 @@ export default function Navbar() {
                 <button
                   onClick={() => scrollNav("left")}
                   className={`absolute left-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
-                    canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none"
+                    canScrollLeft
+                      ? "opacity-100"
+                      : "opacity-0 pointer-events-none"
                   }`}
                   aria-label="Scroll left"
                   aria-hidden={!canScrollLeft}
@@ -178,7 +180,9 @@ export default function Navbar() {
                 <button
                   onClick={() => scrollNav("right")}
                   className={`absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
-                    canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none"
+                    canScrollRight
+                      ? "opacity-100"
+                      : "opacity-0 pointer-events-none"
                   }`}
                   aria-label="Scroll right"
                   aria-hidden={!canScrollRight}

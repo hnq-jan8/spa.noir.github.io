@@ -61,11 +61,11 @@ export default function Footer() {
           <Image
             src={
               data?.common.logoOnWhite ||
-              `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`
+              `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`
             }
             alt="Sun PhuQuoc Airways"
-            width={180}
-            height={60}
+            width={185}
+            height={43}
             className={`object-contain opacity-80 ${data?.common.logoOnWhite ? "" : "invert"}`}
           />
         </div>
