@@ -46,7 +46,7 @@ export default function HomeContent() {
   ];
 
   return (
-    <div className="container-page pt-4 pb-8 md:pt-7 md:pb-11 max-w-3xl mx-auto">
+    <div className="container-page pb-8 md:pt-3 md:pb-11 max-w-3xl mx-auto">
       {/* As-of timestamp */}
       <div className="sticky top-14 z-10 pt-4 mb-4">
         <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
@@ -64,7 +64,7 @@ export default function HomeContent() {
         {latestUpdate ? (
           <Link
             href={`/${locale}/official-updates`}
-            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-[0_0_12px_#DFDFDF] transition-shadow"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -79,7 +79,7 @@ export default function HomeContent() {
               <div className="h-2" />
               <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none" />
             </div>
-            <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center justify-between text-xs mt-3">
               <span className="text-gray-400">{latestUpdate.date}</span>
               <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
                 {home["viewAll"]}
@@ -146,7 +146,7 @@ export default function HomeContent() {
           <Reveal key={page.href} delay={100 + index * 50}>
             <Link
               href={page.href}
-              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
+              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
             >
               <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
                 <page.Icon
@@ -173,7 +173,7 @@ export default function HomeContent() {
       <Reveal delay={200}>
         <Link
           href={`/${locale}/press-releases`}
-          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6"
+          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
         >
           <div className="flex items-center gap-4">
             <FileText
