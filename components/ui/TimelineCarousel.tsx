@@ -131,7 +131,9 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
               <div className="w-3 h-3 rounded-full border-2 border-gray-400 bg-white mt-1" />
               <div className="w-px flex-1 bg-gray-300 mt-1" />
             </div>
-            <div className="flex-1 pb-8 pt-0.5">
+            <div
+              className={`flex-1 ${idx < items.length - 1 ? "pb-[1.6rem]" : "pb-3"} pt-0.5`}
+            >
               {item.date && (
                 <p className="text-xs text-gray-500 mb-1">{item.date}</p>
               )}
