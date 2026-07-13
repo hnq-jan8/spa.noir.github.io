@@ -131,11 +131,11 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
               <div className="w-3 h-3 rounded-full border-2 border-gray-400 bg-white mt-1" />
               <div className="w-px flex-1 bg-gray-300 mt-1" />
             </div>
-            <div className="flex-1 pb-6 pt-0.5">
+            <div className="flex-1 pb-8 pt-0.5">
               {item.date && (
                 <p className="text-xs text-gray-500 mb-1">{item.date}</p>
               )}
-              <h3 className="text-lg font-bold mb-1">{item.title}</h3>
+              <h3 className="text-lg font-bold mb-2">{item.title}</h3>
               <MarkdownContent
                 content={item.description}
                 className="text-sm text-gray-600"
