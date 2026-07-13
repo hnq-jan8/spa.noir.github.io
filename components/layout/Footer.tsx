@@ -134,7 +134,7 @@ export default function Footer() {
             href="https://www.sunphuquocairways.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-black/5 hover:bg-black/10 transition-colors text-gray-900 text-sm px-5 py-2 rounded-xl"
+            className="inline-flex items-center gap-2 bg-black/5 hover:bg-[#811721] transition-colors text-gray-900 hover:text-gray-50 text-sm px-5 py-2 rounded-xl"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

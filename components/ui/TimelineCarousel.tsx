@@ -51,9 +51,9 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
       {/* ── Desktop layout (lg+): horizontal scroll ── */}
       <div className="hidden lg:block relative">
         {/* Left fade gradient — width matches scroll padding */}
-        <div className="absolute left-0 top-0 -bottom-16 w-12 bg-gradient-to-r from-page to-transparent z-20 pointer-events-none" />
+        <div className="absolute left-0 top-0 -bottom-16 w-9 bg-gradient-to-r from-page to-transparent z-20 pointer-events-none" />
         {/* Right fade gradient */}
-        <div className="absolute right-0 top-0 -bottom-16 w-12 bg-gradient-to-l from-page to-transparent z-20 pointer-events-none" />
+        <div className="absolute right-0 top-0 -bottom-16 w-9 bg-gradient-to-l from-page to-transparent z-20 pointer-events-none" />
 
         {/* Left arrow — overlays on top of gradient */}
         <button
@@ -82,7 +82,7 @@ export default function TimelineCarousel({ items }: { items: TimelineItem[] }) {
           {items.map((item, idx) => (
             <div key={idx} className="flex flex-col flex-shrink-0 w-[23rem]">
               {/* Date, above the dot so its height never depends on card content */}
-              <div className="-ml-[7px] h-4 text-left text-xs text-gray-500">
+              <div className="-ml-[2px] h-4 text-left text-xs text-gray-500">
                 {item.date}
               </div>
               {/* Dot — sits on the fixed timeline line above */}
