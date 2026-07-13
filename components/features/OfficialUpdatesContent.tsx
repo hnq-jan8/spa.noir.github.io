@@ -13,7 +13,9 @@ export default function OfficialUpdatesContent() {
   const updates = data.officialUpdates.updates;
 
   return (
-    <div className="container-page pt-4 pb-8 md:pb-8 md:pt-8">
+    <div
+      className={`container-page pt-4 pb-8 md:pb-8 md:pt-8 ${updates.length === 0 ? "" : "px-3"}`}
+    >
       {updates.length === 0 ? (
         <EmptyState data={data} />
       ) : (
