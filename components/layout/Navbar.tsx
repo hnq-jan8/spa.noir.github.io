@@ -354,8 +354,11 @@ export default function Navbar() {
       {/* Mobile breadcrumb */}
       {activeItem && (
         <div className="md:hidden sticky top-14 z-10 px-4 pt-4 pb-6">
-          <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
-          <div className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full">
+          <div
+            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden whitespace-nowrap
+                    bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full
+                      shadow-[0_0_24px_14px_rgba(255,255,255,0.8)]"
+          >
             <Link
               href={`/${locale}`}
               className="text-gray-700 hover:text-gray-950"
