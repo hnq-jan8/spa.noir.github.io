@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildContentPayload } from "@/lib/contentData";
+import { buildContentPayload } from "@/lib/buildContentPayload";
 
 export const dynamic = "force-static";
 

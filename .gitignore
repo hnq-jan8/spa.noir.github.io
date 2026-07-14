@@ -10,6 +10,9 @@
 /i18n/messages.generated.ts
 /messages/*.json
 
+# logo tải về từ Directus lúc build (scripts/fetch-cms-assets.mjs)
+/public/cms-assets/
+
 # local preview của GitHub Pages (tạo bởi npm run preview)
 /.preview/
 

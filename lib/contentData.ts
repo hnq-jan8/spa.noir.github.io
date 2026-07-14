@@ -1,14 +1,3 @@
-import {
-  getOfficialUpdates,
-  getFlights,
-  getFaqs,
-  getPressReleases,
-  getSiteConfig,
-  getLanguages,
-  getUiLabels,
-  assetUrl,
-} from "@/lib/directus";
-import { assembleContentPayload } from "../scripts/content-payload.mjs";
 import { routing } from "@/i18n/routing";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -151,32 +140,7 @@ export interface ContentData {
   };
 }
 
-// ─── Builder ────────────────────────────────────────────────────────────────────
-
-export async function buildContentPayload(): Promise<ContentPayload> {
-  const [rawUpdates, flights, faqs, releases, config, languages, labelRows] =
-    await Promise.all([
-      getOfficialUpdates(),
-      getFlights(),
-      getFaqs(),
-      getPressReleases(),
-      getSiteConfig(),
-      getLanguages(),
-      getUiLabels(),
-    ]);
-
-  return assembleContentPayload({
-    generatedAt: new Date().toISOString(),
-    officialUpdates: rawUpdates,
-    flights,
-    faqs,
-    pressReleases: releases,
-    siteConfig: config,
-    languages,
-    labelRows,
-    assetUrl,
-  });
-}
+// ─── Locale resolution ──────────────────────────────────────────────────────
 
 export function resolveLocale(payload: ContentPayload, locale: string): ContentData {
   return {

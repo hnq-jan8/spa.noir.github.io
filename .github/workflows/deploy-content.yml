@@ -61,6 +61,7 @@ jobs:
         env:
           DIRECTUS_URL: ${{ vars.DIRECTUS_URL }}
           DIRECTUS_STATIC_TOKEN: ${{ secrets.DIRECTUS_STATIC_TOKEN }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL }}
 
       - uses: actions/configure-pages@v5
         if: steps.download.outputs.fallback != 'true'

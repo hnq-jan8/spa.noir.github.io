@@ -59,5 +59,5 @@ export declare function assembleContentPayload(input: {
     key: string;
     translations: { languages_code: string; value: string }[];
   }[];
-  assetUrl: (id: string | null) => string | null;
+  resolveLogo: (id: string | null) => string | null;
 }): ContentPayload;

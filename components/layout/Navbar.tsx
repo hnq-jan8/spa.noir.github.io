@@ -16,11 +16,14 @@ import { routing, languages as routingLanguages } from "@/i18n/routing";
 
 const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
 
+const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
+
 export default function Navbar() {
   const params = useParams();
   const locale = (params?.locale as string) ?? routing.defaultLocale;
   const pathname = usePathname();
   const data = useContentData();
+  const [logoBroken, setLogoBroken] = useState(false);
   // Fallback về label bundle lúc build để nav hiện ngay first paint,
   // không chờ content.json; bản trong content.json ghi đè khi về.
   const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
@@ -104,9 +107,11 @@ export default function Navbar() {
             >
               <Image
                 src={
-                  data?.common.logoOnBlack ||
-                  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`
+                  logoBroken
+                    ? FALLBACK_LOGO
+                    : data?.common.logoOnBlack || FALLBACK_LOGO
                 }
+                onError={() => setLogoBroken(true)}
                 alt="SUN PhuQuoc Airways"
                 width={185}
                 height={43}

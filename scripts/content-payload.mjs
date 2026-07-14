@@ -56,7 +56,9 @@ function i18nMap(translations, field) {
 
 /**
  * Lắp ráp toàn bộ payload content.json từ data thô của Directus.
- * assetUrl được truyền vào vì mỗi caller có BASE URL riêng.
+ * resolveLogo được truyền vào vì mỗi caller resolve logo theo cách riêng
+ * (path local /cms-assets/... đã tải sẵn lúc build, hoặc URL Directus sống
+ * làm fallback — xem scripts/cms-assets.mjs).
  */
 export function assembleContentPayload({
   generatedAt,
@@ -67,7 +69,7 @@ export function assembleContentPayload({
   siteConfig,
   languages,
   labelRows,
-  assetUrl,
+  resolveLogo,
 }) {
   const languageCodes = languages.map((l) => l.code);
   const labelsByNs = buildLabels(languageCodes, labelRows);
@@ -83,8 +85,8 @@ export function assembleContentPayload({
         supportEmail: siteConfig.support_email,
         mediaContact: siteConfig.media_contact,
       },
-      logoOnBlack: assetUrl(siteConfig.logo_on_black),
-      logoOnWhite: assetUrl(siteConfig.logo_on_white),
+      logoOnBlack: resolveLogo(siteConfig.logo_on_black),
+      logoOnWhite: resolveLogo(siteConfig.logo_on_white),
       social: {
         facebook: siteConfig.social_facebook || null,
         instagram: siteConfig.social_instagram || null,

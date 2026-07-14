@@ -4,15 +4,23 @@
  * into the `out/` directory. Runs without a Next.js build step.
  *
  * Usage: node scripts/fetch-json.mjs
- * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN, NEXT_PUBLIC_BASE_PATH
+ * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN, NEXT_PUBLIC_SITE_URL
  */
 import { writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { assembleContentPayload } from "./content-payload.mjs";
+import { downloadCmsAssets, resolveBasePath } from "./cms-assets.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
+
+// Process Node riêng, không được Next.js tự nạp .env.local — tự nạp ở đây
+// (bỏ qua nếu không có, vd trên CI đã có sẵn trong env thật). Xem
+// scripts/generate-i18n.mjs — cùng pattern.
+try {
+  process.loadEnvFile(resolve(root, ".env.local"));
+} catch {}
 
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
@@ -43,10 +51,6 @@ async function getActive() {
   );
   if (!res.ok) throw new Error(`Directus app_setting → ${res.status}`);
   return Boolean((await res.json()).data.active);
-}
-
-function assetUrl(id) {
-  return id ? `${BASE}/assets/${id}` : null;
 }
 
 // ─── Fetch all data in parallel ──────────────────────────────────────────────
@@ -85,6 +89,25 @@ const [
   ),
 ]);
 
+// ─── Tải logo CMS về out/cms-assets/ (site đã build sẵn, ghi thẳng vào out/) ───
+
+const outDir = resolve(root, "out");
+const logoManifest = await downloadCmsAssets({
+  base: BASE,
+  token: TOKEN,
+  ids: [config.logo_on_black, config.logo_on_white],
+  destDir: outDir,
+});
+const basePath = resolveBasePath();
+function resolveLogo(id) {
+  if (!id) return null;
+  const filename = logoManifest[id];
+  return filename ? `${basePath}/cms-assets/${filename}` : assetUrl(id);
+}
+function assetUrl(id) {
+  return id ? `${BASE}/assets/${id}` : null;
+}
+
 // ─── Build content.json payload (dùng chung scripts/content-payload.mjs) ──────
 
 const contentPayload = assembleContentPayload({
@@ -96,12 +119,11 @@ const contentPayload = assembleContentPayload({
   siteConfig: config,
   languages: languageRows,
   labelRows,
-  assetUrl,
+  resolveLogo,
 });
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
-const outDir = resolve(root, "out");
 writeFileSync(resolve(outDir, "content.json"), JSON.stringify(contentPayload));
 writeFileSync(resolve(outDir, "status.json"), JSON.stringify({ active }));
 

@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { usePathname, useParams } from "next/navigation";
+import { useState } from "react";
 import { useContentData } from "@/hooks/useContentData";
 import { bundledLabels } from "@/i18n/labels";
 import { routing } from "@/i18n/routing";
 
 const homePathPattern = new RegExp(`^/(${routing.locales.join("|")})/?$`);
+const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 
 const SOCIAL_ICONS = {
   facebook: {
@@ -39,6 +41,7 @@ export default function Footer() {
   const pathname = usePathname();
   const isHome = homePathPattern.test(pathname);
   const data = useContentData();
+  const [logoBroken, setLogoBroken] = useState(false);
   const params = useParams();
   const locale = (params?.locale as string) ?? routing.defaultLocale;
   // Fallback về label bundle lúc build — hiện ngay, content.json ghi đè khi về.
@@ -60,13 +63,13 @@ export default function Footer() {
         <div className="mb-8">
           <Image
             src={
-              data?.common.logoOnWhite ||
-              `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`
+              logoBroken ? FALLBACK_LOGO : data?.common.logoOnWhite || FALLBACK_LOGO
             }
+            onError={() => setLogoBroken(true)}
             alt="Sun PhuQuoc Airways"
             width={185}
             height={43}
-            className={`object-contain opacity-80 ${data?.common.logoOnWhite ? "" : "invert"}`}
+            className={`object-contain opacity-80 ${data?.common.logoOnWhite && !logoBroken ? "" : "invert"}`}
           />
         </div>
 
