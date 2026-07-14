@@ -1,5 +1,8 @@
+"use client";
+
 import { Inbox } from "lucide-react";
 import type { ContentData } from "@/lib/contentData";
+import { invalidateContent } from "@/hooks/useContentData";
 import Reveal from "./Reveal";
 
 export default function EmptyState({ data }: { data: ContentData }) {
@@ -9,7 +12,10 @@ export default function EmptyState({ data }: { data: ContentData }) {
 
   return (
     <div className="flex flex-col items-center justify-center text-center py-16 md:py-24 px-4">
-      <Reveal className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-4">
+      <Reveal
+        className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-4 cursor-pointer"
+        onClick={() => invalidateContent()}
+      >
         <Inbox className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
       </Reveal>
       <Reveal delay={50}>

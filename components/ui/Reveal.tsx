@@ -7,6 +7,7 @@ interface RevealProps {
   children: ReactNode;
   className?: string;
   delay?: number;
+  onClick?: () => void;
 }
 
 function shouldSkipAnimation() {
@@ -20,6 +21,7 @@ export default function Reveal({
   children,
   className = "",
   delay = 0,
+  onClick,
 }: RevealProps) {
   const [visible, setVisible] = useState(
     () => typeof window !== "undefined" && shouldSkipAnimation(),
@@ -37,6 +39,7 @@ export default function Reveal({
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       } ${className}`}
       style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
+      onClick={onClick}
     >
       {children}
     </div>
