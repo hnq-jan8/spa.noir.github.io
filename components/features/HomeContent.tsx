@@ -11,7 +11,7 @@ import {
   ChevronRight,
   Info,
 } from "lucide-react";
-import { useContentData } from "@/hooks/useContentData";
+import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { formatTimestamp } from "@/lib/siteData";
 import MarkdownContent from "@/components/ui/MarkdownContent";
 import Reveal from "@/components/ui/Reveal";
@@ -91,7 +91,10 @@ export default function HomeContent() {
             </div>
           </Link>
         ) : (
-          <div className="flex items-center gap-2 bg-gray-50 border border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400">
+          <div
+            className="flex items-center gap-2 bg-gray-50 border border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400 cursor-pointer"
+            onClick={() => invalidateContent()}
+          >
             <Megaphone className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
             <p className="text-sm">{home["noOfficialUpdate"]}</p>
           </div>

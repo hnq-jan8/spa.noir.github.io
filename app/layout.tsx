@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getBuildMode } from "@/lib/buildMode";
 import { routing } from "@/i18n/routing";
+import "./globals.css";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL}/og-image.png`;

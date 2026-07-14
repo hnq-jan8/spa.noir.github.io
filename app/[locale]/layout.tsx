@@ -8,7 +8,6 @@ import RememberLocale from "@/components/sys/RememberLocale";
 import ActivePoller from "@/components/sys/ActivePoller";
 import { COLORS } from "@/lib/theme-colors";
 import { getBuildMode } from "@/lib/buildMode";
-import "../globals.css";
 
 const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL}/og-image.png`;
 
