@@ -12,7 +12,7 @@
  *   - scripts/fetch-cms-assets.mjs (prebuild, ghi vào public/ — deploy-layout)
  *   - scripts/fetch-json.mjs       (content-only refresh, ghi vào out/ — deploy-content)
  */
-import { writeFileSync, mkdirSync } from "fs";
+import { writeFileSync, mkdirSync, readFileSync } from "fs";
 import { resolve } from "path";
 
 const EXT_BY_CONTENT_TYPE = {
@@ -29,10 +29,15 @@ const EXT_BY_CONTENT_TYPE = {
  */
 export async function downloadCmsAssets({ base, token, ids, destDir }) {
   const uniqueIds = [...new Set(ids.filter(Boolean))];
-  const manifest = {};
+  const cmsAssetsDir = resolve(destDir, "cms-assets");
+
+  let manifest = {};
+  try {
+    manifest = JSON.parse(readFileSync(resolve(cmsAssetsDir, "manifest.json"), "utf-8"));
+  } catch {}
+
   if (uniqueIds.length === 0) return manifest;
 
-  const cmsAssetsDir = resolve(destDir, "cms-assets");
   mkdirSync(cmsAssetsDir, { recursive: true });
 
   await Promise.all(
