@@ -26,14 +26,10 @@ export async function generateMetadata({
     description,
     icons: favicon ? { icon: favicon } : undefined,
     openGraph: {
-      title,
-      description,
       images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
       images: [ogImage],
     },
   };
