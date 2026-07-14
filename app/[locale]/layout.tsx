@@ -10,6 +10,10 @@ import { COLORS } from "@/lib/theme-colors";
 import { getBuildMode } from "@/lib/buildMode";
 import "../globals.css";
 
+const siteOrigin = "https://hnq-jan8.github.io";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const ogImage = `${siteOrigin}${basePath}/og-image.png`;
+
 export async function generateMetadata({
   params,
 }: {
@@ -23,6 +27,17 @@ export async function generateMetadata({
     title: { default: title, template: `%s | ${title}` },
     description,
     icons: favicon ? { icon: favicon } : undefined,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 

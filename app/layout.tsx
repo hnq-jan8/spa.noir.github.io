@@ -3,13 +3,27 @@ import { getBuildMode } from "@/lib/buildMode";
 import { routing } from "@/i18n/routing";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const ogImage = `https://hnq-jan8.github.io${basePath}/og-image.png`;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { seoTitle, seoDescription, favicon } = await getBuildMode();
+  const title = seoTitle[routing.defaultLocale];
+  const description = seoDescription[routing.defaultLocale];
   return {
-    title: seoTitle[routing.defaultLocale],
-    description: seoDescription[routing.defaultLocale],
+    title,
+    description,
     icons: favicon ? { icon: favicon } : undefined,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
