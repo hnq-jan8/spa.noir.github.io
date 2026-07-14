@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { syncContentSince } from "@/hooks/useContentData";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const POLL_INTERVAL_MS = 30_000;
@@ -16,10 +17,13 @@ export default function ActivePoller({
     const check = () => {
       fetch(`${basePath}/status.json?_=${Date.now()}`, { cache: "no-store" })
         .then((res) => res.json())
-        .then((data: { active: boolean }) => {
-          if (!cancelled && data.active === false) {
+        .then((data: { active: boolean; since?: string }) => {
+          if (cancelled) return;
+          if (data.active === false) {
             window.location.replace(officialSiteUrl);
+            return;
           }
+          if (data.since) syncContentSince(data.since);
         })
         .catch(() => {});
     };

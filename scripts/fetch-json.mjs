@@ -125,7 +125,10 @@ const contentPayload = assembleContentPayload({
 // ─── Write output ─────────────────────────────────────────────────────────────
 
 writeFileSync(resolve(outDir, "content.json"), JSON.stringify(contentPayload));
-writeFileSync(resolve(outDir, "status.json"), JSON.stringify({ active }));
+writeFileSync(
+  resolve(outDir, "status.json"),
+  JSON.stringify({ active, since: contentPayload.generatedAt }),
+);
 
 console.log(`✓ content.json  (generatedAt: ${contentPayload.generatedAt})`);
 console.log(`✓ status.json   (active: ${active})`);

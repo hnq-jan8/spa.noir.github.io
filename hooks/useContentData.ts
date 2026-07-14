@@ -37,6 +37,23 @@ export function invalidateContent() {
   listeners.forEach((l) => l());
 }
 
+// Version đã trigger invalidate nhưng chưa fetch xong — tránh gọi
+// invalidateContent() lặp lại cho cùng một "since" khi có nhiều poller
+// (hoặc nhiều chu kỳ poll) bắn trùng lúc fetch còn đang chạy dở.
+let pendingSince: string | null = null;
+
+/**
+ * Gọi từ poller nền (status.json.since) — chỉ invalidate khi bản đang
+ * cache thực sự cũ hơn, tránh tải lại content.json mỗi chu kỳ poll dù
+ * không có gì thay đổi.
+ */
+export function syncContentSince(since: string) {
+  if (!cachedPayload || cachedPayload.generatedAt === since) return;
+  if (pendingSince === since) return;
+  pendingSince = since;
+  invalidateContent();
+}
+
 export function useContentData(): ContentData | null {
   const params = useParams();
   const pathname = usePathname();
