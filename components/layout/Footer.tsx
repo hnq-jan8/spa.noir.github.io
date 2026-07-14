@@ -132,8 +132,6 @@ export default function Footer() {
           </p>
           <a
             href="https://www.sunphuquocairways.com"
-            target="_blank"
-            rel="noopener noreferrer"
             className="group relative inline-flex items-center gap-2 overflow-hidden bg-black/5 hover:bg-[#811721] transition-colors duration-300 text-gray-900 hover:text-gray-50 text-sm px-5 py-2 rounded-xl"
           >
             <span
