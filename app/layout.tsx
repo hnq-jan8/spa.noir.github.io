@@ -38,10 +38,33 @@ export default async function RootLayout({
   // If status.json says active=false, redirect immediately — no flash.
   const earlyRedirectScript = `(function(){try{var x=new XMLHttpRequest();x.open('GET','${basePath}/status.json?_='+Date.now(),false);x.setRequestHeader('Cache-Control','no-cache, no-store');x.setRequestHeader('Pragma','no-cache');x.send(null);if(x.status===200){var s=JSON.parse(x.responseText);if(s.active===false){window.location.replace(${JSON.stringify(officialSiteUrl)});}}}catch(e){}})();`;
 
+  // A stale browser-cached HTML page (e.g. a tab left open across a deploy)
+  // can reference a hashed CSS/JS bundle that a later deploy overwrote,
+  // 404ing that asset and leaving the page unstyled. globals.css sets
+  // --app-css-loaded on <html> only once it has actually applied, so once
+  // the window is done loading we can detect that failure and recover with
+  // a single hard reload (guarded so it can't loop if the failure persists).
+  const cssRecoveryScript = `(function(){function check(){try{var v=getComputedStyle(document.documentElement).getPropertyValue('--app-css-loaded').trim();if(v!=='1'){var KEY='darksite-css-recovery-ts';var last=sessionStorage.getItem(KEY);var now=Date.now();if(!last||now-parseInt(last,10)>15000){sessionStorage.setItem(KEY,String(now));window.location.reload();}}}catch(e){}}if(document.readyState==='complete'){check();}else{window.addEventListener('load',check);}})();`;
+
   return (
     <html lang={routing.defaultLocale}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: earlyRedirectScript }} />
+        <script dangerouslySetInnerHTML={{ __html: cssRecoveryScript }} />
+        {/*
+          Inlined (not linked) CSS, so it is part of the HTML response itself
+          and can't 404 the way the hashed Tailwind bundle can. Navbar/
+          LanguageSelector render desktop-only markup unconditionally and
+          normally rely on `hidden md:flex` (from the linked stylesheet) to
+          keep it off-screen on mobile. If that stylesheet fails to load,
+          this is the safety net that still hides it, instead of showing the
+          duplicated desktop nav/language list on top of the mobile ones.
+        */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `@media (max-width:767px){[data-fallback-desktop-only]{display:none !important;}}`,
+          }}
+        />
       </head>
       <body>{children}</body>
     </html>

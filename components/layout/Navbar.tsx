@@ -121,7 +121,10 @@ export default function Navbar() {
             </Link>
 
             {/* Tablet + Desktop nav */}
-            <div className="hidden md:flex items-stretch flex-1 min-w-0 relative self-stretch ml-2">
+            <div
+              data-fallback-desktop-only
+              className="hidden md:flex items-stretch flex-1 min-w-0 relative self-stretch ml-2"
+            >
               <div className="relative flex-1 min-w-0 self-stretch">
                 <div
                   className={`absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-chrome to-transparent z-10 pointer-events-none lg:hidden transition-opacity duration-200 ${
@@ -253,6 +256,13 @@ export default function Navbar() {
         {/* Mobile full-screen menu */}
         <div
           ref={drawerRef}
+          // Inline style mirrors the closed-state Tailwind classes below, so
+          // the drawer stays hidden by default even if the stylesheet fails
+          // to load — otherwise it renders as plain unstyled content instead
+          // of staying off-screen.
+          style={
+            menuOpen ? undefined : { visibility: "hidden", pointerEvents: "none" }
+          }
           className={`md:hidden fixed inset-x-0 top-14 h-[calc(100dvh-3.5rem)] z-40 bg-chrome text-white overflow-y-auto overscroll-contain ${
             menuOpen
               ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
@@ -323,11 +333,12 @@ export default function Navbar() {
               </svg>
             </button>
             <div
+              style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
               className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                 langExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
               }`}
             >
-              <div className="overflow-hidden">
+              <div style={{ overflow: "hidden" }} className="overflow-hidden">
                 {languageOptions.map((lang) => {
                   const isActive = lang.code === locale;
                   return (

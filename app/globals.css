@@ -10,6 +10,9 @@
       sans-serif;
     @apply bg-page;
     overflow-x: clip;
+    /* Marker read by the stylesheet-load-recovery script in app/layout.tsx —
+       only present once this (external) stylesheet has actually applied. */
+    --app-css-loaded: 1;
   }
 
   body {

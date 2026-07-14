@@ -132,11 +132,23 @@ interface LanguageSelectorProps {
 export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: liveLanguages }: LanguageSelectorProps) {
   const options = liveLanguages ?? languages;
   const [open, setOpen] = useState(false);
+  // Mirrors the `group-hover` CSS interaction in JS so the dropdown still
+  // opens on hover even if the stylesheet fails to load (see `visible`
+  // below) — the inline style guarding the default-hidden state would
+  // otherwise out-specificity `group-hover:opacity-100` and disable hover.
+  const [hovered, setHovered] = useState(false);
+  const visible = open || hovered;
   const containerRef = useRef<HTMLDivElement>(null);
   useDismissOnOutside(containerRef, open, () => setOpen(false));
 
   return (
-    <div ref={containerRef} className="hidden md:flex relative items-stretch flex-shrink-0 ml-2 group w-max">
+    <div
+      ref={containerRef}
+      data-fallback-desktop-only
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="hidden md:flex relative items-stretch flex-shrink-0 ml-2 group w-max"
+    >
       <button
         aria-label="Language"
         onClick={() => setOpen((o) => !o)}
@@ -148,8 +160,14 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
         <LanguageTriggerContent languages={options} locale={locale} className="absolute inset-0 hidden lg:flex items-center gap-1.5 px-3" />
       </button>
       <div
+        // Inline style guards the shown/hidden state with JS state (`visible`)
+        // rather than relying solely on the `invisible`/`group-hover` utility
+        // classes, so the panel doesn't fall back to always-visible if the
+        // stylesheet fails to load — hover is tracked in JS above so this
+        // doesn't disable the existing hover-to-open behavior.
+        style={visible ? undefined : { opacity: 0, visibility: "hidden" }}
         className={`absolute top-full left-0 w-full bg-chrome-panelHover shadow-lg transition-all duration-150 z-50 ${
-          open ? "opacity-100 visible" : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
+          visible ? "opacity-100 visible" : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
         }`}
       >
         <div className="lg:hidden">

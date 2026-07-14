@@ -63,7 +63,9 @@ export default function Footer() {
         <div className="mb-8">
           <Image
             src={
-              logoBroken ? FALLBACK_LOGO : data?.common.logoOnWhite || FALLBACK_LOGO
+              logoBroken
+                ? FALLBACK_LOGO
+                : data?.common.logoOnWhite || FALLBACK_LOGO
             }
             onError={() => setLogoBroken(true)}
             alt="Sun PhuQuoc Airways"
@@ -156,7 +158,7 @@ export default function Footer() {
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="relative z-10 transition-transform duration-300 ease-out group-hover:translate-x-1"
+              className="relative z-10 transition-transform duration-300 ease-out translate-y-[0.02rem] group-hover:translate-x-1.5"
             >
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
