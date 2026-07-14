@@ -12,15 +12,19 @@ export default function FaqsContent() {
 
   const faqs = data.faqs.faqs;
 
-  return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 md:py-8">
-      {faqs.length === 0 ? (
+  if (faqs.length === 0) {
+    return (
+      <div className="container-page pt-4 pb-8 md:py-8">
         <EmptyState data={data} />
-      ) : (
-        <Reveal>
-          <FaqAccordion items={faqs} />
-        </Reveal>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-page pt-4 pb-8 md:py-8">
+      <Reveal>
+        <FaqAccordion items={faqs} />
+      </Reveal>
     </div>
   );
 }
