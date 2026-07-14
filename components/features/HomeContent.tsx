@@ -48,8 +48,8 @@ export default function HomeContent() {
   return (
     <div className="container-page pb-8 md:pt-3 md:pb-11 max-w-3xl mx-auto">
       {/* As-of timestamp */}
-      <div className="sticky top-14 z-10 pt-4 mb-4">
-        <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
+      <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4">
+        <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
         <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-md shadow-gray-200/50">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 animate-pulse [animation-duration:1s]" />
           <p className="flex flex-wrap gap-x-1">

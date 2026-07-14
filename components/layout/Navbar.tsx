@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { Fragment, useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   DesktopLanguageSelector,
@@ -17,6 +17,9 @@ import { routing, languages as routingLanguages } from "@/i18n/routing";
 const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
 
 const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
+
+// Icon menu animate 2 pha 260ms, pha sau bắt đầu ở mốc 110ms => tổng ~370ms.
+const MENU_ICON_ANIM_MS = 370;
 
 export default function Navbar() {
   const params = useParams();
@@ -42,6 +45,7 @@ export default function Navbar() {
     languageOptions.find((lang) => lang.code === locale) ?? languageOptions[0];
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [iconAnimating, setIconAnimating] = useState(false);
   const [langExpanded, setLangExpanded] = useState(false);
   const {
     ref: navRef,
@@ -50,7 +54,22 @@ export default function Navbar() {
     scrollBy: scrollNavBy,
   } = useHorizontalScroll<HTMLElement>();
   const headerRef = useRef<HTMLElement>(null);
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const iconAnimationTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const toggleMenu = () => {
+    if (iconAnimating) return;
+    setMenuOpen((o) => !o);
+    setIconAnimating(true);
+    clearTimeout(iconAnimationTimeoutRef.current);
+    iconAnimationTimeoutRef.current = setTimeout(
+      () => setIconAnimating(false),
+      MENU_ICON_ANIM_MS,
+    );
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(iconAnimationTimeoutRef.current);
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) setLangExpanded(false);
@@ -88,13 +107,13 @@ export default function Navbar() {
   return (
     <>
       {/* Spacer to compensate for the fixed header being taken out of flow */}
-      <div className="h-14" aria-hidden />
+      <div className="h-12 md:h-14" aria-hidden />
       <header
         ref={headerRef}
         className="fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
       >
         <div className="container-page">
-          <div className="flex items-stretch h-14">
+          <div className="flex items-stretch h-12 md:h-14">
             {/* Logo */}
             <Link
               href={`/${locale}`}
@@ -115,7 +134,7 @@ export default function Navbar() {
                 alt="SUN PhuQuoc Airways"
                 width={185}
                 height={43}
-                className="h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_#202020]"
+                className="h-7 md:h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_#202020]"
                 priority
               />
             </Link>
@@ -126,27 +145,6 @@ export default function Navbar() {
               className="hidden md:flex items-stretch flex-1 min-w-0 relative self-stretch ml-2"
             >
               <div className="relative flex-1 min-w-0 self-stretch">
-                <div
-                  className={`absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-chrome to-transparent z-10 pointer-events-none lg:hidden transition-opacity duration-200 ${
-                    canScrollLeft ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-                <button
-                  onClick={() => scrollNav("left")}
-                  className={`absolute left-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
-                    canScrollLeft
-                      ? "opacity-100"
-                      : "opacity-0 pointer-events-none"
-                  }`}
-                  aria-label="Scroll left"
-                  aria-hidden={!canScrollLeft}
-                  tabIndex={canScrollLeft ? 0 : -1}
-                >
-                  <ChevronLeft
-                    className="absolute left-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
-                    strokeWidth={2}
-                  />
-                </button>
                 <nav
                   ref={navRef}
                   className="flex items-stretch overflow-x-auto overflow-y-clip scrollbar-hide h-full w-full px-2 scroll-px-5 lg:px-0 lg:scroll-px-0"
@@ -180,27 +178,44 @@ export default function Navbar() {
                     );
                   })}
                 </nav>
-                <div
-                  className={`absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-chrome to-transparent z-10 pointer-events-none lg:hidden transition-opacity duration-200 ${
-                    canScrollRight ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-                <button
-                  onClick={() => scrollNav("right")}
-                  className={`absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
-                    canScrollRight
-                      ? "opacity-100"
-                      : "opacity-0 pointer-events-none"
-                  }`}
-                  aria-label="Scroll right"
-                  aria-hidden={!canScrollRight}
-                  tabIndex={canScrollRight ? 0 : -1}
-                >
-                  <ChevronRight
-                    className="absolute right-0.5 w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm"
-                    strokeWidth={2}
-                  />
-                </button>
+                {(
+                  [
+                    { side: "left", active: canScrollLeft, Icon: ChevronLeft },
+                    {
+                      side: "right",
+                      active: canScrollRight,
+                      Icon: ChevronRight,
+                    },
+                  ] as const
+                ).map(({ side, active, Icon }) => (
+                  <Fragment key={side}>
+                    <div
+                      className={`absolute top-0 bottom-0 w-16 from-chrome to-transparent z-10 pointer-events-none lg:hidden transition-opacity duration-200 ${
+                        side === "left"
+                          ? "left-0 bg-gradient-to-r"
+                          : "right-0 bg-gradient-to-l"
+                      } ${active ? "opacity-100" : "opacity-0"}`}
+                    />
+                    <button
+                      onClick={() => scrollNav(side)}
+                      className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
+                        side === "left" ? "left-0" : "right-0"
+                      } ${
+                        active ? "opacity-100" : "opacity-0 pointer-events-none"
+                      }`}
+                      aria-label={`Scroll ${side}`}
+                      aria-hidden={!active}
+                      tabIndex={active ? 0 : -1}
+                    >
+                      <Icon
+                        className={`absolute ${
+                          side === "left" ? "left-0.5" : "right-0.5"
+                        } w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm`}
+                        strokeWidth={2}
+                      />
+                    </button>
+                  </Fragment>
+                ))}
               </div>
             </div>
 
@@ -214,40 +229,37 @@ export default function Navbar() {
 
             <div className="flex md:hidden items-stretch gap-1">
               <button
-                onClick={() => setMenuOpen((o) => !o)}
-                className="h-full px-2 flex items-center text-gray-200 hover:text-white"
+                onClick={toggleMenu}
+                className="h-full px-2 flex items-center justify-center text-gray-200 hover:text-white"
                 aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
               >
-                {menuOpen ? (
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      // d="M4 6h16M4 12h16M4 18h16"
-                      d="M4 8h16M4 16h16"
-                    />
-                  </svg>
-                )}
+                <span className="relative w-4 h-4 flex items-center justify-center ml-1">
+                  {(
+                    [
+                      { rest: "-translate-y-[3px]", open: "rotate-45" },
+                      { rest: "translate-y-[3px]", open: "-rotate-45" },
+                    ] as const
+                  ).map(({ rest, open }) => (
+                    <span
+                      key={open}
+                      className={`absolute w-4 h-[1.5px] transition-transform duration-[260ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                        menuOpen
+                          ? "translate-y-0 delay-0"
+                          : `${rest} delay-[110ms]`
+                      }`}
+                    >
+                      <span
+                        className={`block w-full h-full bg-current rounded-full transition-transform duration-[260ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                          menuOpen
+                            ? `${open} scale-x-[1.2] delay-[110ms]`
+                            : "rotate-0 scale-x-100 delay-0"
+                        }`}
+                      />
+                    </span>
+                  ))}
+                </span>
               </button>
             </div>
           </div>
@@ -255,15 +267,17 @@ export default function Navbar() {
 
         {/* Mobile full-screen menu */}
         <div
-          ref={drawerRef}
+          id="mobile-menu"
           // Inline style mirrors the closed-state Tailwind classes below, so
           // the drawer stays hidden by default even if the stylesheet fails
           // to load — otherwise it renders as plain unstyled content instead
           // of staying off-screen.
           style={
-            menuOpen ? undefined : { visibility: "hidden", pointerEvents: "none" }
+            menuOpen
+              ? undefined
+              : { visibility: "hidden", pointerEvents: "none" }
           }
-          className={`md:hidden fixed inset-x-0 top-14 h-[calc(100dvh-3.5rem)] z-40 bg-chrome text-white overflow-y-auto overscroll-contain ${
+          className={`md:hidden fixed inset-x-0 top-12 h-[calc(100dvh-3rem)] z-40 bg-chrome text-white overflow-y-auto overscroll-contain ${
             menuOpen
               ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
               : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
@@ -271,7 +285,7 @@ export default function Navbar() {
           role="dialog"
           aria-modal="true"
         >
-          <nav className="flex flex-col mt-1">
+          <nav className="flex flex-col">
             {navItems.map((item) => {
               const isActive = normalizedPath === item.href;
               return (
@@ -282,10 +296,10 @@ export default function Navbar() {
                     setMenuOpen(false);
                     if (isActive) invalidateContent();
                   }}
-                  className={`px-6 py-4 text-xl transition-colors ${
+                  className={`px-6 py-4 text-xl transition-colors font-semibold ${
                     isActive
-                      ? "text-white font-semibold bg-black/20"
-                      : "text-gray-200 font-medium hover:text-white hover:bg-black/10"
+                      ? "text-white bg-black/20"
+                      : "text-gray-300 hover:text-white hover:bg-black/10"
                   }`}
                 >
                   {item.label}
@@ -294,10 +308,10 @@ export default function Navbar() {
             })}
           </nav>
 
-          <div className="mt-1">
+          <div className="mt-2">
             <button
               onClick={() => setLangExpanded((o) => !o)}
-              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-200"} hover:text-white transition-colors`}
+              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white transition-colors`}
               aria-expanded={langExpanded}
             >
               <svg
@@ -318,23 +332,14 @@ export default function Navbar() {
                   ? nav?.["selectLanguage"]
                   : currentLanguage?.label}
               </span>
-              <svg
+              <ChevronRight
                 className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${langExpanded ? "rotate-90" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+                strokeWidth={2}
+              />
             </button>
             <div
               style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
-              className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              className={`grid bg-black/10 transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                 langExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
               }`}
             >
@@ -364,7 +369,7 @@ export default function Navbar() {
 
       {/* Mobile breadcrumb */}
       {activeItem && (
-        <div className="md:hidden sticky top-14 z-10 px-4 pt-4 pb-6">
+        <div className="md:hidden sticky top-12 z-10 px-4 pt-4 pb-6">
           <div
             className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden whitespace-nowrap
                     bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full
@@ -376,19 +381,10 @@ export default function Navbar() {
             >
               {nav?.["home"]}
             </Link>
-            <svg
+            <ChevronRight
               className="w-3 h-3 text-gray-400 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+              strokeWidth={2}
+            />
             <Link
               href={activeItem.href}
               onClick={() => invalidateContent()}
