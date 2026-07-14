@@ -3,7 +3,7 @@ import { getBuildMode } from "@/lib/buildMode";
 import { routing } from "@/i18n/routing";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const ogImage = `https://hnq-jan8.github.io${basePath}/og-image.png`;
+const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL}/og-image.png`;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { seoTitle, seoDescription, favicon } = await getBuildMode();

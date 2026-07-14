@@ -10,9 +10,7 @@ import { COLORS } from "@/lib/theme-colors";
 import { getBuildMode } from "@/lib/buildMode";
 import "../globals.css";
 
-const siteOrigin = "https://hnq-jan8.github.io";
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const ogImage = `${siteOrigin}${basePath}/og-image.png`;
+const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL}/og-image.png`;
 
 export async function generateMetadata({
   params,
