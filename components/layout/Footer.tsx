@@ -134,8 +134,17 @@ export default function Footer() {
             href="https://www.sunphuquocairways.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-black/5 hover:bg-[#811721] transition-colors text-gray-900 hover:text-gray-50 text-sm px-5 py-2 rounded-xl"
+            className="group relative inline-flex items-center gap-2 overflow-hidden bg-black/5 hover:bg-[#811721] transition-colors duration-300 text-gray-900 hover:text-gray-50 text-sm px-5 py-2 rounded-xl"
           >
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -top-10 -right-8 h-32 w-32 rotate-[12deg] bg-contain bg-no-repeat opacity-0 mix-blend-soft-light transition-[transform,opacity] duration-300 ease-out
+                        group-hover:rotate-[30deg] group-hover:opacity-100"
+              style={{
+                backgroundImage: `url(${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/ic_flower.png)`,
+              }}
+            />
+            <span className="relative z-10">{footer?.["officialSite"]}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="14"
@@ -146,12 +155,11 @@ export default function Footer() {
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="relative z-10 transition-transform duration-300 ease-out group-hover:translate-x-1"
             >
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
             </svg>
-            {footer?.["officialSite"]}
           </a>
         </div>
       </div>
