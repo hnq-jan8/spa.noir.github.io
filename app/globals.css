@@ -35,6 +35,19 @@
   }
 
   .timeline-card {
-    @apply border-l border-gray-300 pl-4 pr-6 pb-6 pt-4;
+    @apply bg-white border border-gray-200 rounded-2xl shadow-sm px-6 py-5;
+  }
+
+  /* For scroll areas that render content behind an absolute/blurred overlay
+     (e.g. the timeline detail modal header) — the native scrollbar belongs
+     to the whole scrolling box, so with a header overlaid on top of it the
+     scrollbar's top portion renders stuck behind that header. Hiding it
+     avoids that visual clash; the area is still scrollable by wheel/touch. */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

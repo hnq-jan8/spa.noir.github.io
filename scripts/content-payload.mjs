@@ -17,6 +17,7 @@ export const LABEL_NAMESPACES = {
   common: ["nav", "footer", "support", "emptyState"],
   home: ["home"],
   flightInfo: ["flightInfo"],
+  officialUpdates: ["officialUpdates"],
 };
 
 export function formatTime(time) {
@@ -134,6 +135,7 @@ export function assembleContentPayload({
         title: i18nMap(u.translations, "title"),
         description: i18nMap(u.translations, "description"),
       })),
+      labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.officialUpdates),
     },
     pressReleases: {
       pressRelease: latestRelease

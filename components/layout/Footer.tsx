@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useContentData } from "@/hooks/useContentData";
+import { useLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
 import { routing } from "@/i18n/routing";
 
@@ -42,8 +43,7 @@ export default function Footer() {
   const isHome = homePathPattern.test(pathname);
   const data = useContentData();
   const [logoBroken, setLogoBroken] = useState(false);
-  const params = useParams();
-  const locale = (params?.locale as string) ?? routing.defaultLocale;
+  const locale = useLocale();
   // Fallback về label bundle lúc build — hiện ngay, content.json ghi đè khi về.
   const footer =
     data?.common.labels["footer"] ?? bundledLabels(locale, "footer");

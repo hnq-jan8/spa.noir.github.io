@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { ContentPayload, ContentData } from "@/lib/contentData";
 import { resolveLocale } from "@/lib/contentData";
-import { routing } from "@/i18n/routing";
+import { useLocale } from "@/hooks/useLocale";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -55,9 +55,8 @@ export function syncContentSince(since: string) {
 }
 
 export function useContentData(): ContentData | null {
-  const params = useParams();
   const pathname = usePathname();
-  const locale = (params?.locale as string) ?? routing.defaultLocale;
+  const locale = useLocale();
   // Khởi tạo bằng dữ liệu stale (nếu có) để trang mới render tức thì,
   // không bị khoảng trắng chờ fetch sau mỗi lần chuyển route.
   const [data, setData] = useState<ContentData | null>(() =>

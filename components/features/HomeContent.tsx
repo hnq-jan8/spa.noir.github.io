@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import {
   Megaphone,
   Phone,
@@ -12,14 +11,13 @@ import {
   Info,
 } from "lucide-react";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
+import { useLocale } from "@/hooks/useLocale";
 import { formatTimestamp } from "@/lib/siteData";
 import MarkdownContent from "@/components/ui/MarkdownContent";
 import Reveal from "@/components/ui/Reveal";
-import { routing } from "@/i18n/routing";
 
 export default function HomeContent() {
-  const params = useParams();
-  const locale = (params?.locale as string) ?? routing.defaultLocale;
+  const locale = useLocale();
   const data = useContentData();
 
   if (!data) return null;
@@ -80,11 +78,13 @@ export default function HomeContent() {
               <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none" />
             </div>
             <div className="flex items-center justify-between text-xs mt-3">
-              <span className="text-gray-400">{latestUpdate.date}</span>
+              <span className="text-gray-400">
+                {formatTimestamp(latestUpdate.date, locale)}
+              </span>
               <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
                 {home["viewAll"]}
                 <ChevronRight
-                  className="w-3.5 h-4 pt-0.5 transition-transform group-hover:translate-x-1"
+                  className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1"
                   strokeWidth={2}
                 />
               </span>

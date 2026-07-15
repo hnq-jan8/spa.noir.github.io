@@ -101,6 +101,7 @@ export interface ContentPayload {
   /** "/official-updates" */
   officialUpdates: {
     updates: ContentUpdate[];
+    labels: LabelMap;
   };
   /** "/press-releases" */
   pressReleases: {
@@ -134,6 +135,7 @@ export interface ContentData {
   };
   officialUpdates: {
     updates: { date: string; title: string; description: string }[];
+    labels: ResolvedLabelMap;
   };
   pressReleases: {
     pressRelease: { title: string; body: string } | null;
@@ -180,6 +182,7 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
         title: pick(u.title, locale),
         description: pick(u.description, locale),
       })),
+      labels: resolveLabels(payload.officialUpdates.labels, locale),
     },
     pressReleases: {
       pressRelease: payload.pressReleases.pressRelease

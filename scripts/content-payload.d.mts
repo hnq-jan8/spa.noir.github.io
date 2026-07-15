@@ -4,6 +4,7 @@ export declare const LABEL_NAMESPACES: {
   common: string[];
   home: string[];
   flightInfo: string[];
+  officialUpdates: string[];
 };
 
 export declare function formatTime(time: string | null): string;

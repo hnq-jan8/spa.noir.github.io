@@ -47,11 +47,24 @@ export default async function RootLayout({
   // a single hard reload (guarded so it can't loop if the failure persists).
   const cssRecoveryScript = `(function(){function check(){try{var v=getComputedStyle(document.documentElement).getPropertyValue('--app-css-loaded').trim();if(v!=='1'){var KEY='darksite-css-recovery-ts';var last=sessionStorage.getItem(KEY);var now=Date.now();if(!last||now-parseInt(last,10)>15000){sessionStorage.setItem(KEY,String(now));window.location.reload();}}}catch(e){}}if(document.readyState==='complete'){check();}else{window.addEventListener('load',check);}})();`;
 
+  // If the site was redeployed (e.g. status.json flips back to active=false
+  // -> true) while this tab was away, the browser can restore this page from
+  // bfcache on "back" navigation instead of re-fetching it. The restored JS
+  // then tries to dynamically import a chunk whose hash no longer exists
+  // (overwritten by the new deploy) -> ChunkLoadError -> uncaught -> Next's
+  // generic "Application error" crash. `pageshow` with `persisted:true` is
+  // the standard signal for a bfcache restore; force a real reload so the
+  // page always re-fetches current HTML/JS instead of running stale code.
+  // The chunk/css error listeners below are a fallback for any chunk-load
+  // failure that reaches this far regardless of cause.
+  const chunkRecoveryScript = `(function(){function reload(){try{var KEY='darksite-chunk-recovery-ts';var last=sessionStorage.getItem(KEY);var now=Date.now();if(!last||now-parseInt(last,10)>15000){sessionStorage.setItem(KEY,String(now));window.location.reload();}}catch(e){}}window.addEventListener('pageshow',function(e){if(e.persisted)reload();});function isChunkError(x){var msg=(x&&x.message)||(x&&x.reason&&x.reason.message)||'';var name=(x&&x.error&&x.error.name)||(x&&x.reason&&x.reason.name)||'';return name==='ChunkLoadError'||/loading chunk [\\w.-]+ failed/i.test(msg)||/loading css chunk/i.test(msg);}window.addEventListener('error',function(e){if(isChunkError(e))reload();});window.addEventListener('unhandledrejection',function(e){if(isChunkError(e))reload();});})();`;
+
   return (
     <html lang={routing.defaultLocale}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: earlyRedirectScript }} />
         <script dangerouslySetInnerHTML={{ __html: cssRecoveryScript }} />
+        <script dangerouslySetInnerHTML={{ __html: chunkRecoveryScript }} />
         {/*
           Inlined (not linked) CSS, so it is part of the HTML response itself
           and can't 404 the way the hashed Tailwind bundle can. Navbar/

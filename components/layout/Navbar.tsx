@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Fragment, useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/components/layout/LanguageSelector";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
+import { useLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
 import { routing, languages as routingLanguages } from "@/i18n/routing";
 
@@ -22,8 +23,7 @@ const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 const MENU_ICON_ANIM_MS = 370;
 
 export default function Navbar() {
-  const params = useParams();
-  const locale = (params?.locale as string) ?? routing.defaultLocale;
+  const locale = useLocale();
   const pathname = usePathname();
   const data = useContentData();
   const [logoBroken, setLogoBroken] = useState(false);
