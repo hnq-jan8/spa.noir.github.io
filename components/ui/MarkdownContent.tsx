@@ -7,9 +7,14 @@ interface MarkdownContentProps {
   className?: string;
 }
 
-export default function MarkdownContent({ content, className = "" }: MarkdownContentProps) {
+export default function MarkdownContent({
+  content,
+  className = "",
+}: MarkdownContentProps) {
   return (
-    <div className={`space-y-4 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 ${className}`}>
+    <div
+      className={`space-y-4 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 ${className}`}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
@@ -45,17 +50,22 @@ export default function MarkdownContent({ content, className = "" }: MarkdownCon
               {children}
             </blockquote>
           ),
-          img: ({ src, alt }) => (
+          img: ({ src, alt, width, height, style }) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={typeof src === "string" ? src : undefined}
               alt={alt ?? ""}
-              className="w-full rounded object-cover"
+              width={width}
+              height={height}
+              style={style}
+              className={`rounded object-cover ${width || style ? "max-w-full" : "w-full"}`}
             />
           ),
           table: ({ children }) => (
             <div className="overflow-x-auto">
-              <table className="border-collapse border border-gray-300">{children}</table>
+              <table className="border-collapse border border-gray-300">
+                {children}
+              </table>
             </div>
           ),
           thead: ({ children }) => <thead>{children}</thead>,
