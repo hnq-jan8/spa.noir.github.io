@@ -51,13 +51,18 @@ export default async function RootLayout({
   // -> true) while this tab was away, the browser can restore this page from
   // bfcache on "back" navigation instead of re-fetching it. The restored JS
   // then tries to dynamically import a chunk whose hash no longer exists
-  // (overwritten by the new deploy) -> ChunkLoadError -> uncaught -> Next's
-  // generic "Application error" crash. `pageshow` with `persisted:true` is
-  // the standard signal for a bfcache restore; force a real reload so the
-  // page always re-fetches current HTML/JS instead of running stale code.
-  // The chunk/css error listeners below are a fallback for any chunk-load
-  // failure that reaches this far regardless of cause.
-  const chunkRecoveryScript = `(function(){function reload(){try{var KEY='darksite-chunk-recovery-ts';var last=sessionStorage.getItem(KEY);var now=Date.now();if(!last||now-parseInt(last,10)>15000){sessionStorage.setItem(KEY,String(now));window.location.reload();}}catch(e){}}window.addEventListener('pageshow',function(e){if(e.persisted)reload();});function isChunkError(x){var msg=(x&&x.message)||(x&&x.reason&&x.reason.message)||'';var name=(x&&x.error&&x.error.name)||(x&&x.reason&&x.reason.name)||'';return name==='ChunkLoadError'||/loading chunk [\\w.-]+ failed/i.test(msg)||/loading css chunk/i.test(msg);}window.addEventListener('error',function(e){if(isChunkError(e))reload();});window.addEventListener('unhandledrejection',function(e){if(isChunkError(e))reload();});})();`;
+  // (overwritten by the new deploy) -> 404. By the time that surfaces as a
+  // thrown error it can show up as different things depending on where in
+  // React's lazy/hydration machinery it's caught (a raw ChunkLoadError, or a
+  // downstream minified React error like #423 during a hydration retry) —
+  // too varied to pattern-match reliably. Instead we catch it at the source:
+  // a same-origin <script>/<link> under _next/static/ failing to load fires
+  // a non-bubbling 'error' event on that element, only observable via a
+  // capture-phase listener on window. `pageshow` with `persisted:true` is
+  // the standard signal for a bfcache restore; both cases force a real
+  // reload so the page always re-fetches current HTML/JS instead of running
+  // stale code. The message-based checks remain as a fallback.
+  const chunkRecoveryScript = `(function(){function reload(){try{var KEY='darksite-chunk-recovery-ts';var last=sessionStorage.getItem(KEY);var now=Date.now();if(!last||now-parseInt(last,10)>15000){sessionStorage.setItem(KEY,String(now));window.location.reload();}}catch(e){}}window.addEventListener('pageshow',function(e){if(e.persisted)reload();});function isChunkError(x){var msg=(x&&x.message)||(x&&x.reason&&x.reason.message)||'';var name=(x&&x.error&&x.error.name)||(x&&x.reason&&x.reason.name)||'';return name==='ChunkLoadError'||/loading chunk [\\w.-]+ failed/i.test(msg)||/loading css chunk/i.test(msg)||/minified react error #4(18|19|22|23|25)/i.test(msg);}window.addEventListener('error',function(e){var t=e&&e.target;if(t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')&&/\\/_next\\/static\\//.test(t.src||t.href||'')){reload();return;}if(isChunkError(e))reload();},true);window.addEventListener('unhandledrejection',function(e){if(isChunkError(e))reload();});})();`;
 
   return (
     <html lang={routing.defaultLocale}>
