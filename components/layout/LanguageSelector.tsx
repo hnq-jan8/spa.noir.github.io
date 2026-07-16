@@ -127,9 +127,11 @@ interface LanguageSelectorProps {
   pathWithoutLocale: string;
   /** Danh sách ngôn ngữ hiện tại (từ content.json) — fallback về danh sách build-time nếu chưa fetch xong. */
   languages?: LanguageOption[];
+  /** aria-label cho nút mở dropdown (ui_labels: nav.selectLanguage). */
+  selectLanguageLabel?: string;
 }
 
-export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: liveLanguages }: LanguageSelectorProps) {
+export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: liveLanguages, selectLanguageLabel }: LanguageSelectorProps) {
   const options = liveLanguages ?? languages;
   const [open, setOpen] = useState(false);
   // Mirrors the `group-hover` CSS interaction in JS so the dropdown still
@@ -150,7 +152,7 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
       className="hidden md:flex relative items-stretch flex-shrink-0 ml-2 group w-max"
     >
       <button
-        aria-label="Language"
+        aria-label={selectLanguageLabel}
         onClick={() => setOpen((o) => !o)}
         className="relative flex items-center px-2 lg:px-3 text-xs text-gray-200 hover:text-white hover:bg-black/10 transition-colors h-full w-full"
       >

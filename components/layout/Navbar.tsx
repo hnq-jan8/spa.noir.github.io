@@ -9,13 +9,14 @@ import {
   DesktopLanguageSelector,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
+import MobileMenu from "@/components/layout/MobileMenu";
+import ScrollButton from "@/components/ui/ScrollButton";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
-import { routing, languages as routingLanguages } from "@/i18n/routing";
-
-const localeSegmentPattern = new RegExp(`^/(${routing.locales.join("|")})`);
+import { normalizePath, stripLocale } from "@/i18n/paths";
+import { languages as routingLanguages } from "@/i18n/routing";
 
 const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 
@@ -30,6 +31,7 @@ export default function Navbar() {
   // Fallback về label bundle lúc build để nav hiện ngay first paint,
   // không chờ content.json; bản trong content.json ghi đè khi về.
   const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
+  const a11y = data?.common.labels["a11y"] ?? bundledLabels(locale, "a11y");
   const liveLanguages = data?.common.languages.map((lang) => ({
     code: lang.code,
     label: lang.code.toUpperCase(),
@@ -46,7 +48,6 @@ export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [iconAnimating, setIconAnimating] = useState(false);
-  const [langExpanded, setLangExpanded] = useState(false);
   const {
     ref: navRef,
     canScrollLeft,
@@ -72,10 +73,6 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!menuOpen) setLangExpanded(false);
-  }, [menuOpen]);
-
-  useEffect(() => {
     if (!menuOpen) return;
     const html = document.documentElement;
     const prev = html.style.cssText;
@@ -97,8 +94,8 @@ export default function Navbar() {
       ]
     : [];
 
-  const pathWithoutLocale = pathname.replace(localeSegmentPattern, "") || "/";
-  const normalizedPath = pathname.replace(/\/$/, "") || "/";
+  const pathWithoutLocale = stripLocale(pathname);
+  const normalizedPath = normalizePath(pathname);
   const activeItem = navItems.find((item) => item.href === normalizedPath);
   const isHomeActive = normalizedPath === `/${locale}`;
 
@@ -196,24 +193,18 @@ export default function Navbar() {
                           : "right-0 bg-gradient-to-l"
                       } ${active ? "opacity-100" : "opacity-0"}`}
                     />
-                    <button
+                    <ScrollButton
+                      active={active}
                       onClick={() => scrollNav(side)}
-                      className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden transition-opacity duration-200 ${
+                      label={a11y[side === "left" ? "scrollLeft" : "scrollRight"]}
+                      Icon={Icon}
+                      className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden ${
                         side === "left" ? "left-0" : "right-0"
-                      } ${
-                        active ? "opacity-100" : "opacity-0 pointer-events-none"
                       }`}
-                      aria-label={`Scroll ${side}`}
-                      aria-hidden={!active}
-                      tabIndex={active ? 0 : -1}
-                    >
-                      <Icon
-                        className={`absolute ${
-                          side === "left" ? "left-0.5" : "right-0.5"
-                        } w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm`}
-                        strokeWidth={2}
-                      />
-                    </button>
+                      iconClassName={`absolute ${
+                        side === "left" ? "left-0.5" : "right-0.5"
+                      } w-4 h-4 bg-gray-100 border border-white/10 rounded-full shadow-sm`}
+                    />
                   </Fragment>
                 ))}
               </div>
@@ -225,13 +216,14 @@ export default function Navbar() {
               locale={locale}
               pathWithoutLocale={pathWithoutLocale}
               languages={liveLanguages}
+              selectLanguageLabel={nav?.["selectLanguage"]}
             />
 
             <div className="flex md:hidden items-stretch gap-1">
               <button
                 onClick={toggleMenu}
                 className="h-full px-2 flex items-center justify-center text-gray-200 hover:text-white"
-                aria-label="Toggle menu"
+                aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
               >
@@ -266,105 +258,17 @@ export default function Navbar() {
         </div>
 
         {/* Mobile full-screen menu */}
-        <div
-          id="mobile-menu"
-          // Inline style mirrors the closed-state Tailwind classes below, so
-          // the drawer stays hidden by default even if the stylesheet fails
-          // to load — otherwise it renders as plain unstyled content instead
-          // of staying off-screen.
-          style={
-            menuOpen
-              ? undefined
-              : { visibility: "hidden", pointerEvents: "none" }
-          }
-          className={`md:hidden fixed inset-x-0 top-12 h-[calc(100dvh-3rem)] z-40 bg-chrome text-white overflow-y-auto overscroll-contain ${
-            menuOpen
-              ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
-              : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
-          }`}
-          role="dialog"
-          aria-modal="true"
-        >
-          <nav className="flex flex-col">
-            {navItems.map((item) => {
-              const isActive = normalizedPath === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => {
-                    setMenuOpen(false);
-                    if (isActive) invalidateContent();
-                  }}
-                  className={`px-6 py-4 text-xl transition-colors font-semibold ${
-                    isActive
-                      ? "text-white bg-black/20"
-                      : "text-gray-300 hover:text-white hover:bg-black/10"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="mt-2">
-            <button
-              onClick={() => setLangExpanded((o) => !o)}
-              className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white transition-colors`}
-              aria-expanded={langExpanded}
-            >
-              <svg
-                className="w-5 h-5 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="flex-1 text-left">
-                {langExpanded
-                  ? nav?.["selectLanguage"]
-                  : currentLanguage?.label}
-              </span>
-              <ChevronRight
-                className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${langExpanded ? "rotate-90" : ""}`}
-                strokeWidth={2}
-              />
-            </button>
-            <div
-              style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
-              className={`grid bg-black/10 transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-                langExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-              }`}
-            >
-              <div style={{ overflow: "hidden" }} className="overflow-hidden">
-                {languageOptions.map((lang) => {
-                  const isActive = lang.code === locale;
-                  return (
-                    <Link
-                      key={lang.code}
-                      href={`/${lang.code}${pathWithoutLocale}`}
-                      onClick={() => setMenuOpen(false)}
-                      className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
-                        isActive
-                          ? "text-white font-semibold"
-                          : "text-gray-300 hover:text-white"
-                      }`}
-                    >
-                      <span>{lang.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
+        <MobileMenu
+          open={menuOpen}
+          navItems={navItems}
+          normalizedPath={normalizedPath}
+          nav={nav}
+          currentLanguage={currentLanguage}
+          languageOptions={languageOptions}
+          pathWithoutLocale={pathWithoutLocale}
+          locale={locale}
+          onNavigate={() => setMenuOpen(false)}
+        />
       </header>
 
       {/* Mobile breadcrumb */}

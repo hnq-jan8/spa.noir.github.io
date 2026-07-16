@@ -14,6 +14,7 @@ export default function OfficialUpdatesContent() {
 
   const updates = data.officialUpdates.updates;
   const labels = data.officialUpdates.labels["officialUpdates"];
+  const a11y = data.common.labels["a11y"] ?? {};
 
   return (
     <div
@@ -27,6 +28,7 @@ export default function OfficialUpdatesContent() {
             items={updates}
             viewDetailsLabel={labels["viewDetails"]}
             collapseLabel={labels["collapse"]}
+            a11y={a11y}
             locale={locale}
           />
         </Reveal>

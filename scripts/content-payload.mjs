@@ -14,7 +14,7 @@
 
 /** Namespace của ui_labels được nhúng vào từng phần của content.json. */
 export const LABEL_NAMESPACES = {
-  common: ["nav", "footer", "support", "emptyState"],
+  common: ["nav", "footer", "support", "emptyState", "a11y"],
   home: ["home"],
   flightInfo: ["flightInfo"],
   officialUpdates: ["officialUpdates"],

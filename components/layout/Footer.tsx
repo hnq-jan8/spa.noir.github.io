@@ -6,9 +6,8 @@ import { useState } from "react";
 import { useContentData } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
-import { routing } from "@/i18n/routing";
+import { isHomePath } from "@/i18n/paths";
 
-const homePathPattern = new RegExp(`^/(${routing.locales.join("|")})/?$`);
 const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 
 const SOCIAL_ICONS = {
@@ -40,7 +39,7 @@ const SOCIAL_ICONS = {
 
 export default function Footer() {
   const pathname = usePathname();
-  const isHome = homePathPattern.test(pathname);
+  const isHome = isHomePath(pathname);
   const data = useContentData();
   const [logoBroken, setLogoBroken] = useState(false);
   const locale = useLocale();
