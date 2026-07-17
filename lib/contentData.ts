@@ -77,8 +77,6 @@ export interface ContentPayload {
   /** Dùng chung bởi Navbar + Footer, không thuộc riêng route nào. */
   common: {
     contacts: ContentContacts;
-    logoOnBlack: string | null;
-    logoOnWhite: string | null;
     social: ContentSocialLinks;
     languages: ContentLanguage[];
     labels: LabelMap;
@@ -115,8 +113,6 @@ export interface ContentData {
   generatedAt: string;
   common: {
     contacts: ContentContacts;
-    logoOnBlack: string | null;
-    logoOnWhite: string | null;
     social: ContentSocialLinks;
     languages: ContentLanguage[];
     labels: ResolvedLabelMap;
@@ -149,8 +145,6 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
     generatedAt: payload.generatedAt,
     common: {
       contacts: payload.common.contacts,
-      logoOnBlack: payload.common.logoOnBlack,
-      logoOnWhite: payload.common.logoOnWhite,
       social: payload.common.social,
       languages: payload.common.languages,
       labels: resolveLabels(payload.common.labels, locale),

@@ -37,5 +37,4 @@ export declare function assembleContentPayload(input: {
   siteConfig: SiteConfig;
   languages: Language[];
   labelRows: UiLabel[];
-  resolveLogo: (id: string | null) => string | null;
 }): ContentPayload;

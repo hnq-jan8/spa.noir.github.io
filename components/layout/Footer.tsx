@@ -37,7 +37,7 @@ const SOCIAL_ICONS = {
   },
 } as const;
 
-export default function Footer() {
+export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) {
   const pathname = usePathname();
   const isHome = isHomePath(pathname);
   const data = useContentData();
@@ -61,16 +61,12 @@ export default function Footer() {
       <div className="container-page py-8">
         <div className="mb-8">
           <Image
-            src={
-              logoBroken
-                ? FALLBACK_LOGO
-                : data?.common.logoOnWhite || FALLBACK_LOGO
-            }
+            src={logoBroken ? FALLBACK_LOGO : logoOnWhite || FALLBACK_LOGO}
             onError={() => setLogoBroken(true)}
             alt="Sun PhuQuoc Airways"
             width={185}
             height={43}
-            className={`object-contain opacity-80 ${data?.common.logoOnWhite && !logoBroken ? "" : "invert"}`}
+            className={`object-contain opacity-80 ${logoOnWhite && !logoBroken ? "" : "invert"}`}
           />
         </div>
 

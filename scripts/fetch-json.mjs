@@ -10,7 +10,6 @@ import { writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { assembleContentPayload } from "./content-payload.mjs";
-import { downloadCmsAssets, resolveBasePath } from "./cms-assets.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -78,7 +77,7 @@ const [
     "/items/press_releases?fields=translations.languages_code,translations.title,translations.body&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   ),
   get(
-    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,logo_on_black,logo_on_white,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy",
+    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy",
   ),
   getActive(),
   get(
@@ -88,25 +87,6 @@ const [
     "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true",
   ),
 ]);
-
-// ─── Tải logo CMS về out/cms-assets/ (site đã build sẵn, ghi thẳng vào out/) ───
-
-const outDir = resolve(root, "out");
-const logoManifest = await downloadCmsAssets({
-  base: BASE,
-  token: TOKEN,
-  ids: [config.logo_on_black, config.logo_on_white],
-  destDir: outDir,
-});
-const basePath = resolveBasePath();
-function resolveLogo(id) {
-  if (!id) return null;
-  const filename = logoManifest[id];
-  return filename ? `${basePath}/cms-assets/${filename}` : assetUrl(id);
-}
-function assetUrl(id) {
-  return id ? `${BASE}/assets/${id}` : null;
-}
 
 // ─── Build content.json payload (dùng chung scripts/content-payload.mjs) ──────
 
@@ -119,11 +99,11 @@ const contentPayload = assembleContentPayload({
   siteConfig: config,
   languages: languageRows,
   labelRows,
-  resolveLogo,
 });
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
+const outDir = resolve(root, "out");
 writeFileSync(resolve(outDir, "content.json"), JSON.stringify(contentPayload));
 writeFileSync(
   resolve(outDir, "status.json"),

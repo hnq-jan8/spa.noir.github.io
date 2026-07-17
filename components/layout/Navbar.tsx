@@ -23,7 +23,7 @@ const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 // Icon menu animate 2 pha 260ms, pha sau bắt đầu ở mốc 110ms => tổng ~370ms.
 const MENU_ICON_ANIM_MS = 370;
 
-export default function Navbar() {
+export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) {
   const locale = useLocale();
   const pathname = usePathname();
   const data = useContentData();
@@ -122,11 +122,7 @@ export default function Navbar() {
               }}
             >
               <Image
-                src={
-                  logoBroken
-                    ? FALLBACK_LOGO
-                    : data?.common.logoOnBlack || FALLBACK_LOGO
-                }
+                src={logoBroken ? FALLBACK_LOGO : logoOnBlack || FALLBACK_LOGO}
                 onError={() => setLogoBroken(true)}
                 alt="SUN PhuQuoc Airways"
                 width={185}

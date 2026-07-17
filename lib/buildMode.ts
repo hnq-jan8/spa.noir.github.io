@@ -8,14 +8,16 @@ export interface BuildMode {
   seoTitle: Record<string, string>;
   seoDescription: Record<string, string>;
   favicon: string | null;
+  logoOnBlack: string | null;
+  logoOnWhite: string | null;
 }
 
 let cached: BuildMode | null = null;
 
-// Manifest do scripts/fetch-cms-assets.mjs ghi lúc prebuild — xem
-// lib/buildContentPayload.ts (cùng pattern cho logo) để biết lý do:
-// favicon trỏ URL Directus sống sẽ vỡ nếu server CMS offline lúc build/xem site.
-function resolveFavicon(id: string | null): string | null {
+// Manifest do scripts/fetch-cms-assets.mjs ghi lúc prebuild (tải favicon +
+// logo về public/cms-assets/) — dùng chung cho mọi asset CMS baked lúc build,
+// tránh URL Directus sống vỡ nếu server offline lúc user xem site.
+function resolveCmsAsset(id: string | null): string | null {
   if (!id) return null;
   try {
     const manifest = JSON.parse(
@@ -46,7 +48,9 @@ export async function getBuildMode(): Promise<BuildMode> {
     seoDescription: Object.fromEntries(
       meta.translations.map((t) => [t.languages_code, t.seo_description]),
     ),
-    favicon: resolveFavicon(meta.favicon),
+    favicon: resolveCmsAsset(meta.favicon),
+    logoOnBlack: resolveCmsAsset(meta.logo_on_black),
+    logoOnWhite: resolveCmsAsset(meta.logo_on_white),
   };
   return cached;
 }

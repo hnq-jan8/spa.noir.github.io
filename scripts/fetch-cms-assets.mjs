@@ -36,14 +36,13 @@ async function get(path) {
   return (await res.json()).data;
 }
 
-const [config, metadata] = await Promise.all([
-  get("/items/site_config/1?fields=logo_on_black,logo_on_white"),
-  get("/items/site_metadata/1?fields=favicon"),
-]);
+const metadata = await get(
+  "/items/site_metadata/1?fields=favicon,logo_on_black,logo_on_white",
+);
 const manifest = await downloadCmsAssets({
   base: BASE,
   token: TOKEN,
-  ids: [config.logo_on_black, config.logo_on_white, metadata.favicon],
+  ids: [metadata.logo_on_black, metadata.logo_on_white, metadata.favicon],
   destDir: resolve(root, "public"),
 });
 

@@ -59,7 +59,7 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  const { officialSiteUrl } = await getBuildMode();
+  const { officialSiteUrl, logoOnBlack, logoOnWhite } = await getBuildMode();
 
   return (
     <>
@@ -67,10 +67,10 @@ export default async function LocaleLayout({
       <ActivePoller officialSiteUrl={officialSiteUrl} />
       <div className="flex flex-col min-h-screen bg-page">
         <div className="flex flex-col flex-1">
-          <Navbar />
+          <Navbar logoOnBlack={logoOnBlack} />
           <main className="flex-1">{children}</main>
         </div>
-        <Footer />
+        <Footer logoOnWhite={logoOnWhite} />
       </div>
     </>
   );
