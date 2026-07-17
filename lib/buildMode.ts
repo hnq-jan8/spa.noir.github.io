@@ -10,6 +10,13 @@ export interface BuildMode {
   favicon: string | null;
   logoOnBlack: string | null;
   logoOnWhite: string | null;
+  /**
+   * Chỉ đổi khi có full rebuild thật (bundle JS/HTML mới) — set 1 lần bởi
+   * `pnpm build` (xem package.json), KHÔNG đổi bởi content-only deploy
+   * (scripts/fetch-json.mjs giữ nguyên giá trị cũ khi ghi lại status.json).
+   * Dùng để ActivePoller phát hiện tab đang mở chạy bundle cũ và tự reload.
+   */
+  buildId: string;
 }
 
 let cached: BuildMode | null = null;
@@ -51,6 +58,7 @@ export async function getBuildMode(): Promise<BuildMode> {
     favicon: resolveCmsAsset(meta.favicon),
     logoOnBlack: resolveCmsAsset(meta.logo_on_black),
     logoOnWhite: resolveCmsAsset(meta.logo_on_white),
+    buildId: process.env.BUILD_TIMESTAMP ?? "dev",
   };
   return cached;
 }

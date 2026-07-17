@@ -6,7 +6,7 @@
  * Usage: node scripts/fetch-json.mjs
  * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN, NEXT_PUBLIC_SITE_URL
  */
-import { writeFileSync } from "fs";
+import { writeFileSync, readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { assembleContentPayload } from "./content-payload.mjs";
@@ -103,11 +103,20 @@ const contentPayload = assembleContentPayload({
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
+// buildId chỉ đổi khi có full rebuild thật (bundle JS/HTML mới) — content-only
+// deploy này không chạy `next build` nên phải giữ nguyên giá trị đã build sẵn
+// trong out/status.json (artifact của lần deploy-layout gần nhất), không tự
+// sinh giá trị mới. Xem lib/buildMode.ts.
 const outDir = resolve(root, "out");
+let buildId = "dev";
+try {
+  buildId = JSON.parse(readFileSync(resolve(outDir, "status.json"), "utf-8")).buildId ?? "dev";
+} catch {}
+
 writeFileSync(resolve(outDir, "content.json"), JSON.stringify(contentPayload));
 writeFileSync(
   resolve(outDir, "status.json"),
-  JSON.stringify({ active, since: contentPayload.generatedAt }),
+  JSON.stringify({ active, since: contentPayload.generatedAt, buildId }),
 );
 
 console.log(`✓ content.json  (generatedAt: ${contentPayload.generatedAt})`);

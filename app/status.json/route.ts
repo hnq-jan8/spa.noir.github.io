@@ -7,9 +7,9 @@ import { buildContentPayload } from "@/lib/buildContentPayload";
 export const dynamic = "force-static";
 
 export async function GET() {
-  const [{ active }, { generatedAt }] = await Promise.all([
+  const [{ active, buildId }, { generatedAt }] = await Promise.all([
     getBuildMode(),
     buildContentPayload(),
   ]);
-  return NextResponse.json({ active, since: generatedAt });
+  return NextResponse.json({ active, since: generatedAt, buildId });
 }
