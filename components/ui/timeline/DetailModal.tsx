@@ -159,7 +159,7 @@ export default function DetailModal({
           className="overflow-y-auto scrollbar-hide"
           style={{ paddingTop: headerHeight }}
         >
-          <div className="p-6 pt-4">
+          <div className="p-6 pb-8">
             <MarkdownContent
               content={item.description}
               className="text-sm text-gray-600"
