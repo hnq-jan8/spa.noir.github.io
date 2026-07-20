@@ -32,7 +32,7 @@ jobs:
         run: |
           RUN_ID=$(gh run list \
             --workflow deploy-layout.yml \
-            --branch main \
+            --branch master \
             --status success \
             --limit 1 \
             --json databaseId \
