@@ -1,14 +1,14 @@
 "use client";
 
-import EmptyState from "@/components/ui/EmptyState";
+import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import FaqAccordion from "@/components/ui/FaqAccordion";
-import { useContentData } from "@/hooks/useContentData";
+import { useContentState } from "@/hooks/useContentData";
 import Reveal from "../ui/Reveal";
 
 export default function FaqsContent() {
-  const data = useContentData();
+  const { data, failed } = useContentState();
 
-  if (!data) return null;
+  if (!data) return failed ? <ContentLoadError /> : null;
 
   const faqs = data.faqs.faqs;
 

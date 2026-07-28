@@ -1,16 +1,16 @@
 "use client";
 
-import EmptyState from "@/components/ui/EmptyState";
+import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import Reveal from "@/components/ui/Reveal";
 import TimelineCarousel from "@/components/ui/TimelineCarousel";
-import { useContentData } from "@/hooks/useContentData";
+import { useContentState } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
 
 export default function OfficialUpdatesContent() {
   const locale = useLocale();
-  const data = useContentData();
+  const { data, failed } = useContentState();
 
-  if (!data) return null;
+  if (!data) return failed ? <ContentLoadError /> : null;
 
   const updates = data.officialUpdates.updates;
   const labels = data.officialUpdates.labels["officialUpdates"];

@@ -18,7 +18,10 @@ function fetchPayload(): Promise<ContentPayload> {
   cachedPromise = fetch(`${basePath}/content.json?_=${Date.now()}`, {
     cache: "no-store",
   })
-    .then((res) => res.json() as Promise<ContentPayload>)
+    .then((res) => {
+      if (!res.ok) throw new Error(`content.json ${res.status}`);
+      return res.json() as Promise<ContentPayload>;
+    })
     .then((payload) => {
       cachedPayload = payload;
       return payload;
@@ -54,7 +57,14 @@ export function syncContentSince(since: string) {
   invalidateContent();
 }
 
-export function useContentData(): ContentData | null {
+/**
+ * Kèm `failed` để trang phân biệt được "đang tải" với "tải hỏng" — nếu không,
+ * content.json lỗi sẽ để lại vùng nội dung trắng vĩnh viễn, không cách nào thử lại.
+ */
+export function useContentState(): {
+  data: ContentData | null;
+  failed: boolean;
+} {
   const pathname = usePathname();
   const locale = useLocale();
   // Khởi tạo bằng dữ liệu stale (nếu có) để trang mới render tức thì,
@@ -62,6 +72,7 @@ export function useContentData(): ContentData | null {
   const [data, setData] = useState<ContentData | null>(() =>
     cachedPayload ? resolveLocale(cachedPayload, locale) : null,
   );
+  const [failed, setFailed] = useState(false);
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
@@ -83,13 +94,21 @@ export function useContentData(): ContentData | null {
     let cancelled = false;
     fetchPayload()
       .then((payload) => {
-        if (!cancelled) setData(resolveLocale(payload, locale));
+        if (cancelled) return;
+        setData(resolveLocale(payload, locale));
+        setFailed(false);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
     return () => {
       cancelled = true;
     };
   }, [locale, version]);
 
-  return data;
+  return { data, failed };
+}
+
+export function useContentData(): ContentData | null {
+  return useContentState().data;
 }

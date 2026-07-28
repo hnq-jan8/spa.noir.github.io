@@ -143,6 +143,10 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
   const containerRef = useRef<HTMLDivElement>(null);
   useDismissOnOutside(containerRef, open, () => setOpen(false));
 
+  // The dropdown lists every language except the current one, so a
+  // single-language build would open an empty panel.
+  if (options.length <= 1) return null;
+
   return (
     <div
       ref={containerRef}
@@ -152,7 +156,10 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
       className="hidden md:flex relative items-stretch flex-shrink-0 ml-2 group w-max"
     >
       <button
+        type="button"
         aria-label={selectLanguageLabel}
+        aria-haspopup="menu"
+        aria-expanded={visible}
         onClick={() => setOpen((o) => !o)}
         className="relative flex items-center px-2 lg:px-3 text-xs text-gray-200 hover:text-white hover:bg-black/10 transition-colors h-full w-full"
       >

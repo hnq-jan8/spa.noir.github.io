@@ -217,8 +217,9 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
 
             <div className="flex md:hidden items-stretch gap-1">
               <button
+                type="button"
                 onClick={toggleMenu}
-                className="h-full px-2 flex items-center justify-center text-gray-200 hover:text-white"
+                className="h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white"
                 aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
@@ -271,13 +272,13 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
       {activeItem && (
         <div className="md:hidden sticky top-12 z-10 px-4 pt-4 pb-6">
           <div
-            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden whitespace-nowrap
+            className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full overflow-hidden whitespace-nowrap
                     bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full
                       shadow-[0_0_24px_14px_rgba(255,255,255,0.8)]"
           >
             <Link
               href={`/${locale}`}
-              className="text-gray-700 hover:text-gray-950"
+              className="inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-950"
             >
               {nav?.["home"]}
             </Link>
@@ -288,7 +289,7 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
             <Link
               href={activeItem.href}
               onClick={() => invalidateContent()}
-              className="font-medium truncate"
+              className="inline-flex items-center min-h-[24px] font-medium truncate"
             >
               {activeItem.label}
             </Link>

@@ -1,15 +1,15 @@
 "use client";
 
-import EmptyState from "@/components/ui/EmptyState";
+import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import FlightTable from "@/components/ui/FlightTable";
 import MarkdownContent from "@/components/ui/MarkdownContent";
 import Reveal from "@/components/ui/Reveal";
-import { useContentData } from "@/hooks/useContentData";
+import { useContentState } from "@/hooks/useContentData";
 
 export default function FlightInfoContent() {
-  const data = useContentData();
+  const { data, failed } = useContentState();
 
-  if (!data) return null;
+  if (!data) return failed ? <ContentLoadError /> : null;
 
   const fi = data.flightInfo.labels["flightInfo"];
   const flights = data.flightInfo.flights;

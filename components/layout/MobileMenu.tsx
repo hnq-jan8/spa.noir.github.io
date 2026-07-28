@@ -85,60 +85,63 @@ export default function MobileMenu({
         })}
       </nav>
 
-      <div className="mt-2">
-        <button
-          onClick={() => setLangExpanded((o) => !o)}
-          className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white transition-colors`}
-          aria-expanded={langExpanded}
-        >
-          <svg
-            className="w-5 h-5 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      {languageOptions.length > 1 && (
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={() => setLangExpanded((o) => !o)}
+            className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white transition-colors`}
+            aria-expanded={langExpanded}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            <svg
+              className="w-5 h-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="flex-1 text-left">
+              {langExpanded ? nav?.["selectLanguage"] : currentLanguage?.label}
+            </span>
+            <ChevronRight
+              className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${langExpanded ? "rotate-90" : ""}`}
+              strokeWidth={2}
             />
-          </svg>
-          <span className="flex-1 text-left">
-            {langExpanded ? nav?.["selectLanguage"] : currentLanguage?.label}
-          </span>
-          <ChevronRight
-            className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${langExpanded ? "rotate-90" : ""}`}
-            strokeWidth={2}
-          />
-        </button>
-        <div
-          style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
-          className={`grid bg-black/10 transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-            langExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-          }`}
-        >
-          <div style={{ overflow: "hidden" }} className="overflow-hidden">
-            {languageOptions.map((lang) => {
-              const isActive = lang.code === locale;
-              return (
-                <Link
-                  key={lang.code}
-                  href={`/${lang.code}${pathWithoutLocale}`}
-                  onClick={onNavigate}
-                  className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
-                    isActive
-                      ? "text-white font-semibold"
-                      : "text-gray-300 hover:text-white"
-                  }`}
-                >
-                  <span>{lang.label}</span>
-                </Link>
-              );
-            })}
+          </button>
+          <div
+            style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
+            className={`grid bg-black/10 transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              langExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div style={{ overflow: "hidden" }} className="overflow-hidden">
+              {languageOptions.map((lang) => {
+                const isActive = lang.code === locale;
+                return (
+                  <Link
+                    key={lang.code}
+                    href={`/${lang.code}${pathWithoutLocale}`}
+                    onClick={onNavigate}
+                    className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
+                      isActive
+                        ? "text-white font-semibold"
+                        : "text-gray-300 hover:text-white"
+                    }`}
+                  >
+                    <span>{lang.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRight, Plane, Tag, Users } from "lucide-react";
 
 export interface FlightRow {
@@ -132,71 +134,97 @@ export default function FlightTable({
       </div>
 
       {/* Desktop / tablet: table */}
-      <div className="hidden md:block -mx-6 overflow-x-auto max-h-[70vh] px-6">
-        <table className="w-full min-w-[760px] text-sm text-left whitespace-nowrap">
-          <thead className="sticky top-0 bg-white z-10">
-            <tr className="border-b border-gray-200">
-              <th className="py-2 pr-8 font-bold text-gray-900 text-center">
-                {h.no}
-              </th>
-              <th className="py-2 pr-8 font-bold text-gray-900">{h.type}</th>
-              <th className="py-2 pr-8 font-bold text-gray-900">
-                {h.capacity}
-              </th>
-              <th className="py-2 pr-8 font-bold text-gray-900">
-                {h.flightNo}
-              </th>
-              <th className="py-2 pr-8 font-bold text-gray-900">{h.route}</th>
-              <th className="py-2 pr-8 font-bold text-gray-900 text-center">
-                {h.srtd}
-              </th>
-              <th className="py-2 pr-8 font-bold text-gray-900 text-center">
-                {h.atd}
-              </th>
-              <th className="py-2 pr-8 font-bold text-gray-900">{h.note}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, idx) => (
-              <tr key={idx} className="border-b border-gray-100">
-                <td className="py-3 pr-8 text-gray-600 text-center">
-                  {row.no}
-                </td>
-                <td className="py-3 pr-8 text-gray-600">{row.type}</td>
-                <td className="py-3 pr-8 text-gray-600">{row.capacity}</td>
-                <td className="py-3 pr-8 font-semibold text-gray-700">
-                  {row.flightNo}
-                </td>
-                <td className="py-3 pr-8">
-                  <span className="inline-flex items-center gap-2 text-xs bg-gray-100 px-2 py-1 rounded">
-                    <Plane
-                      className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
-                      strokeWidth={2}
-                    />
-                    <span className="font-semibold text-gray-700">
-                      {row.departure}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                    <span className="font-semibold text-gray-700">
-                      {row.arrival}
-                    </span>
-                  </span>
-                </td>
-                <td className="py-3 pr-8 text-gray-600 text-center">
-                  {row.srtd}
-                </td>
-                <td className="py-3 pr-8 text-gray-600 text-center">
-                  {row.atd}
-                </td>
-                <td className="py-3 pr-8 text-gray-500">
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                    {row.note}
-                  </span>
-                </td>
+      <div className="hidden md:block -mx-6">
+        {/* `clip` rather than `auto`: it is not a scrolling value, so this box
+            never becomes a scroll container and the sticky header below keeps
+            resolving against the viewport at every width. It still stops an
+            unusually wide row from spilling outside the card. No height cap
+            either, so the page is the only thing that scrolls vertically. */}
+        <div className="overflow-x-clip px-6">
+          {/* Tighter column gaps below lg (see pr-4) drop the natural width to
+              ~591px, inside the ~672px available at 768px — that is what lets
+              the table fit without a scroll container in the first place. */}
+          <table className="w-full text-sm text-left whitespace-nowrap">
+            {/* Offset by the fixed navbar (h-14 from md up, and the table only
+                renders from md), since the scrollport here is the viewport. */}
+            <thead className="sticky top-14 bg-white z-10">
+              {/* The divider is an inset shadow on each th, not `border-b` on
+                  the tr: under `border-collapse: collapse` a row border is
+                  painted by the table grid, so it stays behind when the thead
+                  sticks. A shadow is painted by the th itself and travels. */}
+              <tr>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb] text-center">
+                  {h.no}
+                </th>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  {h.type}
+                </th>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  {h.capacity}
+                </th>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  {h.flightNo}
+                </th>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  {h.route}
+                </th>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb] text-center">
+                  {h.srtd}
+                </th>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb] text-center">
+                  {h.atd}
+                </th>
+                <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  {h.note}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((row, idx) => (
+                <tr key={idx} className="border-b border-gray-100">
+                  <td className="py-3 pr-4 lg:pr-8 text-gray-600 text-center">
+                    {row.no}
+                  </td>
+                  <td className="py-3 pr-4 lg:pr-8 text-gray-600">
+                    {row.type}
+                  </td>
+                  <td className="py-3 pr-4 lg:pr-8 text-gray-600">
+                    {row.capacity}
+                  </td>
+                  <td className="py-3 pr-4 lg:pr-8 font-semibold text-gray-700">
+                    {row.flightNo}
+                  </td>
+                  <td className="py-3 pr-4 lg:pr-8">
+                    <span className="inline-flex items-center gap-2 text-xs bg-gray-100 px-2 py-1 rounded">
+                      <Plane
+                        className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
+                        strokeWidth={2}
+                      />
+                      <span className="font-semibold text-gray-700">
+                        {row.departure}
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                      <span className="font-semibold text-gray-700">
+                        {row.arrival}
+                      </span>
+                    </span>
+                  </td>
+                  <td className="py-3 pr-4 lg:pr-8 text-gray-600 text-center">
+                    {row.srtd}
+                  </td>
+                  <td className="py-3 pr-4 lg:pr-8 text-gray-600 text-center">
+                    {row.atd}
+                  </td>
+                  <td className="py-3 pr-4 lg:pr-8 text-gray-500">
+                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                      {row.note}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

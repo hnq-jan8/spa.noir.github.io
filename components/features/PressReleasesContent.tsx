@@ -1,13 +1,13 @@
 "use client";
 
 import ArticleContent from "@/components/ui/ArticleContent";
-import EmptyState from "@/components/ui/EmptyState";
-import { useContentData } from "@/hooks/useContentData";
+import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
+import { useContentState } from "@/hooks/useContentData";
 
 export default function PressReleasesContent() {
-  const data = useContentData();
+  const { data, failed } = useContentState();
 
-  if (!data) return null;
+  if (!data) return failed ? <ContentLoadError /> : null;
 
   const pressRelease = data.pressReleases.pressRelease;
   const isEmpty = !pressRelease || (!pressRelease.body && !pressRelease.title);
