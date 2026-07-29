@@ -85,7 +85,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
                   </p>
                   <a
                     href={href}
-                    className="inline-flex items-center min-h-[44px] md:min-h-0 text-sm font-semibold text-gray-900 hover:text-amber-700 transition-colors"
+                    className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-amber-700 transition-colors"
                   >
                     {value}
                   </a>
@@ -109,7 +109,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  className="flex h-11 w-11 md:h-8 md:w-8 items-center justify-center rounded-full bg-black/5 text-gray-900 hover:bg-black/10 transition-colors"
+                  className="flex h-9 w-9 md:h-8 md:w-8 items-center justify-center rounded-full bg-black/5 text-gray-900 hover:bg-black/10 transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

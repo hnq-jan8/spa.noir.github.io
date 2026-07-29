@@ -14,14 +14,14 @@ export default function FaqsContent() {
 
   if (faqs.length === 0) {
     return (
-      <div className="container-page pt-4 pb-8 md:py-8">
+      <div className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto">
         <EmptyState data={data} />
       </div>
     );
   }
 
   return (
-    <div className="container-page pt-4 pb-8 md:py-8">
+    <div className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto">
       <Reveal>
         <FaqAccordion items={faqs} />
       </Reveal>
