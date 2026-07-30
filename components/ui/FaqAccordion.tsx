@@ -16,22 +16,21 @@ function AccordionPanel({
   children: React.ReactNode;
 }) {
   // grid-rows 0fr/1fr trick (no JS height measuring). min-h-0 on the inner
-  // wrapper is required or the track never reaches 0fr. Opacity cross-fade
-  // + ease-out-expo mask the resize as a soft fade instead of a hard step.
-  const EASE = "ease-[cubic-bezier(0.16,1,0.3,1)]";
+  // wrapper is required or the track never reaches 0fr.
+  //
+  // duration-300 + a negative delay of half that: the browser computes the
+  // very first rendered frame as if 150ms had already elapsed, so it jumps
+  // straight to the midpoint and only actually animates the remaining
+  // 150ms. Half as many frames need a layout recalc per toggle.
   return (
     <div
       id={panelId}
       role="region"
       aria-hidden={!isOpen}
       style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-      className={`grid transition-[grid-template-rows] duration-300 ${EASE}`}
+      className="grid transition-[grid-template-rows] duration-300 delay-[-150ms] ease-out"
     >
-      <div
-        className={`overflow-hidden min-h-0 transition-opacity duration-300 ${EASE} ${isOpen ? "opacity-100" : "opacity-0"}`}
-      >
-        {children}
-      </div>
+      <div className="overflow-hidden min-h-0">{children}</div>
     </div>
   );
 }
@@ -56,16 +55,14 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
     return (
       <div
         key={i}
-        // own compositing layer + contained reflow, avoids cascading
-        // repaint/layout to sibling cards on mobile Safari
-        className="bg-white border border-gray-200 rounded-2xl overflow-hidden isolate contain-content [transform:translateZ(0)]"
+        className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
       >
         <button
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
           className={`w-full flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-colors
-                    ${isOpen ? "hover:bg-gray-100 active:bg-gray-100 bg-gray-200" : "hover:bg-gray-50 active:bg-gray-100"}`}
+                    ${isOpen ? "bg-gray-100 hover:bg-gray-200/70 active:bg-gray-200/70" : "hover:bg-gray-50 active:bg-gray-100"}`}
           onClick={() => toggle(i)}
         >
           <span className="font-medium text-gray-900 pr-4">
