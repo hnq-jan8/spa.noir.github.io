@@ -76,7 +76,7 @@ export default function MobileMenu({
               className={`px-6 py-4 text-xl transition-colors font-semibold ${
                 isActive
                   ? "text-white bg-black/20"
-                  : "text-gray-300 hover:text-white hover:bg-black/10"
+                  : "text-gray-300 hover:text-white hover:bg-black/10 active:text-white active:bg-black/10"
               }`}
             >
               {item.label}
@@ -90,7 +90,7 @@ export default function MobileMenu({
           <button
             type="button"
             onClick={() => setLangExpanded((o) => !o)}
-            className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white transition-colors`}
+            className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white active:text-white transition-colors`}
             aria-expanded={langExpanded}
           >
             <svg
@@ -131,7 +131,7 @@ export default function MobileMenu({
                     className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
                       isActive
                         ? "text-white font-semibold"
-                        : "text-gray-300 hover:text-white"
+                        : "text-gray-300 hover:text-white active:text-white"
                     }`}
                   >
                     <span>{lang.label}</span>

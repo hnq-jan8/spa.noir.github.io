@@ -63,7 +63,7 @@ export default function HomeContent() {
         {latestUpdate ? (
           <Link
             href={`/${locale}/official-updates`}
-            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-[0_0_12px_#DFDFDF] transition-shadow"
+            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-[0_0_12px_#DFDFDF] active:shadow-[0_0_12px_#DFDFDF] transition-shadow"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -94,7 +94,7 @@ export default function HomeContent() {
         ) : (
           <button
             type="button"
-            className="w-full flex items-center gap-2 bg-gray-50 border border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400 text-left hover:bg-gray-100 transition-colors"
+            className="w-full flex items-center gap-2 bg-gray-50 border border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400 text-left hover:bg-gray-100 active:bg-gray-100 transition-colors"
             onClick={() => invalidateContent()}
           >
             <Megaphone className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
@@ -123,7 +123,7 @@ export default function HomeContent() {
                   </p>
                   <a
                     href={href}
-                    className="text-sm font-semibold text-gray-900 hover:text-amber-700 transition-colors"
+                    className="text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700 transition-colors"
                   >
                     {value}
                   </a>
@@ -151,7 +151,7 @@ export default function HomeContent() {
           <Reveal key={page.href} delay={100 + index * 50}>
             <Link
               href={page.href}
-              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
+              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] active:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
             >
               <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
                 <page.Icon
@@ -178,7 +178,7 @@ export default function HomeContent() {
       <Reveal delay={200}>
         <Link
           href={`/${locale}/press-releases`}
-          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
+          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] active:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
         >
           <div className="flex items-center gap-4">
             <FileText

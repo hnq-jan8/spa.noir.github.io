@@ -18,7 +18,7 @@ export const COLLAPSED_HEIGHT = 350;
 // Nút tròn mờ dùng chung cho mũi tên trái/phải của carousel và nút cuộn xuống
 // của modal — vị trí (left/right/bottom) thêm riêng ở từng chỗ.
 export const CIRCLE_BUTTON =
-  "flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70 bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full";
+  "flex items-center justify-center w-8 h-8 text-black/40 hover:text-black/70 active:text-black/70 bg-gray-400/25 backdrop-blur-sm border border-white/10 rounded-full";
 
 export function useOverflowMeasure(description: string) {
   const [overflowing, setOverflowing] = useState(false);

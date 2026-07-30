@@ -68,7 +68,7 @@ function LanguageDropdownLinks({
             key={lang.code}
             href={`/${lang.code}${pathWithoutLocale}`}
             onClick={onSelect}
-            className={`flex items-center text-xs text-gray-200 transition-colors hover:bg-black/10 hover:text-white ${
+            className={`flex items-center text-xs text-gray-200 transition-colors hover:bg-black/10 hover:text-white active:bg-black/10 active:text-white ${
               compact ? "px-2" : "px-3"
             } ${itemClassName}`}
           >
@@ -161,7 +161,7 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
         aria-haspopup="menu"
         aria-expanded={visible}
         onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center px-2 lg:px-3 text-xs text-gray-200 hover:text-white hover:bg-black/10 transition-colors h-full w-full"
+        className="relative flex items-center px-2 lg:px-3 text-xs text-gray-200 hover:text-white hover:bg-black/10 active:text-white active:bg-black/10 transition-colors h-full w-full"
       >
         <LanguageWidthSizer languages={options} compact className="lg:hidden" />
         <LanguageWidthSizer languages={options} className="hidden lg:grid" />

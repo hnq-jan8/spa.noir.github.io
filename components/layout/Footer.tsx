@@ -90,7 +90,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
                   </p>
                   <a
                     href={href}
-                    className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-amber-700 transition-colors"
+                    className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700 transition-colors"
                   >
                     {value}
                   </a>
@@ -114,7 +114,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  className={`flex items-center justify-center py-1 ${"padX" in social ? social.padX : "px-1"} text-gray-900 hover:text-amber-700 transition-colors`}
+                  className={`flex items-center justify-center py-1 ${"padX" in social ? social.padX : "px-1"} text-gray-900 hover:text-amber-700 active:text-amber-700 transition-colors`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +137,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
           </p>
           <a
             href="https://www.sunphuquocairways.com"
-            className="group relative inline-flex items-center gap-2 overflow-hidden bg-black/5 hover:bg-[#811721] transition-colors duration-300 text-gray-900 hover:text-gray-50 text-sm px-5 py-2 rounded-xl"
+            className="group relative inline-flex items-center gap-2 overflow-hidden bg-black/5 hover:bg-[#811721] active:bg-[#811721] transition-colors duration-300 active:duration-100 text-gray-900 hover:text-gray-50 active:text-gray-50 text-sm px-5 py-2 rounded-xl"
           >
             <span
               aria-hidden="true"

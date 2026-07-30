@@ -38,7 +38,7 @@ export default function NotFoundContent() {
         )}
         <Link
           href={`/${locale}`}
-          className="inline-block mt-6 bg-black/5 hover:bg-black/10 transition-colors text-sm text-gray-900 px-5 py-2 rounded-xl"
+          className="inline-block mt-6 bg-black/5 hover:bg-black/10 active:bg-black/10 transition-colors text-sm text-gray-900 px-5 py-2 rounded-xl"
         >
           {t?.["backHome"]}
         </Link>

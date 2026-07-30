@@ -43,7 +43,7 @@ export default function EmptyState({
           type="button"
           aria-label={t?.["retry"] ?? t?.["title"]}
           onClick={() => invalidateContent()}
-          className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-4 hover:bg-gray-50 transition-colors"
+          className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-4"
         >
           <Icon className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
         </button>
@@ -61,7 +61,7 @@ export default function EmptyState({
           <button
             type="button"
             onClick={() => invalidateContent()}
-            className="inline-block mt-6 bg-black/5 hover:bg-black/10 transition-colors text-sm text-gray-900 px-5 py-2 rounded-xl"
+            className="inline-block mt-6 bg-black/5 text-sm text-gray-900 px-5 py-2 rounded-xl"
           >
             {t["retry"]}
           </button>

@@ -155,7 +155,7 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
                         className={`text-xs whitespace-nowrap px-4 flex items-center transition-colors relative flex-shrink-0 ${
                           isActive
                             ? "text-white font-medium bg-black/30"
-                            : "text-gray-200 hover:text-white hover:bg-black/20"
+                            : "text-gray-200 hover:text-white hover:bg-black/20 active:text-white active:bg-black/20"
                         }`}
                       >
                         <span
@@ -194,7 +194,7 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
                       onClick={() => scrollNav(side)}
                       label={a11y[side === "left" ? "scrollLeft" : "scrollRight"]}
                       Icon={Icon}
-                      className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden ${
+                      className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 active:text-black/80 z-20 lg:hidden ${
                         side === "left" ? "left-0" : "right-0"
                       }`}
                       iconClassName={`absolute ${
@@ -219,7 +219,7 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
               <button
                 type="button"
                 onClick={toggleMenu}
-                className="h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white"
+                className="h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white active:text-white"
                 aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
@@ -278,7 +278,7 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
           >
             <Link
               href={`/${locale}`}
-              className="inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-950"
+              className="inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-950 active:text-gray-950"
             >
               {nav?.["home"]}
             </Link>

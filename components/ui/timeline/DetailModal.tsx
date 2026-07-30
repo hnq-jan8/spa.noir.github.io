@@ -149,7 +149,7 @@ export default function DetailModal({
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="text-gray-400 hover:text-gray-700 flex-shrink-0"
+            className="text-gray-400 hover:text-gray-700 active:text-gray-700 flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
