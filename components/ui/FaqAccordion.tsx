@@ -15,21 +15,23 @@ function AccordionPanel({
   panelId: string;
   children: React.ReactNode;
 }) {
-  // CSS-grid 0fr/1fr row trick instead of measuring scrollHeight in JS:
-  // no forced-synchronous-layout read on every toggle, no ResizeObserver,
-  // and it transitions a grid track (not the box's own height), which
-  // Safari animates far more smoothly than a JS-driven height transition.
-  // min-h-0 on the inner wrapper is required — grid items default to
-  // min-height:auto, which would stop the track from ever reaching 0fr.
+  // grid-rows 0fr/1fr trick (no JS height measuring). min-h-0 on the inner
+  // wrapper is required or the track never reaches 0fr. Opacity cross-fade
+  // + ease-out-expo mask the resize as a soft fade instead of a hard step.
+  const EASE = "ease-[cubic-bezier(0.16,1,0.3,1)]";
   return (
     <div
       id={panelId}
       role="region"
       aria-hidden={!isOpen}
       style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-      className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+      className={`grid transition-[grid-template-rows] duration-300 ${EASE}`}
     >
-      <div className="overflow-hidden min-h-0">{children}</div>
+      <div
+        className={`overflow-hidden min-h-0 transition-opacity duration-300 ${EASE} ${isOpen ? "opacity-100" : "opacity-0"}`}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -54,13 +56,8 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
     return (
       <div
         key={i}
-        // isolate + translateZ(0): own compositing layer, so Safari doesn't
-        // repaint the rounded-corner clip mask every frame the panel
-        // resizes. contain-content: scopes layout/paint to this card, so
-        // the height change doesn't force Safari to re-run layout on every
-        // FAQ card below it in the list — on mobile Safari that cascading
-        // reflow across all the other cards was the actual source of the
-        // jank, not just this card's own animation.
+        // own compositing layer + contained reflow, avoids cascading
+        // repaint/layout to sibling cards on mobile Safari
         className="bg-white border border-gray-200 rounded-2xl overflow-hidden isolate contain-content [transform:translateZ(0)]"
       >
         <button
