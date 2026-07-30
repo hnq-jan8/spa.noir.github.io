@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 interface FaqItem {
   question: string;
@@ -15,46 +15,21 @@ function AccordionPanel({
   panelId: string;
   children: React.ReactNode;
 }) {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const isFirstRender = useRef(true);
-  const [height, setHeight] = useState(isOpen ? "auto" : "0px");
-
-  // Once we leave the initial "auto" resting state we stay in explicit px
-  // from then on (0px when closed, measured px when open), so a close
-  // always has a concrete value to transition from — no double-rAF dance
-  // needed to fake a transition out of "auto".
-  useLayoutEffect(() => {
-    const content = contentRef.current;
-    if (!content) return;
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    setHeight(isOpen ? `${content.scrollHeight}px` : "0px");
-  }, [isOpen]);
-
-  // Keep the pinned px height correct while open if content reflows
-  // (e.g. viewport rotation, font load) instead of ever falling back to
-  // "auto", which can't be transitioned from later.
-  useEffect(() => {
-    const content = contentRef.current;
-    if (!isOpen || !content) return;
-    const ro = new ResizeObserver(() =>
-      setHeight(`${content.scrollHeight}px`),
-    );
-    ro.observe(content);
-    return () => ro.disconnect();
-  }, [isOpen]);
-
+  // CSS-grid 0fr/1fr row trick instead of measuring scrollHeight in JS:
+  // no forced-synchronous-layout read on every toggle, no ResizeObserver,
+  // and it transitions a grid track (not the box's own height), which
+  // Safari animates far more smoothly than a JS-driven height transition.
+  // min-h-0 on the inner wrapper is required — grid items default to
+  // min-height:auto, which would stop the track from ever reaching 0fr.
   return (
     <div
       id={panelId}
       role="region"
       aria-hidden={!isOpen}
-      style={{ height, overflow: "hidden" }}
-      className="transition-[height] duration-300 ease-in-out"
+      style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+      className="grid transition-[grid-template-rows] duration-300 ease-in-out"
     >
-      <div ref={contentRef}>{children}</div>
+      <div className="overflow-hidden min-h-0">{children}</div>
     </div>
   );
 }
