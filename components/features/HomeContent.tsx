@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   Megaphone,
   Phone,
@@ -16,6 +15,7 @@ import { formatTimestamp } from "@/lib/siteData";
 import { ContentLoadError } from "@/components/ui/EmptyState";
 import MarkdownContent from "@/components/ui/MarkdownContent";
 import Reveal from "@/components/ui/Reveal";
+import { CardLink } from "@/components/ui/Card";
 
 export default function HomeContent() {
   const locale = useLocale();
@@ -61,9 +61,9 @@ export default function HomeContent() {
       {/* Latest official update */}
       <Reveal className="mb-4">
         {latestUpdate ? (
-          <Link
+          <CardLink
             href={`/${locale}/official-updates`}
-            className="group block bg-white border-l-4 border-l-amber-600 border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-[0_0_12px_#DFDFDF] active:shadow-[0_0_12px_#DFDFDF] transition-shadow"
+            className="block border-l-4 border-l-amber-600"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -90,7 +90,7 @@ export default function HomeContent() {
                 />
               </span>
             </div>
-          </Link>
+          </CardLink>
         ) : (
           <button
             type="button"
@@ -149,9 +149,9 @@ export default function HomeContent() {
       <div className="grid grid-cols-1 min-[800px]:grid-cols-2 gap-4 mb-4">
         {gridPages.map((page, index) => (
           <Reveal key={page.href} delay={100 + index * 50}>
-            <Link
+            <CardLink
               href={page.href}
-              className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] active:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
+              className="flex items-center justify-between gap-4"
             >
               <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
                 <page.Icon
@@ -169,16 +169,16 @@ export default function HomeContent() {
                 className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1"
                 strokeWidth={2}
               />
-            </Link>
+            </CardLink>
           </Reveal>
         ))}
       </div>
 
       {/* Press releases */}
       <Reveal delay={200}>
-        <Link
+        <CardLink
           href={`/${locale}/press-releases`}
-          className="group flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-[0_0_12px_#DFDFDF] active:shadow-[0_0_12px_#DFDFDF] transition-shadow p-6"
+          className="flex items-center justify-between gap-4"
         >
           <div className="flex items-center gap-4">
             <FileText
@@ -196,7 +196,7 @@ export default function HomeContent() {
             className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1"
             strokeWidth={2}
           />
-        </Link>
+        </CardLink>
       </Reveal>
     </div>
   );

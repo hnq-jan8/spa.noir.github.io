@@ -28,7 +28,7 @@ export default function PressReleasesContent() {
         className="md:hidden absolute -top-[126px] inset-x-0 bottom-0 bg-white -z-10 pointer-events-none"
         aria-hidden="true"
       />
-      <div className="md:bg-white md:border md:border-gray-200 md:rounded-2xl md:shadow-sm md:p-8">
+      <div className="md:bg-white md:border md:border-gray-200 md:rounded-2xl md:p-8">
         <ArticleContent title={title} body={body} />
       </div>
     </div>
