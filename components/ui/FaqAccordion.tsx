@@ -39,6 +39,12 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
   const [openSet, setOpenSet] = useState<Set<number>>(
     () => new Set(items.length > 0 ? [0] : []),
   );
+  // Degrees keep accumulating (0, 180, 360, 540, ...) instead of toggling
+  // back to 0 — rotating the chevron the same clockwise direction every
+  // time instead of winding it back counter-clockwise on close.
+  const [chevronDeg, setChevronDeg] = useState<Record<number, number>>(() =>
+    items.length > 0 ? { 0: 180 } : ({} as Record<number, number>),
+  );
 
   const toggle = (i: number) => {
     setOpenSet((prev) => {
@@ -47,6 +53,7 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
       else next.add(i);
       return next;
     });
+    setChevronDeg((prev) => ({ ...prev, [i]: (prev[i] ?? 0) + 180 }));
   };
 
   const renderCard = (item: FaqItem, i: number) => {
@@ -61,11 +68,10 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
-          className={`w-full flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-colors
-                    ${isOpen ? "bg-gray-100 hover:bg-gray-200/70 active:bg-gray-200/70" : "hover:bg-gray-50 active:bg-gray-100"}`}
+          className="w-full flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-colors hover:bg-gray-50 active:bg-gray-50"
           onClick={() => toggle(i)}
         >
-          <span className="font-medium text-gray-900 pr-4">
+          <span className="pr-4 text-gray-900 font-medium">
             {item.question}
           </span>
           <svg
@@ -78,13 +84,14 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={`flex-shrink-0 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            className="flex-shrink-0 text-gray-500 transition-transform duration-200"
+            style={{ transform: `rotate(${chevronDeg[i] ?? 0}deg)` }}
           >
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
         <AccordionPanel isOpen={isOpen} panelId={panelId}>
-          <div className="px-4 pt-3 pb-4 sm:px-6 sm:pt-4 sm:pb-6 text-gray-700 leading-relaxed text-sm">
+          <div className="mx-4 sm:mx-6 border-t border-gray-200 pt-3 sm:pt-4 pb-4 sm:pb-6 text-gray-700 leading-relaxed text-sm">
             {item.answer}
           </div>
         </AccordionPanel>
