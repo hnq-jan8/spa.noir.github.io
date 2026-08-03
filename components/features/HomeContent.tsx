@@ -64,6 +64,7 @@ export default function HomeContent() {
           <CardLink
             href={`/${locale}/official-updates`}
             className="block border-l-4 border-l-amber-600"
+            amber
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -85,7 +86,7 @@ export default function HomeContent() {
               <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
                 {home["viewAll"]}
                 <ChevronRight
-                  className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1"
+                  className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
                   strokeWidth={2}
                 />
               </span>
@@ -166,7 +167,7 @@ export default function HomeContent() {
                 </div>
               </div>
               <ChevronRight
-                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1"
+                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
                 strokeWidth={2}
               />
             </CardLink>
@@ -193,7 +194,7 @@ export default function HomeContent() {
             </div>
           </div>
           <ChevronRight
-            className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1"
+            className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
             strokeWidth={2}
           />
         </CardLink>

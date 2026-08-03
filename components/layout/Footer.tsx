@@ -137,7 +137,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
           </p>
           <a
             href="https://www.sunphuquocairways.com"
-            className="group relative inline-flex items-center gap-2 overflow-hidden bg-black/5 hover:bg-[#811721] active:bg-[#811721] transition-colors duration-300 active:duration-100 text-gray-900 hover:text-gray-50 active:text-gray-50 text-sm px-5 py-2 rounded-xl"
+            className="group relative inline-flex items-center gap-2 overflow-hidden bg-black/5 hover:bg-[#811721] active:bg-black/5 transition-colors duration-300 active:duration-100 text-gray-900 hover:text-gray-50 active:text-[#a21725] text-sm px-5 py-2 rounded-xl"
           >
             <span
               aria-hidden="true"
