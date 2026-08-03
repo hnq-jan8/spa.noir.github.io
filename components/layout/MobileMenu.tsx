@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { invalidateContent } from "@/hooks/useContentData";
+import { EXPAND_GRID_TRANSITION_CLASS } from "@/lib/expandTransition";
 
 interface NavItem {
   label: string;
@@ -116,9 +117,7 @@ export default function MobileMenu({
           </button>
           <div
             style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
-            className={`grid bg-black/10 transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-              langExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-            }`}
+            className={`${EXPAND_GRID_TRANSITION_CLASS} bg-black/10`}
           >
             <div style={{ overflow: "hidden" }} className="overflow-hidden">
               {languageOptions.map((lang) => {

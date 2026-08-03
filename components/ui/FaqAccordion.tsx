@@ -1,5 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import {
+  EXPAND_GRID_TRANSITION_CLASS,
+  expandTransition,
+} from "@/lib/expandTransition";
 
 interface FaqItem {
   question: string;
@@ -16,19 +20,15 @@ function AccordionPanel({
   children: React.ReactNode;
 }) {
   // grid-rows 0fr/1fr trick (no JS height measuring). min-h-0 on the inner
-  // wrapper is required or the track never reaches 0fr.
-  //
-  // duration-300 + a negative delay of half that: the browser computes the
-  // very first rendered frame as if 150ms had already elapsed, so it jumps
-  // straight to the midpoint and only actually animates the remaining
-  // 150ms. Half as many frames need a layout recalc per toggle.
+  // wrapper is required or the track never reaches 0fr. See
+  // lib/expandTransition.ts for the negative-delay timing trick.
   return (
     <div
       id={panelId}
       role="region"
       aria-hidden={!isOpen}
       style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-      className="grid transition-[grid-template-rows] duration-300 delay-[-150ms] ease-out"
+      className={EXPAND_GRID_TRANSITION_CLASS}
     >
       <div className="overflow-hidden min-h-0">{children}</div>
     </div>
@@ -46,7 +46,24 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
     items.length > 0 ? { 0: 180 } : ({} as Record<number, number>),
   );
 
+  // FLIP: growing/shrinking a panel pushes every card below it through
+  // normal flow, which forces the browser to recompute their position on
+  // every animation frame (the actual jank source on mobile Safari — a
+  // single card's own layout is cheap, but reflowing the whole list below
+  // it every frame isn't). Instead we let the DOM jump straight to the new
+  // layout in one reflow, then paper over the jump by animating each
+  // shifted card's `transform` from its old position back to zero —
+  // transform runs on the compositor, not main-thread layout.
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const prevRects = useRef<Map<number, number>>(new Map());
+
   const toggle = (i: number) => {
+    const rects = new Map<number, number>();
+    cardRefs.current.forEach((el, idx) => {
+      if (el) rects.set(idx, el.getBoundingClientRect().top);
+    });
+    prevRects.current = rects;
+
     setOpenSet((prev) => {
       const next = new Set(prev);
       if (next.has(i)) next.delete(i);
@@ -56,12 +73,36 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
     setChevronDeg((prev) => ({ ...prev, [i]: (prev[i] ?? 0) + 180 }));
   };
 
+  useLayoutEffect(() => {
+    const prev = prevRects.current;
+    if (prev.size === 0) return;
+    prevRects.current = new Map();
+
+    cardRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const before = prev.get(idx);
+      if (before === undefined) return;
+      const after = el.getBoundingClientRect().top;
+      const dy = before - after;
+      if (dy === 0) return;
+
+      el.style.transition = "none";
+      el.style.transform = `translateY(${dy}px)`;
+      el.getBoundingClientRect(); // force reflow before re-enabling transition
+      el.style.transition = expandTransition("transform");
+      el.style.transform = "";
+    });
+  }, [openSet]);
+
   const renderCard = (item: FaqItem, i: number) => {
     const isOpen = openSet.has(i);
     const panelId = `faq-panel-${i}`;
     return (
       <div
         key={i}
+        ref={(el) => {
+          cardRefs.current[i] = el;
+        }}
         className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
       >
         <button
