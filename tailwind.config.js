@@ -26,6 +26,21 @@ module.exports = {
         page: COLORS.page,
         surface: COLORS.surface,
       },
+      keyframes: {
+        "pulse-glow": {
+          "0%, 100%": {
+            opacity: "1",
+            boxShadow: "0 0 3px 1px rgba(239, 68, 68, 0.5)",
+          },
+          "50%": {
+            opacity: ".5",
+            boxShadow: "0 0 0 0 rgba(239, 68, 68, 0)",
+          },
+        },
+      },
+      animation: {
+        "pulse-glow": "pulse-glow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
     },
   },
   plugins: [],

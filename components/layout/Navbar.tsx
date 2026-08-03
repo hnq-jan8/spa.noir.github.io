@@ -289,7 +289,7 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
             <Link
               href={activeItem.href}
               onClick={() => invalidateContent()}
-              className="inline-flex items-center min-h-[24px] font-medium truncate"
+              className="inline-flex items-center min-h-[24px] font-medium truncate transition-colors hover:text-gray-600 active:text-gray-600"
             >
               {activeItem.label}
             </Link>
