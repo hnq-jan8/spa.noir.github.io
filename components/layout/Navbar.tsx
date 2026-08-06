@@ -23,7 +23,11 @@ const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 // Icon menu animate 2 pha 260ms, pha sau bắt đầu ở mốc 110ms => tổng ~370ms.
 const MENU_ICON_ANIM_MS = 370;
 
-export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) {
+export default function Navbar({
+  logoOnBlack,
+}: {
+  logoOnBlack: string | null;
+}) {
   const locale = useLocale();
   const pathname = usePathname();
   const data = useContentData();
@@ -192,7 +196,9 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
                     <ScrollButton
                       active={active}
                       onClick={() => scrollNav(side)}
-                      label={a11y[side === "left" ? "scrollLeft" : "scrollRight"]}
+                      label={
+                        a11y[side === "left" ? "scrollLeft" : "scrollRight"]
+                      }
                       Icon={Icon}
                       className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 active:text-black/80 z-20 lg:hidden ${
                         side === "left" ? "left-0" : "right-0"
@@ -273,8 +279,7 @@ export default function Navbar({ logoOnBlack }: { logoOnBlack: string | null }) 
         <div className="md:hidden sticky top-12 z-10 px-4 pt-4 pb-6">
           <div
             className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full overflow-hidden whitespace-nowrap
-                    bg-gray-300/60 backdrop-blur-md border border-white/10 text-xs text-black max-w-full
-                      shadow-[0_0_24px_14px_rgba(255,255,255,0.8)]"
+                    bg-white/75 backdrop-blur-md border border-gray-200 text-xs text-black max-w-full"
           >
             <Link
               href={`/${locale}`}

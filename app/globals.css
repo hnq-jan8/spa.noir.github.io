@@ -26,6 +26,28 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  /* Horizontal inset a full-bleed CMS article cancels via
+     `margin: calc(var(--article-pad) * -1)` to reach the edge. Below md
+     there's no card box (see press-article-card usage), so this tracks
+     .container-page's own padding instead; at md+ it switches to the
+     card's md:p-8. */
+  .press-article-card {
+    --article-pad: 1rem;
+  }
+  @media (min-width: 640px) {
+    .press-article-card {
+      --article-pad: 1.5rem;
+    }
+  }
+  @screen md {
+    .press-article-card {
+      --article-pad: 2rem;
+      /* Only clip at md+, where the card is an actual rounded box —
+         below md this would block the negative-margin bleed above. */
+      overflow: hidden;
+    }
+  }
+
   .pill-badge {
     @apply border border-gray-400 rounded-full px-6 py-2.5 text-sm text-gray-700 text-center;
   }

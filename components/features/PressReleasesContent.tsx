@@ -21,14 +21,20 @@ export default function PressReleasesContent() {
   }
 
   const { title, body } = pressRelease;
+  // Mirrors ArticleContent's own check: a blank title means a full-bleed
+  // article. Below md there's no floating card, so drop the vertical page
+  // padding too and let it reach the navbar/footer, same as the sides.
+  const isFullBleed = title.trim().length === 0;
 
   return (
-    <div className="relative z-0 container-page pt-4 pb-8 md:py-8">
+    <div
+      className={`relative z-0 container-page md:py-8 ${isFullBleed ? "pt-0 pb-0" : "pt-4 pb-8"}`}
+    >
       <div
         className="md:hidden absolute -top-[126px] inset-x-0 bottom-0 bg-white -z-10 pointer-events-none"
         aria-hidden="true"
       />
-      <div className="md:bg-white md:border md:border-gray-200 md:rounded-2xl md:p-8">
+      <div className="press-article-card md:bg-white md:border md:border-gray-200 md:rounded-2xl md:p-8">
         <ArticleContent title={title} body={body} />
       </div>
     </div>

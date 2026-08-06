@@ -49,7 +49,7 @@ export default function HomeContent() {
       {/* As-of timestamp */}
       <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4">
         <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
-        <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md shadow-[0_0_24px_14px_rgba(255,255,255,0.8)]">
+        <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 animate-pulse-glow" />
           <p className="flex flex-wrap items-center min-h-[24px] gap-x-1">
             <span>{home["asOf"]}:</span>
