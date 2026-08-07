@@ -86,7 +86,7 @@ const COMPONENTS: Components = {
   ),
   blockquote: ({ children, style }) => (
     <blockquote
-      className="border-l-2 border-gray-300 pl-4 italic text-gray-600"
+      className="rounded-r-lg border-l-4 border-gray-300 bg-gray-50 px-4 py-3 italic text-gray-600"
       style={style}
     >
       {children}
@@ -102,8 +102,8 @@ const COMPONENTS: Components = {
     />
   ),
   table: ({ children, style }) => (
-    <div className="overflow-x-auto">
-      <table className="border-collapse border border-gray-300" style={style}>
+    <div className="inline-block max-w-full overflow-x-auto rounded-xl border border-gray-200 bg-white [&_tr:last-child>td]:border-b-0">
+      <table className="border-collapse" style={style}>
         {children}
       </table>
     </div>
@@ -111,14 +111,36 @@ const COMPONENTS: Components = {
   thead: ({ children, style }) => <thead style={style}>{children}</thead>,
   tr: ({ children, style }) => <tr style={style}>{children}</tr>,
   th: ({ children, style }) => (
-    <th className="border border-gray-300 px-3 py-2 text-left font-bold" style={style}>
+    <th
+      className="border-b border-r border-gray-200 bg-gray-50 px-3 py-2 text-left font-bold last:border-r-0"
+      style={style}
+    >
       {children}
     </th>
   ),
   td: ({ children, style }) => (
-    <td className="border border-gray-300 px-3 py-2" style={style}>
+    <td
+      className="border-b border-r border-gray-100 px-3 py-2 last:border-r-0"
+      style={style}
+    >
       {children}
     </td>
+  ),
+  pre: ({ children, style }) => (
+    <pre
+      className="overflow-x-auto rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm font-mono [&_code]:border-0 [&_code]:bg-transparent [&_code]:p-0"
+      style={style}
+    >
+      {children}
+    </pre>
+  ),
+  code: ({ children, style }) => (
+    <code
+      className="rounded bg-gray-100 px-1.5 py-0.5 text-[0.85em] font-mono"
+      style={style}
+    >
+      {children}
+    </code>
   ),
 };
 

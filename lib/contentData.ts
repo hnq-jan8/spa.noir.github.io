@@ -4,8 +4,14 @@ import { routing } from "@/i18n/routing";
 
 export type I18n<T> = Record<string, T>;
 
+// Falls back further to any locale with a value, so an untranslated field
+// doesn't resolve to null just because the default locale is the empty one.
 function pick<T>(map: I18n<T>, locale: string): T {
-  return map[locale] ?? map[routing.defaultLocale];
+  return (
+    map[locale] ??
+    map[routing.defaultLocale] ??
+    (Object.values(map).find((value) => value != null) as T)
+  );
 }
 
 type LabelMap = Record<string, Record<string, I18n<string>>>;
