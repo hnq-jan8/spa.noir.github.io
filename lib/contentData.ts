@@ -4,14 +4,8 @@ import { routing } from "@/i18n/routing";
 
 export type I18n<T> = Record<string, T>;
 
-// Falls back further to any locale with a value, so an untranslated field
-// doesn't resolve to null just because the default locale is the empty one.
 function pick<T>(map: I18n<T>, locale: string): T {
-  return (
-    map[locale] ??
-    map[routing.defaultLocale] ??
-    (Object.values(map).find((value) => value != null) as T)
-  );
+  return map[locale] ?? map[routing.defaultLocale];
 }
 
 type LabelMap = Record<string, Record<string, I18n<string>>>;
@@ -59,7 +53,9 @@ export interface ContentFaq {
 }
 
 export interface ContentPressRelease {
-  title: I18n<string>;
+  // A null title (per-locale) opts that locale into a full-bleed layout —
+  // the CMS body already carries its own hero, so the title bar is skipped.
+  title: I18n<string | null>;
   body: I18n<string>;
 }
 
@@ -140,7 +136,7 @@ export interface ContentData {
     labels: ResolvedLabelMap;
   };
   pressReleases: {
-    pressRelease: { title: string; body: string } | null;
+    pressRelease: { title: string | null; body: string } | null;
   };
 }
 

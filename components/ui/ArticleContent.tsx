@@ -2,15 +2,16 @@ import MarkdownContent from "@/components/ui/MarkdownContent";
 import Reveal from "./Reveal";
 
 interface ArticleContentProps {
-  title: string;
+  title: string | null;
   body: string;
 }
 
 export default function ArticleContent({ title, body }: ArticleContentProps) {
-  // A blank title is how a full-bleed CMS article (its own hero already
-  // carries the headline) opts out of the default title + rule — showing
-  // both would just double up the heading and clash with the custom design.
-  const hasTitle = title.trim().length > 0;
+  // A blank or null title is how a full-bleed CMS article (its own hero
+  // already carries the headline) opts out of the default title + rule —
+  // showing both would just double up the heading and clash with the custom
+  // design.
+  const hasTitle = !!title && title.trim().length > 0;
 
   return (
     <div>

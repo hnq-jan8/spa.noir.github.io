@@ -21,10 +21,11 @@ export default function PressReleasesContent() {
   }
 
   const { title, body } = pressRelease;
-  // Mirrors ArticleContent's own check: a blank title means a full-bleed
-  // article. Below md there's no floating card, so drop the vertical page
-  // padding too and let it reach the navbar/footer, same as the sides.
-  const isFullBleed = title.trim().length === 0;
+  // Mirrors ArticleContent's own check: a blank/null title means a
+  // full-bleed article. Below md there's no floating card, so drop the
+  // vertical page padding too and let it reach the navbar/footer, same as
+  // the sides.
+  const isFullBleed = !title || title.trim().length === 0;
 
   return (
     <div
