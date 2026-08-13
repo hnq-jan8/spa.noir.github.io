@@ -36,8 +36,13 @@ export interface OfficialUpdateTranslation {
   languages_code: string;
   title: string;
   description: string;
+  /** Đoạn preview trên card; để trống thì cắt từ `description`. */
+  preview_excerpt: string | null;
+  /** UUID file trong directus_files. */
+  preview_image: string | null;
 }
 export interface OfficialUpdate {
+  id: number;
   date: string;
   translations: OfficialUpdateTranslation[];
 }
@@ -66,8 +71,13 @@ export interface PressReleaseTranslation {
   languages_code: string;
   title: string;
   body: string;
+  preview_excerpt: string | null;
+  preview_image: string | null;
 }
 export interface PressRelease {
+  id: number;
+  slug: string | null;
+  published_at: string | null;
   translations: PressReleaseTranslation[];
 }
 
@@ -119,7 +129,7 @@ export interface UiLabel {
 
 export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
   return get(
-    "/items/official_updates?fields=date,translations.languages_code,translations.title,translations.description&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
+    "/items/official_updates?fields=id,date,translations.languages_code,translations.title,translations.description,translations.preview_excerpt,translations.preview_image&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   );
 }
 
@@ -137,7 +147,7 @@ export async function getFaqs(): Promise<Faq[]> {
 
 export async function getPressReleases(): Promise<PressRelease[]> {
   return get(
-    "/items/press_releases?fields=translations.languages_code,translations.title,translations.body&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
+    "/items/press_releases?fields=id,slug,published_at,translations.languages_code,translations.title,translations.body,translations.preview_excerpt,translations.preview_image&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   );
 }
 

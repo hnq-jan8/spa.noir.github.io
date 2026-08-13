@@ -17,7 +17,7 @@ export default function ArticleContent({ title, body }: ArticleContentProps) {
     <div>
       {hasTitle && (
         <Reveal>
-          <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-4">
+          <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-4 text-balance">
             {title}
           </h1>
           <hr className="border-gray-300 mb-6" />

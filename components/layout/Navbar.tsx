@@ -4,16 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, Megaphone } from "lucide-react";
 import {
   DesktopLanguageSelector,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
 import MobileMenu from "@/components/layout/MobileMenu";
 import ScrollButton from "@/components/ui/ScrollButton";
+import {
+  ARTICLE_PARAM,
+  clearArticleRoute,
+  useArticleKey,
+} from "@/hooks/useArticleRoute";
+import { useBreadcrumbHidden } from "@/hooks/useBreadcrumbVisibility";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useLocale } from "@/hooks/useLocale";
+import { useUnreadUpdate } from "@/hooks/useUnreadUpdate";
 import { bundledLabels } from "@/i18n/labels";
 import { normalizePath, stripLocale } from "@/i18n/paths";
 import { languages as routingLanguages } from "@/i18n/routing";
@@ -36,11 +43,8 @@ export default function Navbar({
   // không chờ content.json; bản trong content.json ghi đè khi về.
   const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
   const a11y = data?.common.labels["a11y"] ?? bundledLabels(locale, "a11y");
-  const liveLanguages = data?.common.languages.map((lang) => ({
-    code: lang.code,
-    label: lang.code.toUpperCase(),
-  }));
-
+  // Full language names — the desktop selector shows the two-letter code at
+  // rest and expands to the name on hover, so it needs the name too.
   const languageOptions = (data?.common.languages ?? routingLanguages).map(
     (lang) => ({
       code: lang.code,
@@ -98,10 +102,47 @@ export default function Navbar({
       ]
     : [];
 
+  // Switching language while reading an article has to land on the same
+  // article, not back at the list — the key rides along on the new locale's
+  // URL. Kept as a suffix rather than merging the whole query string so an
+  // unrelated param can't leak across a locale switch.
+  const articleKey = useArticleKey();
+  const localeSuffix = articleKey
+    ? `?${ARTICLE_PARAM}=${encodeURIComponent(articleKey)}`
+    : "";
+
   const pathWithoutLocale = stripLocale(pathname);
   const normalizedPath = normalizePath(pathname);
   const activeItem = navItems.find((item) => item.href === normalizedPath);
   const isHomeActive = normalizedPath === `/${locale}`;
+  const breadcrumbHidden = useBreadcrumbHidden();
+
+  // Directus serves official_updates sorted `-date`, so the head of the list
+  // is the newest one. Feeding its date (not a count) to the badge means a
+  // corrected/re-published update reads as new, while an unrelated edit
+  // elsewhere in content.json doesn't.
+  const updatesHref = `/${locale}/official-updates`;
+  const hasUnreadUpdate = useUnreadUpdate(
+    data?.officialUpdates.updates[0]?.date,
+    normalizedPath === updatesHref,
+  );
+
+  // Third breadcrumb crumb: only the two article-listing pages ever open a
+  // detail view, and only while they're the active tab (articleKey lingers
+  // briefly during a cross-tab navigation — see clearArticleRoute).
+  const pressReleasesHref = `/${locale}/press-releases`;
+  const openedArticle =
+    articleKey &&
+    (normalizedPath === updatesHref || normalizedPath === pressReleasesHref)
+      ? (data?.officialUpdates.updates.find((u) => u.key === articleKey) ??
+        data?.pressReleases.releases.find((r) => r.key === articleKey) ??
+        null)
+      : null;
+  // Same glyph the two pages already use for themselves: Megaphone on the
+  // home card's official-update badge, FileText on its press-releases card
+  // — so the crumb echoes an icon the reader has already seen instead of
+  // introducing a new one.
+  const ArticleIcon = normalizedPath === updatesHref ? Megaphone : FileText;
 
   const scrollNav = (dir: "left" | "right") => scrollNavBy(dir, 120);
 
@@ -122,6 +163,7 @@ export default function Navbar({
               onClick={(e) => {
                 setMenuOpen(false);
                 e.currentTarget.blur();
+                clearArticleRoute();
                 if (isHomeActive) invalidateContent();
               }}
             >
@@ -149,13 +191,20 @@ export default function Navbar({
                 >
                   {navItems.map((item) => {
                     const isActive = normalizedPath === item.href;
+                    const showDot =
+                      item.href === updatesHref && hasUnreadUpdate;
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
-                        onClick={
-                          isActive ? () => invalidateContent() : undefined
-                        }
+                        onClick={() => {
+                          // Re-clicking the tab you're already on keeps the
+                          // same pathname, so nothing remounts — the detail
+                          // view has to be dismissed explicitly or the URL
+                          // loses `?a=` while the article stays on screen.
+                          clearArticleRoute();
+                          if (isActive) invalidateContent();
+                        }}
                         className={`text-xs whitespace-nowrap px-4 flex items-center transition-colors relative flex-shrink-0 ${
                           isActive
                             ? "text-white font-medium bg-black/30"
@@ -170,7 +219,19 @@ export default function Navbar({
                         </span>
                         <span className="absolute inset-0 flex items-center justify-center px-4">
                           {item.label}
+                          {showDot && (
+                            <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 animate-pulse-glow" />
+                          )}
                         </span>
+                        {/* Amber, matching the site's single accent. White
+                            read as an artefact of the chrome against the page
+                            below it rather than as a deliberate marker. */}
+                        {isActive && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute inset-x-0 bottom-0 h-0.5 bg-amber-500"
+                          />
+                        )}
                       </Link>
                     );
                   })}
@@ -216,8 +277,8 @@ export default function Navbar({
 
             <DesktopLanguageSelector
               locale={locale}
-              pathWithoutLocale={pathWithoutLocale}
-              languages={liveLanguages}
+              pathWithoutLocale={`${pathWithoutLocale}${localeSuffix}`}
+              languages={languageOptions}
               selectLanguageLabel={nav?.["selectLanguage"]}
             />
 
@@ -225,11 +286,20 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={toggleMenu}
-                className="h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white active:text-white"
+                className="relative h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white active:text-white"
                 aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
               >
+                {/* The nav tabs live behind this button on mobile, so the
+                    unread dot has to surface on the trigger itself —
+                    otherwise it's only visible once the menu is already open. */}
+                {hasUnreadUpdate && !menuOpen && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-2.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse-glow"
+                  />
+                )}
                 <span className="relative w-4 h-4 flex items-center justify-center ml-1">
                   {(
                     [
@@ -268,21 +338,29 @@ export default function Navbar({
           nav={nav}
           currentLanguage={currentLanguage}
           languageOptions={languageOptions}
-          pathWithoutLocale={pathWithoutLocale}
+          pathWithoutLocale={`${pathWithoutLocale}${localeSuffix}`}
           locale={locale}
           onNavigate={() => setMenuOpen(false)}
+          unreadHref={hasUnreadUpdate ? updatesHref : null}
         />
       </header>
 
-      {/* Mobile breadcrumb */}
+      {/* Mobile breadcrumb — `invisible` (not just a lower-z-index mask)
+          whenever a page needs this row for something else, e.g. the FAQs
+          mobile search capsule; see hooks/useBreadcrumbVisibility.ts for why
+          a mask alone isn't reliable here. Kept mounted so its layout space
+          doesn't reflow the page underneath while it's toggled. */}
       {activeItem && (
-        <div className="md:hidden sticky top-12 z-10 px-4 pt-4 pb-6">
+        <div
+          className={`md:hidden sticky top-12 z-10 px-4 pt-4 pb-6 ${breadcrumbHidden ? "invisible" : ""}`}
+        >
           <div
             className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full overflow-hidden whitespace-nowrap
                     bg-white/75 backdrop-blur-md border border-gray-200 text-xs text-black max-w-full"
           >
             <Link
               href={`/${locale}`}
+              onClick={() => clearArticleRoute()}
               className="inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-950 active:text-gray-950"
             >
               {nav?.["home"]}
@@ -293,11 +371,46 @@ export default function Navbar({
             />
             <Link
               href={activeItem.href}
-              onClick={() => invalidateContent()}
-              className="inline-flex items-center min-h-[24px] font-medium truncate transition-colors hover:text-gray-600 active:text-gray-600"
+              onClick={() => {
+                // Same-pathname re-click behavior as the tab bar: close the
+                // article detail view (its own query param, invisible to
+                // Next's router) and refresh the list underneath it.
+                clearArticleRoute();
+                invalidateContent();
+              }}
+              // Current page's own weight (font-medium, near-black) moves to
+              // the icon crumb once an article is open — this one drops back
+              // to the same de-emphasized treatment as Trang chủ, since it's
+              // then just another link back up the chain, not where you are.
+              className={`inline-flex items-center min-h-[24px] truncate transition-colors hover:text-gray-600 active:text-gray-600 ${
+                openedArticle
+                  ? "text-gray-700 hover:text-gray-950 active:text-gray-950"
+                  : "font-medium"
+              }`}
             >
               {activeItem.label}
             </Link>
+            {openedArticle && (
+              <>
+                <ChevronRight
+                  className="w-3 h-3 text-gray-400 flex-shrink-0"
+                  strokeWidth={2}
+                />
+                {/* Icon-only, not the article's own title — a headline can run
+                    to a full sentence, which would blow out this pill's width
+                    or truncate down to something unreadable either way. The
+                    real title still reaches screen readers via sr-only text. */}
+                <span
+                  aria-current="page"
+                  className="inline-flex items-center min-h-[24px] text-gray-900 flex-shrink-0"
+                >
+                  <ArticleIcon className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden="true" />
+                  <span className="sr-only">
+                    {openedArticle.title ?? activeItem.label}
+                  </span>
+                </span>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -45,6 +45,7 @@ export async function buildContentPayload(): Promise<ContentPayload> {
     siteConfig: config,
     languages,
     labelRows,
+    directusUrl: process.env.DIRECTUS_URL ?? "http://localhost:8055",
   });
   return cached;
 }

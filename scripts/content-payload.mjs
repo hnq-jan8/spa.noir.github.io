@@ -18,6 +18,8 @@ export const LABEL_NAMESPACES = {
   home: ["home"],
   flightInfo: ["flightInfo"],
   officialUpdates: ["officialUpdates"],
+  faqs: ["faqs"],
+  pressReleases: ["pressReleases"],
 };
 
 export function formatTime(time) {
@@ -56,6 +58,21 @@ function i18nMap(translations, field) {
 }
 
 /**
+ * Như i18nMap nhưng cho field kiểu file (preview_image): đổi UUID thành URL
+ * asset đầy đủ của Directus, giống cách assetUrl() trong lib/directus.ts làm
+ * cho logo. Ảnh trỏ thẳng sang Directus — MarkdownImage/PreviewImage phía
+ * client đã có sẵn nhánh xử lý khi ảnh hỏng, nên host chết không làm vỡ layout.
+ */
+function i18nAsset(translations, field, directusUrl) {
+  return Object.fromEntries(
+    translations.map((t) => [
+      t.languages_code,
+      t[field] ? `${directusUrl}/assets/${t[field]}` : null,
+    ]),
+  );
+}
+
+/**
  * Lắp ráp toàn bộ payload content.json từ data thô của Directus.
  */
 export function assembleContentPayload({
@@ -67,11 +84,10 @@ export function assembleContentPayload({
   siteConfig,
   languages,
   labelRows,
+  directusUrl = "",
 }) {
   const languageCodes = languages.map((l) => l.code);
   const labelsByNs = buildLabels(languageCodes, labelRows);
-  const latestUpdate = officialUpdates[0];
-  const latestRelease = pressReleases[0];
 
   return {
     generatedAt,
@@ -93,13 +109,9 @@ export function assembleContentPayload({
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.common),
     },
     home: {
-      latestUpdate: latestUpdate
-        ? {
-            date: latestUpdate.date,
-            title: i18nMap(latestUpdate.translations, "title"),
-            description: i18nMap(latestUpdate.translations, "description"),
-          }
-        : null,
+      // Không lặp lại bản cập nhật mới nhất ở đây nữa — trang chủ đọc thẳng
+      // officialUpdates.updates[0] để card ngoài trang chủ và mục đầu tiên
+      // của timeline không thể lệch nhau (tiêu đề, đoạn preview, ảnh).
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.home),
     },
     faqs: {
@@ -107,6 +119,7 @@ export function assembleContentPayload({
         question: i18nMap(faq.translations, "question"),
         answer: i18nMap(faq.translations, "answer"),
       })),
+      labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.faqs),
     },
     flightInfo: {
       flights: flights.map((f, i) => ({
@@ -125,19 +138,28 @@ export function assembleContentPayload({
     },
     officialUpdates: {
       updates: officialUpdates.map((u) => ({
+        id: String(u.id),
         date: u.date,
         title: i18nMap(u.translations, "title"),
         description: i18nMap(u.translations, "description"),
+        previewExcerpt: i18nMap(u.translations, "preview_excerpt"),
+        previewImage: i18nAsset(u.translations, "preview_image", directusUrl),
       })),
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.officialUpdates),
     },
     pressReleases: {
-      pressRelease: latestRelease
-        ? {
-            title: i18nMap(latestRelease.translations, "title"),
-            body: i18nMap(latestRelease.translations, "body"),
-          }
-        : null,
+      // Toàn bộ thông cáo, giữ nguyên thứ tự `sort` do biên tập viên đặt —
+      // bài đầu tiên là bài được làm nổi bật ở đầu danh sách.
+      releases: pressReleases.map((r) => ({
+        id: String(r.id),
+        slug: r.slug || String(r.id),
+        publishedAt: r.published_at ?? null,
+        title: i18nMap(r.translations, "title"),
+        body: i18nMap(r.translations, "body"),
+        previewExcerpt: i18nMap(r.translations, "preview_excerpt"),
+        previewImage: i18nAsset(r.translations, "preview_image", directusUrl),
+      })),
+      labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.pressReleases),
     },
   };
 }

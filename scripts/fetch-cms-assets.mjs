@@ -49,5 +49,5 @@ const manifest = await downloadCmsAssets({
 console.log(
   Object.keys(manifest).length > 0
     ? `✓ cms-assets  (${Object.values(manifest).join(", ")})`
-    : "✓ cms-assets  (không có logo/favicon CMS, dùng fallback local)",
+    : "✓ cms-assets  (not found, use fallbacks in public/)",
 );

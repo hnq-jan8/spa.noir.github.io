@@ -65,7 +65,7 @@ const [
   labelRows,
 ] = await Promise.all([
   get(
-    "/items/official_updates?fields=date,translations.languages_code,translations.title,translations.description&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
+    "/items/official_updates?fields=id,date,translations.languages_code,translations.title,translations.description,translations.preview_excerpt,translations.preview_image&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   ),
   get(
     "/items/flights?fields=flight_no,aircraft_type,capacity,dep,arr,srtd,atd,note&sort=sort&filter[deleted_at][_null]=true",
@@ -74,7 +74,7 @@ const [
     "/items/faqs?fields=translations.languages_code,translations.question,translations.answer&sort=sort&filter[deleted_at][_null]=true",
   ),
   get(
-    "/items/press_releases?fields=translations.languages_code,translations.title,translations.body&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
+    "/items/press_releases?fields=id,slug,published_at,translations.languages_code,translations.title,translations.body,translations.preview_excerpt,translations.preview_image&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
   ),
   get(
     "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy",
@@ -99,6 +99,7 @@ const contentPayload = assembleContentPayload({
   siteConfig: config,
   languages: languageRows,
   labelRows,
+  directusUrl: BASE,
 });
 
 // ─── Write output ─────────────────────────────────────────────────────────────

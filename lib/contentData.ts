@@ -35,6 +35,40 @@ export interface ContentUpdate {
   description: I18n<string>;
 }
 
+/** Một official update trong danh sách (kèm dữ liệu preview cho card). */
+export interface ContentUpdateItem extends ContentUpdate {
+  id: string;
+  previewExcerpt: I18n<string | null>;
+  previewImage: I18n<string | null>;
+}
+
+/** Một thông cáo báo chí trong danh sách. */
+export interface ContentReleaseItem {
+  id: string;
+  slug: string;
+  publishedAt: string | null;
+  title: I18n<string | null>;
+  body: I18n<string>;
+  previewExcerpt: I18n<string | null>;
+  previewImage: I18n<string | null>;
+}
+
+/**
+ * Hình dạng chung sau khi pick locale cho cả official update lẫn thông cáo —
+ * hai collection có tên field khác nhau (description/body, date/published_at),
+ * quy về một shape ở đây để card danh sách và trang chi tiết dùng chung một
+ * component thay vì viết hai bản gần giống nhau.
+ */
+export interface ResolvedArticle {
+  /** Khoá dùng trên URL trang chi tiết (`?a=`). */
+  key: string;
+  date: string | null;
+  title: string | null;
+  body: string;
+  previewExcerpt: string | null;
+  previewImage: string | null;
+}
+
 export interface ContentFlightRow {
   no: number;
   type: string;
@@ -50,13 +84,6 @@ export interface ContentFlightRow {
 export interface ContentFaq {
   question: I18n<string>;
   answer: I18n<string>;
-}
-
-export interface ContentPressRelease {
-  // A null title (per-locale) opts that locale into a full-bleed layout —
-  // the CMS body already carries its own hero, so the title bar is skipped.
-  title: I18n<string | null>;
-  body: I18n<string>;
 }
 
 export interface ContentLanguage {
@@ -85,12 +112,12 @@ export interface ContentPayload {
   };
   /** Trang chủ "/" */
   home: {
-    latestUpdate: ContentUpdate | null;
     labels: LabelMap;
   };
   /** "/faqs" */
   faqs: {
     faqs: ContentFaq[];
+    labels: LabelMap;
   };
   /** "/flight-info" */
   flightInfo: {
@@ -100,12 +127,13 @@ export interface ContentPayload {
   };
   /** "/official-updates" */
   officialUpdates: {
-    updates: ContentUpdate[];
+    updates: ContentUpdateItem[];
     labels: LabelMap;
   };
   /** "/press-releases" */
   pressReleases: {
-    pressRelease: ContentPressRelease | null;
+    releases: ContentReleaseItem[];
+    labels: LabelMap;
   };
 }
 
@@ -120,11 +148,11 @@ export interface ContentData {
     labels: ResolvedLabelMap;
   };
   home: {
-    latestUpdate: { date: string; title: string; description: string } | null;
     labels: ResolvedLabelMap;
   };
   faqs: {
-    faqs: { question: string; answer: string }[];
+    faqs: { question: string; answer: string; searchText: string }[];
+    labels: ResolvedLabelMap;
   };
   flightInfo: {
     flights: ContentFlightRow[];
@@ -132,11 +160,12 @@ export interface ContentData {
     labels: ResolvedLabelMap;
   };
   officialUpdates: {
-    updates: { date: string; title: string; description: string }[];
+    updates: ResolvedArticle[];
     labels: ResolvedLabelMap;
   };
   pressReleases: {
-    pressRelease: { title: string | null; body: string } | null;
+    releases: ResolvedArticle[];
+    labels: ResolvedLabelMap;
   };
 }
 
@@ -152,20 +181,20 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
       labels: resolveLabels(payload.common.labels, locale),
     },
     home: {
-      latestUpdate: payload.home.latestUpdate
-        ? {
-            date: payload.home.latestUpdate.date,
-            title: pick(payload.home.latestUpdate.title, locale),
-            description: pick(payload.home.latestUpdate.description, locale),
-          }
-        : null,
       labels: resolveLabels(payload.home.labels, locale),
     },
     faqs: {
+      // searchText spans every locale's question + answer, not just the
+      // page's own — so typing an English word still surfaces its Vietnamese
+      // translation (same FAQ item) when browsing /vi, and vice versa.
       faqs: payload.faqs.faqs.map((f) => ({
         question: pick(f.question, locale),
         answer: pick(f.answer, locale),
+        searchText: [...Object.values(f.question), ...Object.values(f.answer)]
+          .join(" ")
+          .toLocaleLowerCase(),
       })),
+      labels: resolveLabels(payload.faqs.labels, locale),
     },
     flightInfo: {
       flights: payload.flightInfo.flights,
@@ -174,19 +203,25 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
     },
     officialUpdates: {
       updates: payload.officialUpdates.updates.map((u) => ({
+        key: u.id,
         date: u.date,
         title: pick(u.title, locale),
-        description: pick(u.description, locale),
+        body: pick(u.description, locale),
+        previewExcerpt: pick(u.previewExcerpt, locale),
+        previewImage: pick(u.previewImage, locale),
       })),
       labels: resolveLabels(payload.officialUpdates.labels, locale),
     },
     pressReleases: {
-      pressRelease: payload.pressReleases.pressRelease
-        ? {
-            title: pick(payload.pressReleases.pressRelease.title, locale),
-            body: pick(payload.pressReleases.pressRelease.body, locale),
-          }
-        : null,
+      releases: payload.pressReleases.releases.map((r) => ({
+        key: r.slug,
+        date: r.publishedAt,
+        title: pick(r.title, locale),
+        body: pick(r.body, locale),
+        previewExcerpt: pick(r.previewExcerpt, locale),
+        previewImage: pick(r.previewImage, locale),
+      })),
+      labels: resolveLabels(payload.pressReleases.labels, locale),
     },
   };
 }

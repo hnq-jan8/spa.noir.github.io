@@ -30,7 +30,7 @@ const SOCIAL_ICONS = {
   youtube: {
     name: "Youtube",
     viewBox: "-2.88 1.52 29.76 20.97",
-    size: "h-[17.36px]",
+    size: "h-[14.76px]",
     nudgeY: "translate-y-[1.5px]",
     padX: "px-0",
     path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z",
@@ -118,7 +118,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className={`w-auto ${"size" in social ? social.size : "h-[19.84px]"} ${"nudgeY" in social ? social.nudgeY : ""}`}
+                    className={`w-auto ${"size" in social ? social.size : "h-[16.86px]"} ${"nudgeY" in social ? social.nudgeY : ""}`}
                     viewBox={social.viewBox}
                     fill="currentColor"
                     aria-hidden="true"

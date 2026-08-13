@@ -48,14 +48,12 @@ function LanguageDropdownLinks({
   languages: options,
   locale,
   pathWithoutLocale,
-  compact = false,
   onSelect,
   itemClassName = "py-3",
 }: {
   languages: LanguageOption[];
   locale: string;
   pathWithoutLocale: string;
-  compact?: boolean;
   onSelect?: () => void;
   itemClassName?: string;
 }) {
@@ -68,56 +66,66 @@ function LanguageDropdownLinks({
             key={lang.code}
             href={`/${lang.code}${pathWithoutLocale}`}
             onClick={onSelect}
-            className={`flex items-center text-xs text-gray-200 transition-colors hover:bg-black/10 hover:text-white active:bg-black/10 active:text-white ${
-              compact ? "px-2" : "px-3"
-            } ${itemClassName}`}
+            className={`flex items-center px-3 text-xs text-gray-200 transition-colors hover:bg-black/10 hover:text-white active:bg-black/10 active:text-white ${itemClassName}`}
           >
-            <span>{compact ? lang.code.toUpperCase() : lang.label}</span>
+            <span>{lang.label}</span>
           </Link>
         ))}
     </>
   );
 }
 
-function LanguageTriggerContent({
-  languages: options,
-  locale,
-  compact = false,
-  className,
-}: {
-  languages: LanguageOption[];
-  locale: string;
-  compact?: boolean;
-  className?: string;
-}) {
-  const current = options.find((lang) => lang.code === locale) ?? options[0];
+/**
+ * One half of the trigger's label swap. The grid `0fr`/`1fr` track is the
+ * same technique the FAQ accordion uses vertically — it animates a real
+ * content-sized width without measuring anything in JS, so the code and the
+ * full language name can trade places smoothly instead of the button
+ * snapping between two widths.
+ */
+function SwapText({ shown, children }: { shown: boolean; children: string }) {
   return (
-    <span className={className}>
-      <span className={compact ? "flex-1 text-left font-medium" : "flex-1 text-left whitespace-nowrap"}>
-        {compact ? locale.toUpperCase() : current.label}
+    <span
+      style={{ gridTemplateColumns: shown ? "1fr" : "0fr" }}
+      className="grid transition-[grid-template-columns] duration-200 ease-out"
+    >
+      <span
+        className={`overflow-hidden min-w-0 whitespace-nowrap transition-opacity duration-200 ${
+          shown ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {children}
       </span>
-      <ChevronDownIcon />
     </span>
   );
 }
 
-function LanguageWidthSizer({
+function LanguageTriggerContent({
   languages: options,
-  compact = false,
+  locale,
+  expanded,
   className,
 }: {
   languages: LanguageOption[];
-  compact?: boolean;
+  locale: string;
+  expanded: boolean;
   className?: string;
 }) {
+  const current = options.find((lang) => lang.code === locale) ?? options[0];
+  // No `gap` between the two halves — one of them is always collapsed to
+  // zero width, and a gap would still reserve space around it.
   return (
-    <span className={`invisible grid text-xs ${className ?? ""}`} aria-hidden="true">
-      {options.map((lang) => (
-        <span key={lang.code} className="col-start-1 row-start-1 flex items-center gap-1.5 whitespace-nowrap">
-          <span>{compact ? lang.code.toUpperCase() : lang.label}</span>
-          <ChevronDownIcon />
-        </span>
-      ))}
+    <span className={className}>
+      <SwapText shown={!expanded}>{locale.toUpperCase()}</SwapText>
+      <SwapText shown={expanded}>{current.label}</SwapText>
+      {/* Wider gap once the full name is showing — a two-letter code sits
+          comfortably close to the chevron, a word needs room to breathe. */}
+      <span
+        className={`flex items-center transition-[margin] duration-200 ease-out ${
+          expanded ? "ml-3" : "ml-1.5"
+        }`}
+      >
+        <ChevronDownIcon />
+      </span>
     </span>
   );
 }
@@ -161,12 +169,14 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
         aria-haspopup="menu"
         aria-expanded={visible}
         onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center px-2 lg:px-3 text-xs text-gray-200 hover:text-white hover:bg-black/10 active:text-white active:bg-black/10 transition-colors h-full w-full"
+        className="relative flex items-center px-2 lg:px-3 text-xs text-gray-200 hover:text-white hover:bg-black/10 active:text-white active:bg-black/10 transition-colors h-full"
       >
-        <LanguageWidthSizer languages={options} compact className="lg:hidden" />
-        <LanguageWidthSizer languages={options} className="hidden lg:grid" />
-        <LanguageTriggerContent languages={options} locale={locale} compact className="absolute inset-0 flex items-center gap-1.5 px-2 lg:hidden" />
-        <LanguageTriggerContent languages={options} locale={locale} className="absolute inset-0 hidden lg:flex items-center gap-1.5 px-3" />
+        <LanguageTriggerContent
+          languages={options}
+          locale={locale}
+          expanded={visible}
+          className="flex items-center font-medium"
+        />
       </button>
       <div
         // Inline style guards the shown/hidden state with JS state (`visible`)
@@ -175,16 +185,20 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
         // stylesheet fails to load — hover is tracked in JS above so this
         // doesn't disable the existing hover-to-open behavior.
         style={visible ? undefined : { opacity: 0, visibility: "hidden" }}
-        className={`absolute top-full left-0 w-full bg-chrome-panelHover shadow-lg transition-all duration-150 z-50 ${
+        className={`absolute top-full left-0 min-w-full w-max bg-chrome-panelHover shadow-lg transition-all duration-150 z-50 ${
           visible ? "opacity-100 visible" : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
         }`}
       >
-        <div className="lg:hidden">
-          <LanguageDropdownLinks languages={options} locale={locale} pathWithoutLocale={pathWithoutLocale} compact itemClassName="h-14" onSelect={() => setOpen(false)} />
-        </div>
-        <div className="hidden lg:block">
-          <LanguageDropdownLinks languages={options} locale={locale} pathWithoutLocale={pathWithoutLocale} itemClassName="h-14" onSelect={() => setOpen(false)} />
-        </div>
+        {/* The trigger is expanded to the full language name whenever this
+            panel is open, so the options match it instead of falling back to
+            two-letter codes. */}
+        <LanguageDropdownLinks
+          languages={options}
+          locale={locale}
+          pathWithoutLocale={pathWithoutLocale}
+          itemClassName="h-14 whitespace-nowrap"
+          onSelect={() => setOpen(false)}
+        />
       </div>
     </div>
   );

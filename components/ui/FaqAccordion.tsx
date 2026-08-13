@@ -1,5 +1,5 @@
 "use client";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   EXPAND_GRID_TRANSITION_CLASS,
   expandTransition,
@@ -35,15 +35,43 @@ function AccordionPanel({
   );
 }
 
-export default function FaqAccordion({ items }: { items: FaqItem[] }) {
-  const [openSet, setOpenSet] = useState<Set<number>>(
-    () => new Set(items.length > 0 ? [0] : []),
+export default function FaqAccordion({
+  items,
+  animateFirstOpen = true,
+  onFirstItemOpenChange,
+  reopenFirstSignal,
+}: {
+  items: FaqItem[];
+  /** Skip when the caller already knows the first item is the same one
+   * that was showing before this remount (e.g. narrowing a search without
+   * the top result changing) — opens it plainly instead of replaying the
+   * expand-in, since nothing actually changed for the reader to notice. */
+  animateFirstOpen?: boolean;
+  /** Reports whenever item 0's open state changes, so a non-remounting
+   * caller (this component doesn't own that decision — see FaqsContent's
+   * own `animateFirstOpen` computation) can tell a plain unchanged-question
+   * remount apart from one where the reader had actually closed it. */
+  onFirstItemOpenChange?: (isOpen: boolean) => void;
+  /** Bump (e.g. pass the applied search string) whenever a new search just
+   * resolved, even one that left the result set untouched — a change here
+   * re-opens item 0 if it's currently closed, as confirmation the search
+   * actually re-ran. Only acts on updates, not the mount that first sets
+   * it, so it never fights animateFirstOpen's own opening sequence. */
+  reopenFirstSignal?: string | number;
+}) {
+  // Starts closed (not item 0 open) only when animating in — the mount
+  // effect below needs somewhere to animate *from*. Otherwise item 0 opens
+  // immediately, unanimated, same as a plain `defaultOpen`.
+  const [openSet, setOpenSet] = useState<Set<number>>(() =>
+    animateFirstOpen ? new Set() : new Set(items.length > 0 ? [0] : []),
   );
   // Degrees keep accumulating (0, 180, 360, 540, ...) instead of toggling
   // back to 0 — rotating the chevron the same clockwise direction every
   // time instead of winding it back counter-clockwise on close.
   const [chevronDeg, setChevronDeg] = useState<Record<number, number>>(() =>
-    items.length > 0 ? { 0: 180 } : ({} as Record<number, number>),
+    animateFirstOpen || items.length === 0
+      ? ({} as Record<number, number>)
+      : { 0: 180 },
   );
 
   // FLIP: growing/shrinking a panel pushes every card below it through
@@ -56,14 +84,18 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
   // transform runs on the compositor, not main-thread layout.
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const prevRects = useRef<Map<number, number>>(new Map());
+  const cancelRef = useRef(0);
 
-  const toggle = (i: number) => {
+  const captureRects = () => {
     const rects = new Map<number, number>();
     cardRefs.current.forEach((el, idx) => {
       if (el) rects.set(idx, el.getBoundingClientRect().top);
     });
     prevRects.current = rects;
+  };
 
+  const toggle = (i: number) => {
+    captureRects();
     setOpenSet((prev) => {
       const next = new Set(prev);
       if (next.has(i)) next.delete(i);
@@ -72,6 +104,49 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
     });
     setChevronDeg((prev) => ({ ...prev, [i]: (prev[i] ?? 0) + 180 }));
   };
+
+  // Plays the first card's own expand transition in on mount, standing in
+  // for a generic fade/slide reveal of the whole list. Double rAF (same
+  // trick as components/ui/Reveal.tsx) so Safari doesn't coalesce the
+  // initial paint with the very next frame and skip straight to open.
+  useEffect(() => {
+    if (!animateFirstOpen || items.length === 0) return;
+    const outer = requestAnimationFrame(() => {
+      const inner = requestAnimationFrame(() => {
+        captureRects();
+        setOpenSet(new Set([0]));
+        setChevronDeg({ 0: 180 });
+      });
+      cancelRef.current = inner;
+    });
+    cancelRef.current = outer;
+    return () => cancelAnimationFrame(cancelRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    onFirstItemOpenChange?.(openSet.has(0));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openSet]);
+
+  // Every applied search re-opens a closed item 0 — a plain state flip,
+  // not the mount effect's double-rAF dance, since the instance is already
+  // live and a normal isOpen:false→true change is all the CSS transition
+  // needs to catch. Skips its own mount firing (every effect runs once
+  // then) so it doesn't race the entrance animation above when both are
+  // triggered by the same first search.
+  const hasHandledMountRef = useRef(false);
+  useEffect(() => {
+    if (!hasHandledMountRef.current) {
+      hasHandledMountRef.current = true;
+      return;
+    }
+    if (items.length === 0 || openSet.has(0)) return;
+    captureRects();
+    setOpenSet((prev) => new Set(prev).add(0));
+    setChevronDeg((prev) => ({ ...prev, 0: (prev[0] ?? 0) + 180 }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reopenFirstSignal]);
 
   useLayoutEffect(() => {
     const prev = prevRects.current;
@@ -109,7 +184,16 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
-          className="w-full flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-colors hover:bg-gray-50 active:bg-gray-50"
+          // rounded-2xl (or just the top half when open), not just the
+          // card: the browser's own focus outline follows a button's *own*
+          // border-radius, not its clipping ancestor's — without this it
+          // stayed square and got hard-cut by the card's overflow-hidden
+          // wherever it crossed the rounded corner instead of curving with
+          // it. Open: only the top corners are actually the button's own —
+          // the bottom edge now borders the answer panel, not the card's
+          // own bottom, so rounding it too would bow the outline out past
+          // where the button really ends.
+          className={`w-full ${isOpen ? "rounded-t-2xl" : "rounded-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-colors hover:bg-gray-50 active:bg-gray-50`}
           onClick={() => toggle(i)}
         >
           <span className="pr-4 text-gray-900 font-medium">

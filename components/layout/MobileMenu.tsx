@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
+import { clearArticleRoute } from "@/hooks/useArticleRoute";
 import { invalidateContent } from "@/hooks/useContentData";
 import { EXPAND_GRID_TRANSITION_CLASS } from "@/lib/expandTransition";
 
@@ -30,6 +31,7 @@ export default function MobileMenu({
   pathWithoutLocale,
   locale,
   onNavigate,
+  unreadHref,
 }: {
   open: boolean;
   navItems: NavItem[];
@@ -40,6 +42,8 @@ export default function MobileMenu({
   pathWithoutLocale: string;
   locale: string;
   onNavigate: () => void;
+  /** Route carrying an unread official update, or null when there is none. */
+  unreadHref?: string | null;
 }) {
   const [langExpanded, setLangExpanded] = useState(false);
 
@@ -72,15 +76,25 @@ export default function MobileMenu({
               href={item.href}
               onClick={() => {
                 onNavigate();
+                // Same reason as the desktop tabs: tapping the route you're
+                // already on doesn't remount anything, so the open article
+                // has to be dismissed by hand.
+                clearArticleRoute();
                 if (isActive) invalidateContent();
               }}
-              className={`px-6 py-4 text-xl transition-colors font-semibold ${
+              className={`flex items-center px-6 py-4 text-xl transition-colors font-semibold ${
                 isActive
                   ? "text-white bg-black/20"
                   : "text-gray-300 hover:text-white hover:bg-black/10 active:text-white active:bg-black/10"
               }`}
             >
               {item.label}
+              {item.href === unreadHref && (
+                <span
+                  aria-hidden="true"
+                  className="ml-2 w-2 h-2 rounded-full bg-red-500 flex-shrink-0 animate-pulse-glow"
+                />
+              )}
             </Link>
           );
         })}

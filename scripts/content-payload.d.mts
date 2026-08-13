@@ -19,6 +19,8 @@ export declare const LABEL_NAMESPACES: {
   home: string[];
   flightInfo: string[];
   officialUpdates: string[];
+  faqs: string[];
+  pressReleases: string[];
 };
 
 export declare function formatTime(time: string | null): string;
@@ -37,4 +39,6 @@ export declare function assembleContentPayload(input: {
   siteConfig: SiteConfig;
   languages: Language[];
   labelRows: UiLabel[];
+  /** Origin của Directus, dùng dựng URL đầy đủ cho preview_image. */
+  directusUrl?: string;
 }): ContentPayload;

@@ -2,7 +2,6 @@
 
 import {
   Megaphone,
-  Phone,
   PlaneTakeoff,
   HelpCircle,
   FileText,
@@ -13,7 +12,7 @@ import { useContentState, invalidateContent } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
 import { formatTimestamp } from "@/lib/siteData";
 import { ContentLoadError } from "@/components/ui/EmptyState";
-import MarkdownContent from "@/components/ui/MarkdownContent";
+import { excerptOf, titleOf } from "@/components/ui/ArticleCard";
 import Reveal from "@/components/ui/Reveal";
 import { CardLink } from "@/components/ui/Card";
 
@@ -26,7 +25,9 @@ export default function HomeContent() {
   const nav = data.common.labels["nav"];
   const home = data.home.labels["home"];
   const support = data.common.labels["support"];
-  const latestUpdate = data.home.latestUpdate;
+  // Same record the Official Updates timeline shows at the top, so the home
+  // card and the list can't drift apart in wording or truncation.
+  const latestUpdate = data.officialUpdates.updates[0] ?? null;
   const asOf = formatTimestamp(data.generatedAt, locale);
 
   const gridPages = [
@@ -63,25 +64,28 @@ export default function HomeContent() {
         {latestUpdate ? (
           <CardLink
             href={`/${locale}/official-updates`}
-            className="block border-l-4 border-l-amber-600"
+            // Warm tint on the surface itself, not just the left rule — this
+            // is the one card on the page that must win the first glance, and
+            // against five other white cards a 4px edge wasn't carrying it.
+            className="block border-l-4 border-l-amber-600 !bg-[#fffdf6] pb-4"
             amber
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
               {home["officialUpdateBadge"]}
             </p>
-            <h2 className="font-bold text-lg mb-2">{latestUpdate.title}</h2>
-            <div className="relative max-h-[83px] overflow-hidden mb-2">
-              <MarkdownContent
-                content={latestUpdate.description}
-                className="text-sm text-gray-600"
-              />
-              <div className="h-2" />
-              <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-            </div>
-            <div className="flex items-center justify-between text-xs mt-3">
+            <h2 className="font-bold text-lg mb-2 text-balance">
+              {titleOf(latestUpdate)}
+            </h2>
+            {/* The CMS preview excerpt, shown whole. It is already written
+                short by the editor, so clipping it behind a fade only hid the
+                end of a sentence that was sized to fit in the first place. */}
+            <p className="text-sm text-gray-600 mb-2">
+              {excerptOf(latestUpdate)}
+            </p>
+            <div className="flex items-center justify-between text-xs mt-5">
               <span className="text-gray-400">
-                {formatTimestamp(latestUpdate.date, locale)}
+                {latestUpdate.date && formatTimestamp(latestUpdate.date, locale)}
               </span>
               <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
                 {home["viewAll"]}
@@ -104,13 +108,16 @@ export default function HomeContent() {
         )}
       </Reveal>
 
-      {/* Support hotlines */}
+      {/* Support hotlines. The eyebrow shares the card's Reveal delay so the
+          label and the block it introduces fade in as one unit, instead of
+          the heading arriving first and reading as a separate element. */}
+      <Reveal delay={50}>
+        <p className="text-xs text-gray-400 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+          {home["supportSection"]}
+        </p>
+      </Reveal>
       <Reveal delay={50} className="relative mb-4">
         <div className="relative z-[2] bg-gray-100 border border-gray-200 rounded-2xl p-6">
-          <p className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold uppercase tracking-wide mb-4">
-            <Phone className="w-4 h-4" strokeWidth={2} />
-            {home["supportTitle"]}
-          </p>
           <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
             {Object.entries(data.common.contacts).map(([key, value]) => {
               const isEmail = value.includes("@");
@@ -146,7 +153,15 @@ export default function HomeContent() {
         )}
       </Reveal>
 
-      {/* Grid: flight info / faqs */}
+      {/* Grid: flight info / faqs. The eyebrow groups the three reference
+          pages below it (flight info, FAQs, press releases) as one "look
+          something up" set, separating them from the urgent update and the
+          hotlines above — otherwise all six cards read as one flat list. */}
+      <Reveal delay={100}>
+        <p className="text-xs text-gray-400 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+          {home["browseSection"]}
+        </p>
+      </Reveal>
       <div className="grid grid-cols-1 min-[800px]:grid-cols-2 gap-4 mb-4">
         {gridPages.map((page, index) => (
           <Reveal key={page.href} delay={100 + index * 50}>

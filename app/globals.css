@@ -48,16 +48,31 @@
     }
   }
 
+  /* The CMS's negative-margin trick above cancels on all four sides, not
+     just left/right — at md+ that's fine, `md:p-8` gives it real padding to
+     cancel against. Below md the card carries no padding of its own (see
+     above), so on a full-bleed article specifically the vertical component
+     of that same negative margin has nothing to cancel and instead eats
+     into the meta bar sitting right above it. Giving it real padding
+     matching --article-pad, only on this variant, restores the same
+     cancel-to-zero result the md+ card gets for free. */
+  .press-article-card.full-bleed {
+    padding-top: var(--article-pad);
+    padding-bottom: var(--article-pad);
+  }
+  @screen md {
+    .press-article-card.full-bleed {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
   .pill-badge {
     @apply border border-gray-400 rounded-full px-6 py-2.5 text-sm text-gray-700 text-center;
   }
 
   .section-title {
     @apply text-2xl font-bold text-gray-900 mb-4;
-  }
-
-  .timeline-card {
-    @apply bg-white border border-gray-200 rounded-2xl px-6 py-5;
   }
 
   /* For scroll areas that render content behind an absolute/blurred overlay
