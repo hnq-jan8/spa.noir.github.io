@@ -97,7 +97,12 @@ export default function TimelineCarousel({
         const heading = titleOf(item);
 
         return (
-          <div key={item.key} className="group flex gap-4 sm:gap-5">
+          <button
+            key={item.key}
+            type="button"
+            onClick={() => onOpen(item.key)}
+            className="group flex gap-4 sm:gap-5 w-full text-left"
+          >
             <div className="flex flex-col items-center flex-shrink-0">
               <div
                 // Latest dot keeps its own amber at rest and on hover/active —
@@ -116,74 +121,68 @@ export default function TimelineCarousel({
               )}
             </div>
             <div className={`flex-1 min-w-0 ${isLast ? "pb-1" : "pb-8 sm:pb-9"} pt-0.5`}>
-              <button
-                type="button"
-                onClick={() => onOpen(item.key)}
-                className="w-full text-left"
-              >
-                {isGroupStart && item.date && (
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <span
-                      className={`text-xs sm:text-sm transition-colors ${isPassed ? "text-amber-700 font-medium group-hover:text-amber-800 group-active:text-amber-800" : "text-gray-400 group-hover:text-gray-600 group-active:text-gray-600"}`}
-                    >
-                      {formatTimestamp(item.date, locale)}
+              {isGroupStart && item.date && (
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span
+                    className={`text-xs sm:text-sm transition-colors ${isPassed ? "text-amber-700 font-medium group-hover:text-amber-800 group-active:text-amber-800" : "text-gray-400 group-hover:text-gray-600 group-active:text-gray-600"}`}
+                  >
+                    {formatTimestamp(item.date, locale)}
+                  </span>
+                  {isPassed && latestLabel && (
+                    <span className="text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-50 rounded px-1.5 py-0.5">
+                      {latestLabel}
                     </span>
-                    {isPassed && latestLabel && (
-                      <span className="text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-50 rounded px-1.5 py-0.5">
-                        {latestLabel}
-                      </span>
+                  )}
+                </div>
+              )}
+              {isPassed ? (
+                <div className="flex gap-4 items-start">
+                  <div className="flex-1 min-w-0">
+                    {heading && (
+                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance transition-colors group-hover:text-amber-800 group-active:text-amber-800">
+                        {heading}
+                      </h3>
+                    )}
+                    {excerpt && (
+                      <p className="text-sm text-gray-600 mb-2.5 transition-colors group-hover:text-gray-700 group-active:text-gray-700">
+                        {excerpt}
+                      </p>
+                    )}
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
+                      {viewDetailsLabel}
+                      <ChevronRight
+                        className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
+                        strokeWidth={2}
+                      />
+                    </span>
+                  </div>
+                  {item.previewImage && <Thumb src={item.previewImage} size="lg" />}
+                </div>
+              ) : (
+                <div className="flex gap-3 items-start">
+                  {item.previewImage && <Thumb src={item.previewImage} size="md" />}
+                  <div className="flex-1 min-w-0">
+                    {heading && (
+                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 text-balance mb-1 transition-colors group-hover:text-amber-800 group-active:text-amber-800">
+                        <span className="inline-flex items-center gap-1">
+                          {heading}
+                          <ChevronRight
+                            className="w-3.5 h-4 mt-0.5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                            strokeWidth={2}
+                          />
+                        </span>
+                      </h4>
+                    )}
+                    {excerpt && (
+                      <p className="text-xs sm:text-sm text-gray-500 transition-colors group-hover:text-gray-700 group-active:text-gray-700">
+                        {excerpt}
+                      </p>
                     )}
                   </div>
-                )}
-                {isPassed ? (
-                  <div className="flex gap-4 items-start">
-                    <div className="flex-1 min-w-0">
-                      {heading && (
-                        <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance transition-colors group-hover:text-amber-800 group-active:text-amber-800">
-                          {heading}
-                        </h3>
-                      )}
-                      {excerpt && (
-                        <p className="text-sm text-gray-600 mb-2.5 transition-colors group-hover:text-gray-700 group-active:text-gray-700">
-                          {excerpt}
-                        </p>
-                      )}
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
-                        {viewDetailsLabel}
-                        <ChevronRight
-                          className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
-                          strokeWidth={2}
-                        />
-                      </span>
-                    </div>
-                    {item.previewImage && <Thumb src={item.previewImage} size="lg" />}
-                  </div>
-                ) : (
-                  <div className="flex gap-3 items-start">
-                    {item.previewImage && <Thumb src={item.previewImage} size="md" />}
-                    <div className="flex-1 min-w-0">
-                      {heading && (
-                        <h4 className="text-sm sm:text-base font-semibold text-gray-800 text-balance mb-1 transition-colors group-hover:text-amber-800 group-active:text-amber-800">
-                          <span className="inline-flex items-center gap-1">
-                            {heading}
-                            <ChevronRight
-                              className="w-3.5 h-4 mt-0.5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
-                              strokeWidth={2}
-                            />
-                          </span>
-                        </h4>
-                      )}
-                      {excerpt && (
-                        <p className="text-xs sm:text-sm text-gray-500 transition-colors group-hover:text-gray-700 group-active:text-gray-700">
-                          {excerpt}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </button>
+                </div>
+              )}
             </div>
-          </div>
+          </button>
         );
       })}
     </div>

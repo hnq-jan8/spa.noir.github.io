@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ChevronLeft } from "lucide-react";
 import ArticleContent from "@/components/ui/ArticleContent";
+import { titleOf } from "@/components/ui/ArticleCard";
 import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
 
@@ -31,6 +32,30 @@ export default function ArticleDetail({
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [article.key]);
+
+  // Swaps the tab title to the article's own heading while it's open. This
+  // is client-side only — it can't help link-preview crawlers (Zalo/
+  // Facebook/Messenger don't execute JS), only the open tab/history/bookmark
+  // — but the site is static-export with no per-article route, so there's no
+  // server-rendered title to change instead. Captured once via ref rather
+  // than read fresh each run, since after the first swap `document.title`
+  // itself would be the article title, not the real page title to restore.
+  const originalTitleRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (originalTitleRef.current === null) {
+      originalTitleRef.current = document.title;
+    }
+    const original = originalTitleRef.current;
+    const heading = titleOf(article);
+    if (heading) {
+      const sepIndex = original.indexOf(" | ");
+      const suffix = sepIndex !== -1 ? original.slice(sepIndex) : "";
+      document.title = `${heading}${suffix}`;
+    }
+    return () => {
+      document.title = original;
+    };
+  }, [article]);
 
   const minutes = Math.max(
     1,

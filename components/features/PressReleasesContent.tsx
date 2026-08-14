@@ -2,12 +2,14 @@
 
 import ArticleCard from "@/components/ui/ArticleCard";
 import ArticleDetail from "@/components/ui/ArticleDetail";
+import ArticleNotFound from "@/components/ui/ArticleNotFound";
 import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import Reveal from "@/components/ui/Reveal";
 import { useArticleRoute } from "@/hooks/useArticleRoute";
 import { useContentState } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
 import { useMatchMainHeight } from "@/hooks/useMatchMainHeight";
+import { bundledLabels } from "@/i18n/labels";
 
 export default function PressReleasesContent() {
   const locale = useLocale();
@@ -68,6 +70,20 @@ export default function PressReleasesContent() {
           article={opened}
           locale={locale}
           labels={labels}
+          onBack={close}
+        />
+      </div>
+    );
+  }
+
+  if (key) {
+    const t = data.common.labels["notFound"] ?? bundledLabels(locale, "notFound");
+    return (
+      <div className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto">
+        <ArticleNotFound
+          title={t?.["title"]}
+          description={t?.["description"]}
+          backLabel={labels["back"]}
           onBack={close}
         />
       </div>

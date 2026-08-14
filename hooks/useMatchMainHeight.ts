@@ -32,7 +32,15 @@ export function useMatchMainHeight<T extends HTMLElement>() {
 
     recalc();
     window.addEventListener("resize", recalc);
-    return () => window.removeEventListener("resize", recalc);
+    // Runs on every re-render (no dep array) and on unmount. The detail and
+    // list views share the same DOM node here — React reuses it since both
+    // branches return a plain <div> at the same JSX position — so without
+    // this, an inline minHeight set while viewing an article would linger
+    // on that node after switching back to the list.
+    return () => {
+      window.removeEventListener("resize", recalc);
+      el.style.minHeight = "";
+    };
   });
 
   return ref;

@@ -85,7 +85,8 @@ export default function HomeContent() {
             </p>
             <div className="flex items-center justify-between text-xs mt-5">
               <span className="text-gray-400">
-                {latestUpdate.date && formatTimestamp(latestUpdate.date, locale)}
+                {latestUpdate.date &&
+                  formatTimestamp(latestUpdate.date, locale)}
               </span>
               <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
                 {home["viewAll"]}
@@ -175,7 +176,7 @@ export default function HomeContent() {
                   strokeWidth={2}
                 />
                 <div>
-                  <h2 className="font-bold text-lg min-[800px]:mb-1">
+                  <h2 className="font-semibold text-lg min-[800px]:mb-1">
                     {page.label}
                   </h2>
                   <p className="text-sm text-gray-500">{page.desc}</p>
@@ -202,7 +203,7 @@ export default function HomeContent() {
               strokeWidth={2}
             />
             <div>
-              <h2 className="font-bold text-lg">{nav["pressReleases"]}</h2>
+              <h2 className="font-semibold text-lg">{nav["pressReleases"]}</h2>
               <p className="text-sm text-gray-500">
                 {home["pressReleasesDesc"]}
               </p>
