@@ -127,10 +127,10 @@ export default function ArticleCard({
       // Row cards carry no padding either: the thumbnail runs flush to the
       // top, left and bottom edges, and the text block supplies its own
       // insets. overflow-hidden clips the image to the rounded corners.
-      className={`group w-full text-left bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-[0_0_5px_rgba(0,0,0,0.05)] transition-[box-shadow,border-color] ${
+      className={`group w-full text-left bg-white rounded-2xl overflow-hidden shadow-[0_0_5px_rgba(0,0,0,0.06)] transition-shadow ${
         featured
-          ? "hover:shadow-[0_0_12px_rgba(217,119,6,0.25)] hover:border-amber-600 active:shadow-[0_0_12px_rgba(217,119,6,0.25)] active:border-amber-600"
-          : "flex items-stretch hover:shadow-[0_0_12px_rgba(0,0,0,0.1)] hover:border-gray-400 active:shadow-[0_0_12px_rgba(0,0,0,0.1)] active:border-gray-400"
+          ? "hover:shadow-[0_0_10px_rgba(217,119,6,0.22)] active:shadow-[0_0_10px_rgba(217,119,6,0.22)]"
+          : "flex items-stretch hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] active:shadow-[0_0_10px_rgba(0,0,0,0.1)]"
       }`}
     >
       {featured ? (

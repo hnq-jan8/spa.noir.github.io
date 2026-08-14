@@ -68,7 +68,9 @@ export default async function LocaleLayout({
       <div className="flex flex-col min-h-screen bg-page">
         <div className="flex flex-col flex-1">
           <Navbar logoOnBlack={logoOnBlack} />
-          <main className="flex-1">{children}</main>
+          {/* flex column so a page can claim leftover height with `flex-1`
+              — see PressReleasesContent's article wrapper. */}
+          <main className="flex-1 flex flex-col">{children}</main>
         </div>
         <Footer logoOnWhite={logoOnWhite} />
       </div>

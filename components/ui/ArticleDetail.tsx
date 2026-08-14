@@ -106,7 +106,7 @@ export default function ArticleDetail({
         </div>
       </div>
       <div
-        className={`press-article-card md:bg-white md:border md:border-gray-200 md:rounded-2xl md:p-8 ${isFullBleed ? "full-bleed" : ""}`}
+        className={`press-article-card md:bg-white md:border md:border-gray-100 md:rounded-2xl md:p-8 ${isFullBleed ? "full-bleed" : ""}`}
       >
         <ArticleContent title={article.title} body={article.body} />
       </div>

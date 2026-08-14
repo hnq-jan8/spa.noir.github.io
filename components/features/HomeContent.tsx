@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Megaphone,
   PlaneTakeoff,
@@ -42,6 +43,16 @@ export default function HomeContent() {
       label: nav["faqs"],
       desc: home["faqsDesc"],
       Icon: HelpCircle,
+    },
+  ];
+
+  const browseItems = [
+    ...gridPages,
+    {
+      href: `/${locale}/press-releases`,
+      label: nav["pressReleases"],
+      desc: home["pressReleasesDesc"],
+      Icon: FileText,
     },
   ];
 
@@ -154,67 +165,99 @@ export default function HomeContent() {
         )}
       </Reveal>
 
-      {/* Grid: flight info / faqs. The eyebrow groups the three reference
-          pages below it (flight info, FAQs, press releases) as one "look
-          something up" set, separating them from the urgent update and the
-          hotlines above — otherwise all six cards read as one flat list. */}
+      {/* Browse: flight info / FAQs / press releases. The eyebrow groups
+          these as one "look something up" set, separating them from the
+          urgent update and the hotlines above. */}
       <Reveal delay={100}>
         <p className="text-xs text-gray-400 uppercase tracking-wide mb-2 mt-6 pl-1.5">
           {home["browseSection"]}
         </p>
       </Reveal>
-      <div className="grid grid-cols-1 min-[800px]:grid-cols-2 gap-4 mb-4">
-        {gridPages.map((page, index) => (
-          <Reveal key={page.href} delay={100 + index * 50}>
-            <CardLink
-              href={page.href}
-              className="flex items-center justify-between gap-4"
+
+      {/* Below 800px: one grouped surface with hairline-divided rows, iOS
+          Settings-style, instead of three separate cards with gaps between
+          them. */}
+      <Reveal delay={100} className="min-[800px]:hidden mb-4">
+        <div className="bg-white border border-gray-100 rounded-2xl divide-y divide-gray-100 overflow-hidden">
+          {browseItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-gray-50 active:bg-gray-50 transition-colors"
             >
-              <div className="flex items-center gap-4 min-[800px]:flex-col min-[800px]:items-start min-[800px]:gap-0">
-                <page.Icon
-                  className="w-6 h-6 text-gray-400 flex-shrink-0 min-[800px]:mb-3"
-                  strokeWidth={2}
-                />
-                <div>
-                  <h2 className="font-semibold text-lg min-[800px]:mb-1">
-                    {page.label}
-                  </h2>
-                  <p className="text-sm text-gray-500">{page.desc}</p>
-                </div>
-              </div>
-              <ChevronRight
-                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+              <item.Icon
+                className="w-5 h-5 text-gray-400 flex-shrink-0 mr-1 sm:mr-2"
                 strokeWidth={2}
               />
-            </CardLink>
-          </Reveal>
-        ))}
-      </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold text-base">{item.label}</h2>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+              </div>
+              <ChevronRight
+                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:translate-x-1 group-active:translate-x-1"
+                strokeWidth={2}
+              />
+            </Link>
+          ))}
+        </div>
+      </Reveal>
 
-      {/* Press releases */}
-      <Reveal delay={200}>
-        <CardLink
-          href={`/${locale}/press-releases`}
-          className="flex items-center justify-between gap-4"
-        >
-          <div className="flex items-center gap-4">
-            <FileText
-              className="w-6 h-6 text-gray-400 flex-shrink-0"
+      {/* 800px+: flight info / FAQs as a 2-col grid, press releases as its
+          own full-width card below — unchanged from before the mobile
+          grouped list existed. */}
+      <div className="hidden min-[800px]:block">
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {gridPages.map((page, index) => (
+            <Reveal key={page.href} delay={100 + index * 50}>
+              <CardLink
+                href={page.href}
+                className="flex items-center justify-between gap-4"
+              >
+                <div className="flex flex-col items-start gap-0">
+                  <page.Icon
+                    className="w-6 h-6 text-gray-400 flex-shrink-0 mb-3"
+                    strokeWidth={2}
+                  />
+                  <div>
+                    <h2 className="font-semibold text-lg mb-1">
+                      {page.label}
+                    </h2>
+                    <p className="text-sm text-gray-500">{page.desc}</p>
+                  </div>
+                </div>
+                <ChevronRight
+                  className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                  strokeWidth={2}
+                />
+              </CardLink>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={200}>
+          <CardLink
+            href={`/${locale}/press-releases`}
+            className="flex items-center justify-between gap-4"
+          >
+            <div className="flex items-center gap-4">
+              <FileText
+                className="w-6 h-6 text-gray-400 flex-shrink-0"
+                strokeWidth={2}
+              />
+              <div>
+                <h2 className="font-semibold text-lg">{nav["pressReleases"]}</h2>
+                <p className="text-sm text-gray-500">
+                  {home["pressReleasesDesc"]}
+                </p>
+              </div>
+            </div>
+            <ChevronRight
+              className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
               strokeWidth={2}
             />
-            <div>
-              <h2 className="font-semibold text-lg">{nav["pressReleases"]}</h2>
-              <p className="text-sm text-gray-500">
-                {home["pressReleasesDesc"]}
-              </p>
-            </div>
-          </div>
-          <ChevronRight
-            className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
-            strokeWidth={2}
-          />
-        </CardLink>
-      </Reveal>
+          </CardLink>
+        </Reveal>
+      </div>
     </div>
   );
 }

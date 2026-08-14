@@ -8,14 +8,12 @@ import TimelineCarousel from "@/components/ui/TimelineCarousel";
 import { useArticleRoute } from "@/hooks/useArticleRoute";
 import { useContentState } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
-import { useMatchMainHeight } from "@/hooks/useMatchMainHeight";
 import { bundledLabels } from "@/i18n/labels";
 
 export default function OfficialUpdatesContent() {
   const locale = useLocale();
   const { data, failed } = useContentState();
   const { key, open, close } = useArticleRoute();
-  const wrapperRef = useMatchMainHeight<HTMLDivElement>();
 
   if (!data) return failed ? <ContentLoadError /> : null;
 
@@ -40,16 +38,13 @@ export default function OfficialUpdatesContent() {
     const isFullBleed = !opened.title || opened.title.trim().length === 0;
     return (
       <div
-        ref={wrapperRef}
         // Below md there's no white card (see press-article-card), so the
         // wrapper itself carries the white background — same mechanism as
         // PressReleasesContent (see that file for the full rationale) —
         // otherwise the page's off-white bg-page would show through where a
-        // card used to be. min-height is set imperatively by
-        // useMatchMainHeight to exactly reach `main`'s own bottom on a
-        // short update — see that hook for why a CSS-only min-height
-        // doesn't work here.
-        className={`relative z-0 container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 ${
+        // card used to be, and `flex-1` claims `main`'s leftover space so a
+        // short update's white still reaches the footer.
+        className={`relative z-0 flex-1 md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 ${
           isFullBleed ? "pb-0" : "pb-8"
         }`}
       >
@@ -78,7 +73,7 @@ export default function OfficialUpdatesContent() {
   }
 
   return (
-    <div className="container-page pt-4 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto">
+    <div className="container-page pt-4 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4">
       <Reveal>
         <TimelineCarousel
           items={updates}

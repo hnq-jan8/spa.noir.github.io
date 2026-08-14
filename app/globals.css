@@ -19,6 +19,15 @@
     @apply bg-page text-gray-900 min-h-screen;
     overflow-x: clip;
   }
+
+  /* `main` is a flex column (see app/[locale]/layout.tsx). `container-page`'s
+     `mx-auto` is an auto margin on that column's cross axis, which overrides
+     the default stretch and shrinks each page wrapper to fit its content —
+     pin the width back to definite so max-width + mx-auto still centers as
+     expected. */
+  main > * {
+    width: 100%;
+  }
 }
 
 @layer components {

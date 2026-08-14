@@ -105,13 +105,14 @@ export default function TimelineCarousel({
           >
             <div className="flex flex-col items-center flex-shrink-0">
               <div
-                // Latest dot keeps its own amber at rest and on hover/active —
-                // a glow (same accent shadow ArticleCard uses) reads as "lit up"
-                // without darkening the fill the way swapping to amber-800 did.
+                // Latest dot reads the same as every other dot at rest —
+                // hollow, white fill — just with an amber border instead of
+                // gray, so the timeline reads as one consistent dot style.
+                // Hover/active fills it solid amber and zooms in; no glow.
                 className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 mt-1 transition-all duration-200 ${
                   isPassed
-                    ? "bg-amber-600 border-amber-600 group-hover:scale-125 group-hover:shadow-[0_0_6px_2px_rgba(217,119,6,0.5)] group-active:scale-125 group-active:shadow-[0_0_6px_2px_rgba(217,119,6,0.5)]"
-                    : "bg-white border-gray-400 group-hover:scale-125 group-hover:border-amber-500 group-active:scale-125 group-active:border-amber-500"
+                    ? "bg-white border-amber-600 group-hover:scale-125 group-hover:bg-amber-600 group-active:scale-125 group-active:bg-amber-600"
+                    : "bg-white border-gray-400 group-hover:scale-125 group-hover:border-gray-500 group-hover:bg-gray-500 group-active:scale-125 group-active:border-gray-500 group-active:bg-gray-500"
                 }`}
               />
               {!isLast && (
