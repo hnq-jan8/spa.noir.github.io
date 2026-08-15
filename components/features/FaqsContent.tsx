@@ -58,9 +58,9 @@ function SearchField({
         onBlur={onBlur}
         placeholder={placeholder}
         aria-label={placeholder}
-        // Gray, not amber — matches the same glow a card gets on hover
+        // Gray, not amber — matches the same fill a card gets on hover
         // (see ArticleCard) rather than reaching for the accent color.
-        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-[0_0_5px_rgba(0,0,0,0.05)] transition-[box-shadow,border-color] focus:outline-none focus:border-gray-400 focus:shadow-[0_0_12px_rgba(0,0,0,0.1)]"
+        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-[0_0_5px_rgba(0,0,0,0.05)] transition-[background-color,border-color] focus:outline-none focus:bg-white focus:border-gray-400"
       />
       {query && (
         <button
@@ -211,7 +211,7 @@ export default function FaqsContent() {
       // with it.
       className={`container-page pb-8 md:pb-8 max-w-3xl mx-auto pt-4 transition-[padding-top] duration-300 ease-out ${
         desktopFieldEngaged ? "md:pt-4" : "md:pt-8"
-      } ${desktopFieldEngaged || mobileSearchOpen ? "min-h-screen" : ""}`}
+      } ${desktopFieldEngaged || mobileSearchOpen ? "min-h-[100dvh]" : ""}`}
     >
       {/* While the search field is engaged (desktop: focused; mobile: the
           capsule open) the content area is forced to at least a full

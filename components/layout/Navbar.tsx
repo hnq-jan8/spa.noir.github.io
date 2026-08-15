@@ -148,11 +148,14 @@ export default function Navbar({
 
   return (
     <>
-      {/* Spacer to compensate for the fixed header being taken out of flow */}
-      <div className="h-12 md:h-14" aria-hidden />
+      {/* `sticky`, not `fixed`: on iOS Safari a fixed header's compositing
+          layer gets left at a stale offset as the URL bar collapses — it is
+          painted partway down the page while `getBoundingClientRect().top`
+          still reads 0, and never recovers. Sticky rides the scroller
+          instead, and keeps its own space in flow (hence no spacer div). */}
       <header
         ref={headerRef}
-        className="fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
+        className="sticky top-0 z-50 w-full bg-chrome text-white"
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">
@@ -207,8 +210,8 @@ export default function Navbar({
                         }}
                         className={`text-xs whitespace-nowrap px-4 flex items-center transition-colors relative flex-shrink-0 ${
                           isActive
-                            ? "text-white font-medium bg-black/30"
-                            : "text-gray-200 hover:text-white hover:bg-black/20 active:text-white active:bg-black/20"
+                            ? "text-white font-medium bg-black/15"
+                            : "text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium"
                         }`}
                       >
                         <span

@@ -9,14 +9,23 @@
       -apple-system,
       sans-serif;
     @apply bg-page;
-    overflow-x: clip;
     /* Marker read by the stylesheet-load-recovery script in app/layout.tsx —
        only present once this (external) stylesheet has actually applied. */
     --app-css-loaded: 1;
   }
 
   body {
-    @apply bg-page text-gray-900 min-h-screen;
+    /* `100dvh`, not `min-h-screen` (`100vh`): on iOS `100vh` is the *large*
+       viewport (URL bar collapsed), so with the bar showing the document is
+       ~86px taller than the screen and even a short page scrolls. */
+    @apply bg-page text-gray-900 min-h-[100dvh];
+  }
+
+  /* Bleed guard for CMS content (a wide table shouldn't pan the page).
+     On `main`, not html/body — overflow on the root propagates to the
+     viewport itself. `clip`, not `hidden`, so no scroll container is
+     created and the sticky elements inside still work. */
+  main {
     overflow-x: clip;
   }
 

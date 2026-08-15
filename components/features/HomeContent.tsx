@@ -78,8 +78,7 @@ export default function HomeContent() {
             // Warm tint on the surface itself, not just the left rule — this
             // is the one card on the page that must win the first glance, and
             // against five other white cards a 4px edge wasn't carrying it.
-            className="block border-l-4 border-l-amber-600 !bg-[#fffdf6] pb-4"
-            amber
+            className="block border-l-4 border-l-amber-600 !bg-[#fffdf6] hover:!bg-gray-100 active:!bg-gray-100 pb-4"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -129,7 +128,7 @@ export default function HomeContent() {
         </p>
       </Reveal>
       <Reveal delay={50} className="relative mb-4">
-        <div className="relative z-[2] bg-gray-100 border border-gray-200 rounded-2xl p-6">
+        <div className="relative z-[2] bg-surface border border-gray-200 rounded-2xl p-6">
           <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
             {Object.entries(data.common.contacts).map(([key, value]) => {
               const isEmail = value.includes("@");
@@ -183,7 +182,7 @@ export default function HomeContent() {
             <Link
               key={item.href}
               href={item.href}
-              className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-gray-50 active:bg-gray-50 transition-colors"
+              className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-gray-100 active:bg-gray-100 transition-colors"
             >
               <item.Icon
                 className="w-5 h-5 text-gray-400 flex-shrink-0 mr-1 sm:mr-2"

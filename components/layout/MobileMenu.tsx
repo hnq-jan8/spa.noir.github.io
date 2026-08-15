@@ -82,10 +82,10 @@ export default function MobileMenu({
                 clearArticleRoute();
                 if (isActive) invalidateContent();
               }}
-              className={`flex items-center px-6 py-4 text-xl transition-colors font-semibold ${
+              className={`flex items-center px-6 py-4 text-xl transition-colors ${
                 isActive
-                  ? "text-white bg-black/20"
-                  : "text-gray-300 hover:text-white hover:bg-black/10 active:text-white active:bg-black/10"
+                  ? "text-white font-semibold bg-black/10"
+                  : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
               }`}
             >
               {item.label}
@@ -144,7 +144,7 @@ export default function MobileMenu({
                     className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
                       isActive
                         ? "text-white font-semibold"
-                        : "text-gray-300 hover:text-white active:text-white"
+                        : "text-gray-300 hover:text-white hover:font-medium active:text-white active:font-medium"
                     }`}
                   >
                     <span>{lang.label}</span>

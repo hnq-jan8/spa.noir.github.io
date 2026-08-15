@@ -65,13 +65,14 @@ export default async function LocaleLayout({
     <>
       <RememberLocale />
       <ActivePoller officialSiteUrl={officialSiteUrl} buildId={buildId} />
-      <div className="flex flex-col min-h-screen bg-page">
-        <div className="flex flex-col flex-1">
-          <Navbar logoOnBlack={logoOnBlack} />
-          {/* flex column so a page can claim leftover height with `flex-1`
-              — see PressReleasesContent's article wrapper. */}
-          <main className="flex-1 flex flex-col">{children}</main>
-        </div>
+      {/* Navbar sits directly in this column: its header is `sticky`, which
+          only stays pinned while its own parent is in view — nesting it
+          alongside `main` would unpin it once the footer came up. */}
+      <div className="flex flex-col min-h-[100dvh] bg-page">
+        <Navbar logoOnBlack={logoOnBlack} />
+        {/* flex column so a page can claim leftover height with `flex-1`
+            — see PressReleasesContent's article wrapper. */}
+        <main className="flex-1 flex flex-col">{children}</main>
         <Footer logoOnWhite={logoOnWhite} />
       </div>
     </>

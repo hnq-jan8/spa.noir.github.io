@@ -5,6 +5,11 @@ import {
   expandTransition,
 } from "@/lib/expandTransition";
 
+// Less negative delay than EXPAND_GRID_TRANSITION_CLASS's -150ms: a rotation
+// needs more of the curve on screen to read as motion.
+const CHEVRON_TRANSITION_CLASS =
+  "transition-transform duration-300 delay-[-100ms] ease-out";
+
 interface FaqItem {
   question: string;
   answer: string;
@@ -65,14 +70,6 @@ export default function FaqAccordion({
   const [openSet, setOpenSet] = useState<Set<number>>(() =>
     animateFirstOpen ? new Set() : new Set(items.length > 0 ? [0] : []),
   );
-  // Degrees keep accumulating (0, 180, 360, 540, ...) instead of toggling
-  // back to 0 — rotating the chevron the same clockwise direction every
-  // time instead of winding it back counter-clockwise on close.
-  const [chevronDeg, setChevronDeg] = useState<Record<number, number>>(() =>
-    animateFirstOpen || items.length === 0
-      ? ({} as Record<number, number>)
-      : { 0: 180 },
-  );
 
   // FLIP: growing/shrinking a panel pushes every card below it through
   // normal flow, which forces the browser to recompute their position on
@@ -102,7 +99,6 @@ export default function FaqAccordion({
       else next.add(i);
       return next;
     });
-    setChevronDeg((prev) => ({ ...prev, [i]: (prev[i] ?? 0) + 180 }));
   };
 
   // Plays the first card's own expand transition in on mount, standing in
@@ -115,7 +111,6 @@ export default function FaqAccordion({
       const inner = requestAnimationFrame(() => {
         captureRects();
         setOpenSet(new Set([0]));
-        setChevronDeg({ 0: 180 });
       });
       cancelRef.current = inner;
     });
@@ -144,7 +139,6 @@ export default function FaqAccordion({
     if (items.length === 0 || openSet.has(0)) return;
     captureRects();
     setOpenSet((prev) => new Set(prev).add(0));
-    setChevronDeg((prev) => ({ ...prev, 0: (prev[0] ?? 0) + 180 }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reopenFirstSignal]);
 
@@ -184,16 +178,13 @@ export default function FaqAccordion({
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
-          // rounded-2xl (or just the top half when open), not just the
-          // card: the browser's own focus outline follows a button's *own*
-          // border-radius, not its clipping ancestor's — without this it
-          // stayed square and got hard-cut by the card's overflow-hidden
-          // wherever it crossed the rounded corner instead of curving with
-          // it. Open: only the top corners are actually the button's own —
-          // the bottom edge now borders the answer panel, not the card's
-          // own bottom, so rounding it too would bow the outline out past
-          // where the button really ends.
-          className={`w-full ${isOpen ? "rounded-t-2xl" : "rounded-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-colors hover:bg-gray-50 active:bg-gray-50`}
+          // Rounded on the button itself, not just the card: the focus
+          // outline follows a button's *own* border-radius, so without this
+          // it stayed square and got hard-cut by the card's overflow-hidden.
+          // Top/bottom as separate longhands (not one `rounded-2xl` toggle)
+          // so the bottom pair can transition instead of snapping — square
+          // when open, since that edge then borders the answer panel.
+          className={`w-full rounded-t-2xl ${isOpen ? "rounded-b-none" : "rounded-b-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-[background-color,border-radius] duration-300 ease-out hover:bg-gray-100 active:bg-gray-100`}
           onClick={() => toggle(i)}
         >
           <span className="pr-4 text-gray-900 font-medium">
@@ -209,8 +200,8 @@ export default function FaqAccordion({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="flex-shrink-0 text-gray-500 transition-transform duration-200"
-            style={{ transform: `rotate(${chevronDeg[i] ?? 0}deg)` }}
+            className={`flex-shrink-0 text-gray-500 ${CHEVRON_TRANSITION_CLASS}`}
+            style={{ transform: `rotate(${isOpen ? 180 : 0}deg)` }}
           >
             <polyline points="6 9 12 15 18 9" />
           </svg>

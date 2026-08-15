@@ -20,7 +20,6 @@ module.exports = {
       colors: {
         chrome: {
           DEFAULT: COLORS.chrome,
-          panel: COLORS.chromePanel,
           panelHover: COLORS.chromePanelHover,
         },
         page: COLORS.page,
