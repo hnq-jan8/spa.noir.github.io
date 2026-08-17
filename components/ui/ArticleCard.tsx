@@ -24,10 +24,10 @@ function PreviewImage({
   if (failed) {
     return (
       <div
-        className={`${className} bg-gray-100 flex items-center justify-center overflow-hidden`}
+        className={`${className} bg-gray-200 flex items-center justify-center overflow-hidden`}
         aria-hidden="true"
       >
-        <ImageOff className="w-5 h-5 text-gray-300" strokeWidth={1.5} />
+        <ImageOff className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
       </div>
     );
   }

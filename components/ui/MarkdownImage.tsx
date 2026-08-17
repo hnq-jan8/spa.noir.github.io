@@ -45,7 +45,7 @@ export default function MarkdownImage({
     return (
       <span
         style={{ height: RESERVED_HEIGHT }}
-        className="inline-flex items-center gap-1.5 align-middle rounded border border-gray-200 bg-gray-50 px-2 text-gray-400 my-1"
+        className="inline-flex items-center gap-1.5 align-middle rounded border border-gray-200 bg-gray-50 px-2 text-gray-500 my-1"
         {...(alt
           ? { role: "img", "aria-label": alt }
           : { "aria-hidden": true })}

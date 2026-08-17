@@ -11,11 +11,11 @@ function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
   if (failed) {
     return (
       <div
-        className={`${box} bg-gray-100 flex items-center justify-center flex-shrink-0`}
+        className={`${box} bg-gray-200 flex items-center justify-center flex-shrink-0`}
         aria-hidden="true"
       >
         <ImageOff
-          className={size === "lg" ? "w-5 h-5 text-gray-300" : "w-3.5 h-3.5 text-gray-300"}
+          className={size === "lg" ? "w-5 h-5 text-gray-500" : "w-3.5 h-3.5 text-gray-500"}
           strokeWidth={1.5}
         />
       </div>
