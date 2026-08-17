@@ -18,7 +18,7 @@ export default function OfficialUpdatesContent() {
   if (!data) return failed ? <ContentLoadError /> : null;
 
   const updates = data.officialUpdates.updates;
-  const labels = data.officialUpdates.labels["officialUpdates"] ?? {};
+  const labels = data.officialUpdates.labels["officialUpdates"];
 
   if (updates.length === 0) {
     return (

@@ -8,20 +8,6 @@ function pick<T>(map: I18n<T>, locale: string): T {
   return map[locale] ?? map[routing.defaultLocale];
 }
 
-/**
- * Same as `pick`, but for fields every consumer treats as a plain string.
- *
- * The CMS lets an editor save an article with an empty body (and a locale can
- * be missing its translation row entirely), so these arrive as `null`/absent
- * even where the shape suggests otherwise. Downstream code calls string
- * methods on them directly — `body.trim()` for reading time, `body.match()`
- * for the fallback heading — so a null here took the whole page down with a
- * client-side exception rather than degrading to an article with no body.
- */
-function pickText(map: I18n<string | null> | undefined, locale: string): string {
-  return (map ? pick(map, locale) : null) ?? "";
-}
-
 type LabelMap = Record<string, Record<string, I18n<string>>>;
 type ResolvedLabelMap = Record<string, Record<string, string>>;
 
@@ -45,9 +31,8 @@ export interface ContentContacts {
 
 export interface ContentUpdate {
   date: string;
-  title: I18n<string | null>;
-  /** Nullable: the CMS accepts an update saved with an empty body. */
-  description: I18n<string | null>;
+  title: I18n<string>;
+  description: I18n<string>;
 }
 
 /** Một official update trong danh sách (kèm dữ liệu preview cho card). */
@@ -63,8 +48,7 @@ export interface ContentReleaseItem {
   slug: string;
   publishedAt: string | null;
   title: I18n<string | null>;
-  /** Nullable: same as ContentUpdate.description. */
-  body: I18n<string | null>;
+  body: I18n<string>;
   previewExcerpt: I18n<string | null>;
   previewImage: I18n<string | null>;
 }
@@ -191,12 +175,7 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
   return {
     generatedAt: payload.generatedAt,
     common: {
-      // site_config's hotline/email fields are nullable — a cleared one used
-      // to reach `value.includes("@")` in the footer/homepage contact grids
-      // and crash the page. Coerce to "" here; both grids skip empties.
-      contacts: Object.fromEntries(
-        Object.entries(payload.common.contacts).map(([k, v]) => [k, v ?? ""]),
-      ) as ContentContacts,
+      contacts: payload.common.contacts,
       social: payload.common.social,
       languages: payload.common.languages,
       labels: resolveLabels(payload.common.labels, locale),
@@ -209,8 +188,8 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
       // page's own — so typing an English word still surfaces its Vietnamese
       // translation (same FAQ item) when browsing /vi, and vice versa.
       faqs: payload.faqs.faqs.map((f) => ({
-        question: pickText(f.question, locale),
-        answer: pickText(f.answer, locale),
+        question: pick(f.question, locale),
+        answer: pick(f.answer, locale),
         searchText: [...Object.values(f.question), ...Object.values(f.answer)]
           .join(" ")
           .toLocaleLowerCase(),
@@ -219,17 +198,17 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
     },
     flightInfo: {
       flights: payload.flightInfo.flights,
-      flightPolicy: pickText(payload.flightInfo.flightPolicy, locale),
+      flightPolicy: pick(payload.flightInfo.flightPolicy, locale),
       labels: resolveLabels(payload.flightInfo.labels, locale),
     },
     officialUpdates: {
       updates: payload.officialUpdates.updates.map((u) => ({
         key: u.id,
         date: u.date,
-        title: pick(u.title, locale) ?? null,
-        body: pickText(u.description, locale),
-        previewExcerpt: pick(u.previewExcerpt, locale) ?? null,
-        previewImage: pick(u.previewImage, locale) ?? null,
+        title: pick(u.title, locale),
+        body: pick(u.description, locale),
+        previewExcerpt: pick(u.previewExcerpt, locale),
+        previewImage: pick(u.previewImage, locale),
       })),
       labels: resolveLabels(payload.officialUpdates.labels, locale),
     },
@@ -237,10 +216,10 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
       releases: payload.pressReleases.releases.map((r) => ({
         key: r.slug,
         date: r.publishedAt,
-        title: pick(r.title, locale) ?? null,
-        body: pickText(r.body, locale),
-        previewExcerpt: pick(r.previewExcerpt, locale) ?? null,
-        previewImage: pick(r.previewImage, locale) ?? null,
+        title: pick(r.title, locale),
+        body: pick(r.body, locale),
+        previewExcerpt: pick(r.previewExcerpt, locale),
+        previewImage: pick(r.previewImage, locale),
       })),
       labels: resolveLabels(payload.pressReleases.labels, locale),
     },

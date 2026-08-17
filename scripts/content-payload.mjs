@@ -126,7 +126,7 @@ export function assembleContentPayload({
         no: i + 1,
         type: f.aircraft_type ?? "–",
         capacity: f.capacity ?? "–",
-        flightNo: f.flight_no ?? "–",
+        flightNo: f.flight_no,
         departure: f.dep ?? "–",
         arrival: f.arr ?? "–",
         srtd: formatTime(f.srtd),
