@@ -127,7 +127,7 @@ export default function ArticleCard({
       // Row cards carry no padding either: the thumbnail runs flush to the
       // top, left and bottom edges, and the text block supplies its own
       // insets. overflow-hidden clips the image to the rounded corners.
-      className={`group w-full text-left bg-white rounded-2xl overflow-hidden shadow-[0_0_5px_rgba(0,0,0,0.06)] transition-colors hover:bg-gray-100 active:bg-gray-100 ${
+      className={`group w-full text-left bg-white rounded-2xl overflow-hidden transition-colors hover:bg-cardHover active:bg-cardHover ${
         featured ? "" : "flex items-stretch"
       }`}
     >

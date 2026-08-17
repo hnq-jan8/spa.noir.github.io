@@ -24,6 +24,9 @@ module.exports = {
         },
         page: COLORS.page,
         surface: COLORS.surface,
+        cardHover: COLORS.cardHover,
+        update: COLORS.update,
+        updateHover: COLORS.updateHover,
       },
       keyframes: {
         "pulse-glow": {

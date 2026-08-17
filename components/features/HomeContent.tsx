@@ -23,9 +23,12 @@ export default function HomeContent() {
 
   if (!data) return failed ? <ContentLoadError /> : null;
 
-  const nav = data.common.labels["nav"];
-  const home = data.home.labels["home"];
-  const support = data.common.labels["support"];
+  // `?? {}` because assembleContentPayload drops a namespace entirely when it
+  // has no ui_labels rows — indexing into the missing object would throw.
+  // Same guard the Navbar/Footer/FAQ pages already use.
+  const nav = data.common.labels["nav"] ?? {};
+  const home = data.home.labels["home"] ?? {};
+  const support = data.common.labels["support"] ?? {};
   // Same record the Official Updates timeline shows at the top, so the home
   // card and the list can't drift apart in wording or truncation.
   const latestUpdate = data.officialUpdates.updates[0] ?? null;
@@ -58,8 +61,9 @@ export default function HomeContent() {
 
   return (
     <div className="container-page pb-8 md:pt-3 md:pb-11 max-w-3xl mx-auto">
-      {/* As-of timestamp */}
-      <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4">
+      {/* As-of timestamp. Extra bottom margin at md+ — with no outline on
+          either element, the pill sits too close to the card below it. */}
+      <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6">
         <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
         <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 animate-pulse-glow" />
@@ -75,10 +79,12 @@ export default function HomeContent() {
         {latestUpdate ? (
           <CardLink
             href={`/${locale}/official-updates`}
-            // Warm tint on the surface itself, not just the left rule — this
-            // is the one card on the page that must win the first glance, and
-            // against five other white cards a 4px edge wasn't carrying it.
-            className="block border-l-4 border-l-amber-600 !bg-[#fffdf6] hover:!bg-gray-100 active:!bg-gray-100 pb-4"
+            // The left rule is a deliberate exception to the no-lines card
+            // rule — an emphasis accent, not an outline, marking the one card
+            // that must win the first glance. `update`/`updateHover` (see
+            // lib/theme-colors.js) instead of the shared white/cardHover pair
+            // since this is the only card with a warm surface.
+            className="block border-l-4 border-l-amber-600 !bg-update hover:!bg-updateHover active:!bg-updateHover pb-4"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -110,7 +116,12 @@ export default function HomeContent() {
         ) : (
           <button
             type="button"
-            className="w-full flex items-center gap-2 bg-gray-50 border border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400 text-left hover:bg-gray-100 active:bg-gray-100 transition-colors"
+            // Deliberate exceptions to the no-lines card rule: the dashed
+            // outline is what reads as an empty slot rather than a card with
+            // nothing in it, and it stays silent on hover/active (it retries
+            // the fetch on tap) since a visible affordance here would promise
+            // content that isn't there.
+            className="w-full flex items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400 text-left"
             onClick={() => invalidateContent()}
           >
             <Megaphone className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
@@ -128,9 +139,11 @@ export default function HomeContent() {
         </p>
       </Reveal>
       <Reveal delay={50} className="relative mb-4">
-        <div className="relative z-[2] bg-surface border border-gray-200 rounded-2xl p-6">
+        <div className="relative z-[2] bg-surface rounded-2xl p-6">
           <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
-            {Object.entries(data.common.contacts).map(([key, value]) => {
+            {Object.entries(data.common.contacts)
+              .filter(([, value]) => value)
+              .map(([key, value]) => {
               const isEmail = value.includes("@");
               const href = isEmail
                 ? `mailto:${value}`
@@ -177,12 +190,12 @@ export default function HomeContent() {
           Settings-style, instead of three separate cards with gaps between
           them. */}
       <Reveal delay={100} className="min-[800px]:hidden mb-4">
-        <div className="bg-white border border-gray-100 rounded-2xl divide-y divide-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl divide-y divide-gray-100 overflow-hidden">
           {browseItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-gray-100 active:bg-gray-100 transition-colors"
+              className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-cardHover active:bg-cardHover transition-colors"
             >
               <item.Icon
                 className="w-5 h-5 text-gray-400 flex-shrink-0 mr-1 sm:mr-2"

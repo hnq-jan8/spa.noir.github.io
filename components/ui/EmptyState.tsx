@@ -43,9 +43,12 @@ export default function EmptyState({
           type="button"
           aria-label={t?.["retry"] ?? t?.["title"]}
           onClick={() => invalidateContent()}
-          className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-4"
+          // Retries the fetch on tap, but shows no hover/active state on
+          // purpose — same reasoning as the homepage's empty-update slot: a
+          // visible affordance here would promise content that isn't there.
+          className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-4"
         >
-          <Icon className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
+          <Icon className="w-7 h-7 text-gray-400" strokeWidth={1.5} />
         </button>
       </Reveal>
       <Reveal delay={50}>

@@ -78,7 +78,9 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
         {/* Contact info — chỉ hiện ở các trang con, trang chủ đã có riêng */}
         {!isHome && data && support && (
           <div className="grid grid-cols-1 min-[510px]:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Object.entries(data.common.contacts).map(([key, value]) => {
+            {Object.entries(data.common.contacts)
+              .filter(([, value]) => value)
+              .map(([key, value]) => {
               const isEmail = value.includes("@");
               const href = isEmail
                 ? `mailto:${value}`

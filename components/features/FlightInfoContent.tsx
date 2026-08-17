@@ -11,7 +11,7 @@ export default function FlightInfoContent() {
 
   if (!data) return failed ? <ContentLoadError /> : null;
 
-  const fi = data.flightInfo.labels["flightInfo"];
+  const fi = data.flightInfo.labels["flightInfo"] ?? {};
   const flights = data.flightInfo.flights;
 
   if (flights.length === 0) {
@@ -24,7 +24,7 @@ export default function FlightInfoContent() {
 
   return (
     <div className="container-page pt-4 pb-8 md:py-8 md:max-w-6xl md:mx-auto">
-      <div className="md:bg-white md:border md:border-gray-100 md:rounded-2xl md:p-6">
+      <div className="md:bg-white md:rounded-2xl md:p-6">
         <Reveal>
           <FlightTable
             title={fi["title"]}

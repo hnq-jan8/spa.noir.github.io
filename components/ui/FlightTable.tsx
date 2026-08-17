@@ -59,7 +59,7 @@ export default function FlightTable({
           return (
             <div
               key={idx}
-              className="bg-white border border-gray-100 rounded-2xl overflow-hidden"
+              className="bg-white rounded-2xl overflow-hidden"
             >
               <div className="px-4 pt-4">
                 <div className="flex items-center justify-between mb-3">

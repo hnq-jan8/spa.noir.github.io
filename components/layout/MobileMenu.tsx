@@ -88,13 +88,21 @@ export default function MobileMenu({
                   : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
               }`}
             >
-              {item.label}
-              {item.href === unreadHref && (
-                <span
-                  aria-hidden="true"
-                  className="ml-2 w-2 h-2 rounded-full bg-red-500 flex-shrink-0 animate-pulse-glow"
-                />
-              )}
+              {/* Relative wrapper so the unread dot can sit as a superscript
+                  on the label's top-right corner. Anchored to the text, not
+                  to the row, so it stays put whatever the label's length. */}
+              <span className="relative">
+                {item.label}
+                {item.href === unreadHref && (
+                  <span
+                    aria-hidden="true"
+                    // Steady glow, not `animate-pulse-glow`: a badge marking
+                    // "there's something new" reads as a state, and a pulsing
+                    // one competes with the homepage's live "as of" dot.
+                    className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_3px_1px_rgba(239,68,68,0.5)]"
+                  />
+                )}
+              </span>
             </Link>
           );
         })}

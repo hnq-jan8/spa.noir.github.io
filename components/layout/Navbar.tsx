@@ -221,10 +221,16 @@ export default function Navbar({
                           {item.label}
                         </span>
                         <span className="absolute inset-0 flex items-center justify-center px-4">
-                          {item.label}
-                          {showDot && (
-                            <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 animate-pulse-glow" />
-                          )}
+                          {/* Relative wrapper so the dot sits as a
+                              superscript on the label's top-right corner
+                              rather than centred beside it — matches the
+                              mobile menu. Steady glow, no pulse. */}
+                          <span className="relative">
+                            {item.label}
+                            {showDot && (
+                              <span className="absolute -top-0.5 -right-2 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_3px_1px_rgba(239,68,68,0.5)]" />
+                            )}
+                          </span>
                         </span>
                         {/* Amber, matching the site's single accent. White
                             read as an artefact of the chrome against the page
@@ -300,7 +306,7 @@ export default function Navbar({
                 {hasUnreadUpdate && !menuOpen && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-2.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse-glow"
+                    className="absolute top-2.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_3px_1px_rgba(239,68,68,0.5)]"
                   />
                 )}
                 <span className="relative w-4 h-4 flex items-center justify-center ml-1">
