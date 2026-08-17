@@ -11,7 +11,10 @@ export default function FlightInfoContent() {
 
   if (!data) return failed ? <ContentLoadError /> : null;
 
-  const fi = data.flightInfo.labels["flightInfo"];
+  // `?? {}` because assembleContentPayload drops a namespace entirely when it
+  // has no ui_labels rows — indexing into the missing object would throw.
+  // Same guard the Navbar/Footer/FAQ pages already use.
+  const fi = data.flightInfo.labels["flightInfo"] ?? {};
   const flights = data.flightInfo.flights;
 
   if (flights.length === 0) {

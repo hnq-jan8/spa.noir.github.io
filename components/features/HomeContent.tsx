@@ -23,9 +23,12 @@ export default function HomeContent() {
 
   if (!data) return failed ? <ContentLoadError /> : null;
 
-  const nav = data.common.labels["nav"];
-  const home = data.home.labels["home"];
-  const support = data.common.labels["support"];
+  // `?? {}` because assembleContentPayload drops a namespace entirely when it
+  // has no ui_labels rows — indexing into the missing object would throw.
+  // Same guard the Navbar/Footer/FAQ pages already use.
+  const nav = data.common.labels["nav"] ?? {};
+  const home = data.home.labels["home"] ?? {};
+  const support = data.common.labels["support"] ?? {};
   // Same record the Official Updates timeline shows at the top, so the home
   // card and the list can't drift apart in wording or truncation.
   const latestUpdate = data.officialUpdates.updates[0] ?? null;
@@ -130,7 +133,9 @@ export default function HomeContent() {
       <Reveal delay={50} className="relative mb-4">
         <div className="relative z-[2] bg-surface border border-gray-200 rounded-2xl p-6">
           <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
-            {Object.entries(data.common.contacts).map(([key, value]) => {
+            {Object.entries(data.common.contacts)
+              .filter(([, value]) => value)
+              .map(([key, value]) => {
               const isEmail = value.includes("@");
               const href = isEmail
                 ? `mailto:${value}`
