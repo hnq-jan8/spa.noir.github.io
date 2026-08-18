@@ -148,14 +148,15 @@ export default function Navbar({
 
   return (
     <>
-      {/* `sticky`, not `fixed`: on iOS Safari a fixed header's compositing
-          layer gets left at a stale offset as the URL bar collapses — it is
-          painted partway down the page while `getBoundingClientRect().top`
-          still reads 0, and never recovers. Sticky rides the scroller
-          instead, and keeps its own space in flow (hence no spacer div). */}
+      {/* `fixed` from `md:` up only. Below that, iOS Safari's URL bar
+          collapse leaves a fixed header's compositing layer painted at a
+          stale offset — `getBoundingClientRect().top` reads 0 but it's
+          drawn partway down the page, and never recovers. `sticky` rides
+          the scroller instead on mobile, where that bug actually shows up;
+          desktop Safari doesn't have it, so `fixed` there is safe. */}
       <header
         ref={headerRef}
-        className="sticky top-0 z-50 w-full bg-chrome text-white"
+        className="sticky md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">

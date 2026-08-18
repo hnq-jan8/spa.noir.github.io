@@ -172,7 +172,7 @@ export default function FaqAccordion({
         ref={(el) => {
           cardRefs.current[i] = el;
         }}
-        className="bg-white rounded-2xl overflow-hidden"
+        className="bg-white rounded-2xl overflow-hidden shadow-[0_0_6px_rgba(0,0,0,0.03)]"
       >
         <button
           type="button"

@@ -65,11 +65,14 @@ export default async function LocaleLayout({
     <>
       <RememberLocale />
       <ActivePoller officialSiteUrl={officialSiteUrl} buildId={buildId} />
-      {/* Navbar sits directly in this column: its header is `sticky`, which
-          only stays pinned while its own parent is in view — nesting it
-          alongside `main` would unpin it once the footer came up. */}
       <div className="flex flex-col min-h-[100dvh] bg-page">
         <Navbar logoOnBlack={logoOnBlack} />
+        {/* Navbar's header is `sticky` on mobile (stays in flow, no spacer
+            needed) but `fixed` from `md:` up, where it drops out of flow —
+            this spacer reserves its md:h-14 there so content below (and
+            sticky offsets like `top-12`) sits exactly where it would if the
+            header were still in flow. */}
+        <div className="hidden md:block md:h-14 flex-shrink-0" aria-hidden="true" />
         {/* flex column so a page can claim leftover height with `flex-1`
             — see PressReleasesContent's article wrapper. */}
         <main className="flex-1 flex flex-col">{children}</main>

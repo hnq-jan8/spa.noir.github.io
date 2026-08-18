@@ -139,7 +139,7 @@ export default function HomeContent() {
         </p>
       </Reveal>
       <Reveal delay={50} className="relative mb-4">
-        <div className="relative z-[2] bg-surface rounded-2xl p-6">
+        <div className="relative z-[2] bg-surface rounded-2xl p-6 shadow-[0_0_6px_rgba(0,0,0,0.03)]">
           <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
             {Object.entries(data.common.contacts)
               .filter(([, value]) => value)
@@ -190,7 +190,7 @@ export default function HomeContent() {
           Settings-style, instead of three separate cards with gaps between
           them. */}
       <Reveal delay={100} className="min-[800px]:hidden mb-4">
-        <div className="bg-white rounded-2xl divide-y divide-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl divide-y divide-gray-100 overflow-hidden shadow-[0_0_6px_rgba(0,0,0,0.03)]">
           {browseItems.map((item) => (
             <Link
               key={item.href}
