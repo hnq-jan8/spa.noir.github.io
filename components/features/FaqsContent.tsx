@@ -203,14 +203,24 @@ export default function FaqsContent() {
   return (
     <div
       // Desktop pt only: engaging trims it from py-8's 32px down to 16px —
-      // the same top offset the field's own sticky wrapper (pt-4, below)
-      // already sits at once scrolled. Transitioning this one property
-      // slides the field *and* every card below it up together in a single
-      // animated reflow, landing them at exactly the natural scrolled-sticky
-      // gap rather than a hand-tuned distance that could drift out of sync
-      // with it.
+      // the same top offset the field's own sticky wrapper (pt-[18px],
+      // below) already sits at once scrolled. Transitioning this one
+      // property slides the field *and* every card below it up together
+      // in a single animated reflow, landing them at exactly the natural
+      // scrolled-sticky gap rather than a hand-tuned distance that could
+      // drift out of sync with it.
+      //
+      // md:pt-[18px], not md:pt-4: the field's sticky wrapper stops 2px
+      // short of flush against the nav on purpose (see its own top-[58px]
+      // below). Landing this transition exactly there — rather than at
+      // pt-4's plain 16px, 2px past it — means the field's natural
+      // (pre-clamp) position never dips below its sticky offset mid-
+      // transition; if it did, sticky would clamp the field's own visual
+      // motion to a stop early while this padding kept easing the cards
+      // below it for a few more frames, reading as the two falling out of
+      // sync right at the end of the animation.
       className={`container-page pb-8 md:pb-8 max-w-3xl mx-auto pt-4 transition-[padding-top] duration-300 ease-out ${
-        desktopFieldEngaged ? "md:pt-4" : "md:pt-8"
+        desktopFieldEngaged ? "md:pt-[18px]" : "md:pt-8"
       } ${desktopFieldEngaged || mobileSearchOpen ? "min-h-[100dvh]" : ""}`}
     >
       {/* While the search field is engaged (desktop: focused; mobile: the
@@ -321,29 +331,36 @@ export default function FaqsContent() {
         )}
       </div>
 
-      {/* Desktop: a single, permanently-`sticky` wrapper — engaging no
-          longer swaps it for a `fixed` one. The "docked" look on focus
-          comes entirely from the container's own pt transition above,
-          which pulls this (and everything below it) up into the same
-          top-14/pt-4 spot native scrolling would've stuck it at anyway. A
-          `fixed` branch used to stand in for that, but swapping between two
-          differently-shaped trees on every focus/blur made React tear down
-          and rebuild the subtree — including the <input> itself, dropping
-          focus the instant a click engaged it. One stable tree sidesteps
-          that entirely, and the field's relative offset from its own mask
-          never changes, so the mask no longer needs a second calibration
-          either. */}
-      <div className="hidden md:block sticky top-14 z-[9] pt-4 pb-6 -mt-4 -mb-2 pointer-events-none">
+      {/* Desktop: a single, permanently-`sticky` wrapper (swapping to
+          `fixed` on engage used to tear down and remount the <input>,
+          dropping focus). `top` transitions directly rather than riding
+          the container's pt animation — a plain untransitioned swap only
+          animated near scrollY 0; scrolled further down, sticky stayed
+          clamped the whole time and the swap just snapped. */}
+      <div
+        className={`hidden md:block sticky z-[9] pt-4 pb-6 -mt-4 -mb-2 pointer-events-none transition-[top] duration-300 ease-out ${
+          desktopFieldEngaged ? "top-[58px]" : "top-[72px]"
+        }`}
+      >
         <div className="relative">
           {/* Solid mask covers the band between the navbar and the field's
               own translucent + blurred surface, so the list scrolling
-              underneath doesn't show through the gap above it. It stops at
-              the field's vertical middle (field top +23px: pt-4's 16px
-              plus half of the ~46px-tall pill) so a question scrolling up
-              is hard-covered above that line and dissolves through the
+              underneath doesn't show through the gap above it. Sized for
+              the *unengaged* gap (top-[72px] above, 16px taller than the
+              engaged one) — the wider of the two — so it always reaches
+              all the way up to the nav's own bottom edge; overshooting
+              into the nav itself while engaged just paints over pixels
+              the nav (z-50, above this mask) already covers. Stops at the
+              field's vertical middle (field top +23px: pt-4's 16px plus
+              half of the ~46px-tall pill) so a question scrolling up is
+              hard-covered above that line and dissolves through the
               field's backdrop-blur below it, rather than being masked a
-              second time over the gap beneath the field. */}
-          <div className="absolute inset-x-0 -top-4 h-[39px] bg-page pointer-events-none" />
+              second time over the gap beneath the field.
+
+              -inset-x-2, not inset-x-0: cards below carry a 6px shadow
+              blur that bled past a flush-edged mask, right at the pill's
+              rounded corners. */}
+          <div className="absolute -inset-x-2 -top-8 h-[55px] bg-page pointer-events-none" />
           <SearchField
             query={query}
             onChange={setQuery}

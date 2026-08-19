@@ -85,6 +85,13 @@
     }
   }
 
+  /* MarkdownImage rounds every image by default (see components/ui/
+     MarkdownImage.tsx), which reads wrong on a full-bleed article where the
+     image is meant to reach the card's own edge. */
+  .press-article-card.full-bleed img {
+    border-radius: 0;
+  }
+
   .pill-badge {
     @apply border border-gray-400 rounded-full px-6 py-2.5 text-sm text-gray-700 text-center;
   }
