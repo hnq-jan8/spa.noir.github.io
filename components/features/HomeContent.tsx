@@ -23,14 +23,11 @@ export default function HomeContent() {
 
   if (!data) return failed ? <ContentLoadError /> : null;
 
-  // `?? {}` because assembleContentPayload drops a namespace entirely when it
-  // has no ui_labels rows — indexing into the missing object would throw.
-  // Same guard the Navbar/Footer/FAQ pages already use.
+  // `?? {}`: assembleContentPayload drops a namespace with no ui_labels rows.
   const nav = data.common.labels["nav"] ?? {};
   const home = data.home.labels["home"] ?? {};
   const support = data.common.labels["support"] ?? {};
-  // Same record the Official Updates timeline shows at the top, so the home
-  // card and the list can't drift apart in wording or truncation.
+  // Same record the timeline shows at the top, so the two can't drift apart.
   const latestUpdate = data.officialUpdates.updates[0] ?? null;
   const asOf = formatTimestamp(data.generatedAt, locale);
 
@@ -79,11 +76,9 @@ export default function HomeContent() {
         {latestUpdate ? (
           <CardLink
             href={`/${locale}/official-updates`}
-            // The left rule is a deliberate exception to the no-lines card
-            // rule — an emphasis accent, not an outline, marking the one card
-            // that must win the first glance. `update`/`updateHover` (see
-            // lib/theme-colors.js) instead of the shared white/cardHover pair
-            // since this is the only card with a warm surface.
+            // The left rule is a deliberate exception to the no-lines card rule:
+            // an accent, not an outline, on the one card that must win the first
+            // glance. Warm surface, hence update/updateHover.
             className="block border-l-4 border-l-amber-600 !bg-update hover:!bg-updateHover active:!bg-updateHover pb-4"
           >
             <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
@@ -93,9 +88,8 @@ export default function HomeContent() {
             <h2 className="font-bold text-lg mb-2 text-balance">
               {titleOf(latestUpdate)}
             </h2>
-            {/* The CMS preview excerpt, shown whole. It is already written
-                short by the editor, so clipping it behind a fade only hid the
-                end of a sentence that was sized to fit in the first place. */}
+            {/* Shown whole: the editor already writes this short, so clipping
+                it only cut a sentence that was sized to fit. */}
             <p className="text-sm text-gray-600 mb-2">
               {excerptOf(latestUpdate)}
             </p>
@@ -116,11 +110,9 @@ export default function HomeContent() {
         ) : (
           <button
             type="button"
-            // Deliberate exceptions to the no-lines card rule: the dashed
-            // outline is what reads as an empty slot rather than a card with
-            // nothing in it, and it stays silent on hover/active (it retries
-            // the fetch on tap) since a visible affordance here would promise
-            // content that isn't there.
+            // Exception to the no-lines card rule: the dashed outline is what
+            // reads as an empty slot. Silent on hover despite retrying on tap —
+            // an affordance here would promise content that isn't there.
             className="w-full flex items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400 text-left"
             onClick={() => invalidateContent()}
           >

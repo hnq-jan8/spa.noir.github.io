@@ -5,24 +5,15 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "spa:lastSeenUpdate";
 
 /**
- * Drives the "new official update" dot on the nav tab.
+ * Drives the "new official update" dot on the nav tab. `newestDate` can change
+ * mid-session (background content re-fetch), which is the case the badge
+ * exists for — hence a persisted timestamp, not an in-memory "seen" flag.
  *
- * content.json is re-fetched in the background (status.json poller →
- * syncContentSince), so `newestDate` can change mid-session without a
- * navigation. That's exactly the case the badge exists for, and it's why the
- * comparison is against a persisted timestamp rather than any in-memory
- * "seen" flag — a reload must not resurrect a dot the user already cleared.
- *
- * Three deliberate choices:
- *  - Reads localStorage in an effect, never during render, so the server-
- *    prerendered HTML and the first client paint agree (`ready` gates the
- *    badge off until after hydration).
- *  - A first-ever visit *seeds* the stored timestamp instead of badging.
- *    Otherwise every new visitor gets a dot for content they've never been
- *    told about, which makes it meaningless. The badge means strictly
- *    "something arrived since you were last here".
- *  - Compares with `>` rather than `!==`, so retracting the newest update
- *    (leaving an older one at the top) doesn't read as new content.
+ *  - localStorage is read in an effect, never during render, so prerendered
+ *    HTML and first paint agree (`ready` gates the badge until hydration).
+ *  - A first-ever visit seeds the timestamp instead of badging: the dot means
+ *    strictly "something arrived since you were last here".
+ *  - Compares with `>`, so retracting the newest update doesn't read as new.
  */
 export function useUnreadUpdate(
   newestDate: string | null | undefined,

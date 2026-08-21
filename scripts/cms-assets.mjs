@@ -1,16 +1,10 @@
 /**
- * Tải các file ảnh CMS (hiện tại: logo_on_black / logo_on_white) về đĩa lúc
- * build, thay vì để trình duyệt gọi thẳng URL Directus sống lúc runtime.
+ * Tải ảnh CMS (logo_on_black / logo_on_white) về đĩa lúc build, để site tĩnh
+ * không phụ thuộc Directus còn sống sau khi deploy — ảnh trước đây ref bằng
+ * URL tuyệt đối vào Directus, server tắt là ảnh vỡ.
  *
- * Lý do: site export tĩnh (GitHub Pages) nhưng ảnh CMS trước đây được ref
- * bằng URL tuyệt đối trỏ vào Directus server (thường chạy local qua tunnel
- * ngrok) — nếu server đó offline lúc người dùng xem trang thì ảnh vỡ. Tải
- * bytes về ghi vào output dir lúc build giúp static site không phụ thuộc
- * Directus còn sống sau khi deploy.
- *
- * Dùng chung bởi:
- *   - scripts/fetch-cms-assets.mjs (prebuild, ghi vào public/ — deploy-layout)
- *   - scripts/fetch-json.mjs       (content-only refresh, ghi vào out/ — deploy-content)
+ * Dùng chung bởi scripts/fetch-cms-assets.mjs (prebuild → public/) và
+ * scripts/fetch-json.mjs (content-only → out/).
  */
 import { writeFileSync, mkdirSync, readFileSync } from "fs";
 import { resolve } from "path";

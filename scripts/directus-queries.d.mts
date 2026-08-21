@@ -1,0 +1,9 @@
+export declare const LANGUAGES_QUERY: string;
+export declare const UI_LABELS_QUERY: string;
+export declare const OFFICIAL_UPDATES_QUERY: string;
+export declare const FLIGHTS_QUERY: string;
+export declare const FAQS_QUERY: string;
+export declare const PRESS_RELEASES_QUERY: string;
+export declare const SITE_CONFIG_QUERY: string;
+export declare const SITE_METADATA_QUERY: string;
+export declare const APP_SETTING_QUERY: string;

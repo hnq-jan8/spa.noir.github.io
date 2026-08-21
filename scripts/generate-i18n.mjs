@@ -13,13 +13,13 @@
 import { writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { LANGUAGES_QUERY, UI_LABELS_QUERY } from "./directus-queries.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
-// Chạy trước `next dev`/`next build` như 1 process Node riêng, nên không được
-// Next.js tự nạp .env.local giúp — tự nạp ở đây (bỏ qua nếu file không tồn tại,
-// vd trên CI thì DIRECTUS_URL/DIRECTUS_STATIC_TOKEN đã có sẵn trong env thật).
+// Process Node riêng, Next.js không nạp .env giúp — tự nạp ở đây (bỏ qua nếu
+// không có, vd trên CI đã có sẵn trong env thật).
 try {
   process.loadEnvFile(resolve(root, ".env.local"));
 } catch {}
@@ -39,14 +39,11 @@ async function get(path) {
 }
 
 const [languageRows, labelRows] = await Promise.all([
-  get(
-    "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true",
-  ),
-  get(
-    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true",
-  ),
+  get(LANGUAGES_QUERY),
+  get(UI_LABELS_QUERY),
 ]);
-if (!languageRows.length) throw new Error("Directus languages collection is empty");
+if (!languageRows.length)
+  throw new Error("Directus languages collection has no active language");
 
 const languages = languageRows.map((r) => ({
   code: r.code,
@@ -84,9 +81,8 @@ for (const { code } of languages) {
 }
 
 // ─── i18n/messages.generated.ts — bundle label catalog vào client bundle ────
-// Import tĩnh để Navbar/Footer render label ngay first paint (kể cả trong HTML
-// prerender), không phải chờ content.json; bản trong content.json (có thể mới
-// hơn) sẽ ghi đè khi fetch xong.
+// Import tĩnh để Navbar/Footer có label ngay first paint; content.json (mới
+// hơn) ghi đè khi fetch xong.
 const importLines = languages
   .map(({ code }, i) => `import m${i} from "@/messages/${code}.json";`)
   .join("\n");

@@ -32,22 +32,14 @@ export default function PressReleasesContent() {
 
   if (opened) {
     // A full-bleed article (blank title) reaches the navbar/footer below md,
-    // where there is no card box to sit inside — same handling as before the
-    // list existed.
+    // where there is no card box to sit inside.
     const isFullBleed = !opened.title || opened.title.trim().length === 0;
     return (
       <div
-        // Below md there's no white card (see press-article-card), so the
-        // wrapper itself carries the white background — otherwise the page's
-        // off-white bg-page would show through where a card used to be. The
-        // mobile breadcrumb (see Navbar) sits sticky right above this; the
-        // wrapper's white is pulled up to reach it directly (negative margin
-        // + equal padding), rendered behind it (z-0 vs z-10) so the pill
-        // stays on top. `flex-1` claims `main`'s leftover height (main is a
-        // flex column — see the locale layout) so a short article's white
-        // still reaches the footer instead of leaving the page's gray
-        // showing beneath it. Both variants share `md:max-w-6xl` so the
-        // reading width doesn't jump when switching between articles.
+        // Below md there's no card, so this wrapper carries the white itself:
+        // pulled up behind the sticky breadcrumb (negative margin + equal
+        // padding, z-0 under its z-10) and `flex-1` to claim main's leftover
+        // height, so a short article's white still reaches the footer.
         className={`relative z-0 flex-1 md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 ${
           isFullBleed ? "pb-0" : "pb-8"
         }`}

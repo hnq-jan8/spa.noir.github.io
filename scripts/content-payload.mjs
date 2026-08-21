@@ -1,15 +1,10 @@
 /**
- * Nguồn DUY NHẤT để lắp ráp content.json — dùng chung bởi:
- *   - lib/contentData.ts        (Next `build` → workflow deploy-layout)
- *   - scripts/fetch-json.mjs    (Node thuần, không build → workflow deploy-content)
+ * Nguồn duy nhất lắp ráp content.json, dùng chung bởi lib/buildContentPayload.ts
+ * (`next build` → deploy-layout) và scripts/fetch-json.mjs (deploy-content).
  *
- * Đặt trong scripts/ vì deploy-content chỉ `sparse-checkout: scripts`, không thể
- * với tới lib/. Mỗi bên tự fetch dữ liệu Directus theo cách của mình rồi truyền
- * data thô vào assembleContentPayload() — cấu trúc payload + danh sách namespace
- * chỉ định nghĩa ở một chỗ, sửa route/field/label chỉ cần đụng file này.
- *
- * File .mjs (ESM thuần, không TypeScript / path-alias / next-intl) để chạy được
- * cả trong `next build` lẫn `node scripts/fetch-json.mjs`. Kiểu TS ở content-payload.d.mts.
+ * Nằm trong scripts/ vì deploy-content chỉ `sparse-checkout: scripts`, và là
+ * .mjs thuần (không TS/path-alias) để chạy được ở cả hai đường. Kiểu TS ở
+ * content-payload.d.mts.
  */
 
 /** Namespace của ui_labels được nhúng vào từng phần của content.json. */
@@ -58,10 +53,8 @@ function i18nMap(translations, field) {
 }
 
 /**
- * Như i18nMap nhưng cho field kiểu file (preview_image): đổi UUID thành URL
- * asset đầy đủ của Directus, giống cách assetUrl() trong lib/directus.ts làm
- * cho logo. Ảnh trỏ thẳng sang Directus — MarkdownImage/PreviewImage phía
- * client đã có sẵn nhánh xử lý khi ảnh hỏng, nên host chết không làm vỡ layout.
+ * Như i18nMap nhưng cho field file (preview_image): UUID → URL asset Directus.
+ * Ảnh trỏ thẳng sang Directus; MarkdownImage/PreviewImage đã xử lý ảnh hỏng.
  */
 function i18nAsset(translations, field, directusUrl) {
   return Object.fromEntries(
@@ -72,9 +65,7 @@ function i18nAsset(translations, field, directusUrl) {
   );
 }
 
-/**
- * Lắp ráp toàn bộ payload content.json từ data thô của Directus.
- */
+/** Lắp ráp toàn bộ payload content.json từ data thô của Directus. */
 export function assembleContentPayload({
   generatedAt,
   officialUpdates,
@@ -109,9 +100,8 @@ export function assembleContentPayload({
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.common),
     },
     home: {
-      // Không lặp lại bản cập nhật mới nhất ở đây nữa — trang chủ đọc thẳng
-      // officialUpdates.updates[0] để card ngoài trang chủ và mục đầu tiên
-      // của timeline không thể lệch nhau (tiêu đề, đoạn preview, ảnh).
+      // Trang chủ đọc thẳng officialUpdates.updates[0] để card trang chủ và
+      // mục đầu timeline không lệch nhau.
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.home),
     },
     faqs: {
@@ -148,8 +138,7 @@ export function assembleContentPayload({
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.officialUpdates),
     },
     pressReleases: {
-      // Toàn bộ thông cáo, giữ nguyên thứ tự `sort` do biên tập viên đặt —
-      // bài đầu tiên là bài được làm nổi bật ở đầu danh sách.
+      // Giữ nguyên thứ tự `sort` của biên tập viên; bài đầu là bài nổi bật.
       releases: pressReleases.map((r) => ({
         id: String(r.id),
         slug: r.slug || String(r.id),

@@ -100,11 +100,9 @@
     @apply text-2xl font-bold text-gray-900 mb-4;
   }
 
-  /* For scroll areas that render content behind an absolute/blurred overlay
-     (e.g. the timeline detail modal header) — the native scrollbar belongs
-     to the whole scrolling box, so with a header overlaid on top of it the
-     scrollbar's top portion renders stuck behind that header. Hiding it
-     avoids that visual clash; the area is still scrollable by wheel/touch. */
+  /* The navbar's horizontal tab strip scrolls but must not show a scrollbar
+     across the chrome; it stays scrollable by wheel/touch, and the gradient
+     + arrow buttons signal the overflow instead. */
   .scrollbar-hide {
     scrollbar-width: none;
     -ms-overflow-style: none;

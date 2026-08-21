@@ -8,23 +8,17 @@ interface MarkdownContentProps {
   className?: string;
 }
 
-// Defined once at module scope, not inline in the JSX below. React identifies a
-// component by the function itself, so rebuilding this map on every render
-// would hand React a brand new type for every tag each time and make it throw
-// the rendered markdown away and mount it again from scratch — discarding the
-// children's state with it, which MarkdownImage relies on to remember that a
-// load already failed. None of these close over props, so there is nothing to
-// rebuild per render anyway. Same reasoning for the plugin arrays.
+// Module scope, not inline: React keys components by identity, so rebuilding
+// this map per render would remount all the rendered markdown and discard
+// MarkdownImage's memory of a failed load. Same for the plugin arrays.
 const REMARK_PLUGINS = [remarkGfm];
 const REHYPE_PLUGINS = [rehypeRaw];
 
-// Directus's editor reformats saved HTML on every save (one attribute per
-// line, two-space nesting indent), which trips two CommonMark rules: a blank
-// line inside a tag's attributes ends its HTML block early (e.g.
-// `<img\nsrc="...">` loses its src), and 4+ leading spaces reads as an
-// indented code block instead of HTML. Collapsing in-tag whitespace and
-// dedenting tag-opening lines neutralizes both. Fenced code blocks are
-// skipped so real code samples aren't reflowed.
+// Directus's editor reformats saved HTML (one attribute per line, indented
+// nesting), which trips two CommonMark rules: a blank line inside a tag's
+// attributes ends its HTML block early, and 4+ leading spaces read as a code
+// block. Collapsing in-tag whitespace and dedenting fixes both; fenced code
+// blocks are skipped so real samples aren't reflowed.
 function normalizeRawHtmlWhitespace(content: string): string {
   const segments = content.split(/(```[\s\S]*?```)/g);
   return segments
@@ -39,9 +33,8 @@ function normalizeRawHtmlWhitespace(content: string): string {
     .join("");
 }
 
-// Forwarding `style` lets raw HTML in the CMS content (e.g. a hand-authored
-// `<h1 style="font-size:56px">`) override these defaults instead of having
-// its inline styles silently dropped.
+// Forwarding `style` lets hand-authored HTML in the CMS override these
+// defaults instead of having its inline styles dropped.
 const COMPONENTS: Components = {
   h1: ({ children, style }) => (
     <h2 className="text-xl font-bold mt-6 mb-2" style={style}>

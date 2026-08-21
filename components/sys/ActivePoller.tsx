@@ -7,12 +7,9 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const POLL_INTERVAL_MS = 30_000;
 const RELOAD_COOLDOWN_MS = 15_000;
 
-// Nếu bundle mà tab này đang chạy cũ hơn buildId sống (full rebuild vừa
-// deploy), tự reload cứng — tránh phải F5 tay hoặc thấy asset cũ (logo,
-// label...) kẹt lại vì Next không tự re-render lại layout khi chỉ điều hướng
-// SPA giữa các trang con. Guard bằng sessionStorage giống
-// cssRecoveryScript/chunkRecoveryScript trong app/layout.tsx — cùng pattern,
-// tránh reload loop nếu status.json trả buildId không ổn định.
+// Bundle của tab này cũ hơn buildId sống (vừa có full rebuild) thì reload cứng
+// — điều hướng SPA không re-render layout nên logo/label cũ sẽ kẹt lại. Guard
+// bằng sessionStorage như cssRecoveryScript trong app/layout.tsx.
 function reloadOnceGuarded(key: string) {
   try {
     const last = sessionStorage.getItem(key);

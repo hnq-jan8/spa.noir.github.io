@@ -1,14 +1,11 @@
-// Shared timing for the "smooth expand/collapse" effect used by
-// grid-template-rows 0fr/1fr accordions (see components/ui/FaqAccordion.tsx)
-// and by any JS-driven motion that needs to land on the exact same curve
-// (e.g. a FLIP transform animating siblings pushed by an expanding panel).
+// Shared timing for the grid-template-rows 0fr/1fr expand/collapse and for any
+// JS-driven motion that has to land on the same curve (e.g. FaqAccordion's FLIP
+// transforms).
 //
-// The negative delay is the trick: setting delay to -EXPAND_HALF_MS makes
-// the browser evaluate the transition as if half the duration had already
-// elapsed on the very first rendered frame, so only the decelerating back
-// half of the ease-out curve actually gets painted. Half as many frames
-// need a layout recalc per toggle. (Tried swapping this for an honest full
-// curve at half the duration instead — felt laggier in practice, reverted.)
+// The negative delay is the trick: -EXPAND_HALF_MS makes the browser start the
+// transition already half-elapsed, so only the decelerating half of the curve
+// is painted — half as many layout recalcs per toggle. (An honest full curve at
+// half the duration felt laggier.)
 export const EXPAND_DURATION_MS = 300;
 export const EXPAND_HALF_MS = EXPAND_DURATION_MS / 2;
 export const EXPAND_EASE = "ease-out";

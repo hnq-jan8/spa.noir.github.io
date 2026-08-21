@@ -10,13 +10,21 @@ import { writeFileSync, readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { assembleContentPayload } from "./content-payload.mjs";
+import {
+  LANGUAGES_QUERY,
+  UI_LABELS_QUERY,
+  OFFICIAL_UPDATES_QUERY,
+  FLIGHTS_QUERY,
+  FAQS_QUERY,
+  PRESS_RELEASES_QUERY,
+  SITE_CONFIG_QUERY,
+  APP_SETTING_QUERY,
+} from "./directus-queries.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
-// Process Node riêng, không được Next.js tự nạp .env.local — tự nạp ở đây
-// (bỏ qua nếu không có, vd trên CI đã có sẵn trong env thật). Xem
-// scripts/generate-i18n.mjs — cùng pattern.
+// Process Node riêng, Next.js không nạp .env giúp — xem scripts/generate-i18n.mjs.
 try {
   process.loadEnvFile(resolve(root, ".env.local"));
 } catch {}
@@ -40,7 +48,7 @@ async function get(path) {
 async function getActive() {
   const nonce = Date.now().toString();
   const res = await fetch(
-    `${BASE}/items/app_setting?fields=active&_=${nonce}`,
+    `${BASE}${APP_SETTING_QUERY}&_=${nonce}`,
     {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
@@ -64,28 +72,14 @@ const [
   languageRows,
   labelRows,
 ] = await Promise.all([
-  get(
-    "/items/official_updates?fields=id,date,translations.languages_code,translations.title,translations.description,translations.preview_excerpt,translations.preview_image&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
-  ),
-  get(
-    "/items/flights?fields=flight_no,aircraft_type,capacity,dep,arr,srtd,atd,note&sort=sort&filter[deleted_at][_null]=true",
-  ),
-  get(
-    "/items/faqs?fields=translations.languages_code,translations.question,translations.answer&sort=sort&filter[deleted_at][_null]=true",
-  ),
-  get(
-    "/items/press_releases?fields=id,slug,published_at,translations.languages_code,translations.title,translations.body,translations.preview_excerpt,translations.preview_image&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
-  ),
-  get(
-    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy",
-  ),
+  get(OFFICIAL_UPDATES_QUERY),
+  get(FLIGHTS_QUERY),
+  get(FAQS_QUERY),
+  get(PRESS_RELEASES_QUERY),
+  get(SITE_CONFIG_QUERY),
   getActive(),
-  get(
-    "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true",
-  ),
-  get(
-    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true",
-  ),
+  get(LANGUAGES_QUERY),
+  get(UI_LABELS_QUERY),
 ]);
 
 // ─── Build content.json payload (dùng chung scripts/content-payload.mjs) ──────
@@ -104,10 +98,8 @@ const contentPayload = assembleContentPayload({
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
-// buildId chỉ đổi khi có full rebuild thật (bundle JS/HTML mới) — content-only
-// deploy này không chạy `next build` nên phải giữ nguyên giá trị đã build sẵn
-// trong out/status.json (artifact của lần deploy-layout gần nhất), không tự
-// sinh giá trị mới. Xem lib/buildMode.ts.
+// buildId chỉ đổi khi có full rebuild — deploy content-only phải giữ nguyên
+// giá trị trong out/status.json, không tự sinh mới. Xem lib/buildMode.ts.
 const outDir = resolve(root, "out");
 let buildId = "dev";
 try {

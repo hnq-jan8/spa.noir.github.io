@@ -9,14 +9,9 @@ function pick<T>(map: I18n<T>, locale: string): T {
 }
 
 /**
- * Same as `pick`, but for fields every consumer treats as a plain string.
- *
- * The CMS lets an editor save an article with an empty body (and a locale can
- * be missing its translation row entirely), so these arrive as `null`/absent
- * even where the shape suggests otherwise. Downstream code calls string
- * methods on them directly — `body.trim()` for reading time, `body.match()`
- * for the fallback heading — so a null here took the whole page down with a
- * client-side exception rather than degrading to an article with no body.
+ * Same as `pick`, but coerces to a string: the CMS accepts an empty body and a
+ * locale can be missing its translation row entirely, while consumers call
+ * string methods (`body.trim()`, `body.match()`) on the result directly.
  */
 function pickText(map: I18n<string | null> | undefined, locale: string): string {
   return (map ? pick(map, locale) : null) ?? "";
@@ -191,9 +186,8 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
   return {
     generatedAt: payload.generatedAt,
     common: {
-      // site_config's hotline/email fields are nullable — a cleared one used
-      // to reach `value.includes("@")` in the footer/homepage contact grids
-      // and crash the page. Coerce to "" here; both grids skip empties.
+      // site_config's hotline/email fields are nullable, and the contact grids
+      // call string methods on them. Coerce to ""; both grids skip empties.
       contacts: Object.fromEntries(
         Object.entries(payload.common.contacts).map(([k, v]) => [k, v ?? ""]),
       ) as ContentContacts,
@@ -205,9 +199,8 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
       labels: resolveLabels(payload.home.labels, locale),
     },
     faqs: {
-      // searchText spans every locale's question + answer, not just the
-      // page's own — so typing an English word still surfaces its Vietnamese
-      // translation (same FAQ item) when browsing /vi, and vice versa.
+      // searchText spans every locale, so a query in one language still finds
+      // the same item's translation in another.
       faqs: payload.faqs.faqs.map((f) => ({
         question: pickText(f.question, locale),
         answer: pickText(f.answer, locale),

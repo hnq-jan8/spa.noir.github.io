@@ -21,9 +21,8 @@ export interface BuildMode {
 
 let cached: BuildMode | null = null;
 
-// Manifest do scripts/fetch-cms-assets.mjs ghi lúc prebuild (tải favicon +
-// logo về public/cms-assets/) — dùng chung cho mọi asset CMS baked lúc build,
-// tránh URL Directus sống vỡ nếu server offline lúc user xem site.
+// Manifest do scripts/fetch-cms-assets.mjs ghi lúc prebuild — tránh URL
+// Directus sống vỡ nếu server offline lúc user xem site.
 function resolveCmsAsset(id: string | null): string | null {
   if (!id) return null;
   try {

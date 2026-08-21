@@ -14,10 +14,7 @@ import { downloadCmsAssets } from "./cms-assets.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
-// Chạy trước `next build` như 1 process Node riêng, nên không được Next.js tự
-// nạp .env.local giúp — tự nạp ở đây (bỏ qua nếu file không tồn tại, vd trên
-// CI thì DIRECTUS_URL/DIRECTUS_STATIC_TOKEN đã có sẵn trong env thật). Xem
-// scripts/generate-i18n.mjs — cùng pattern.
+// Process Node riêng, Next.js không nạp .env giúp — xem scripts/generate-i18n.mjs.
 try {
   process.loadEnvFile(resolve(root, ".env.local"));
 } catch {}

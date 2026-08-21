@@ -3,23 +3,17 @@
 import { useEffect, useState } from "react";
 
 /**
- * Whether the mobile breadcrumb pill (see Navbar) should render itself
- * `invisible` — kept mounted (so its layout space doesn't reflow the page
- * underneath) but painting and hit-testing nothing.
+ * Whether the mobile breadcrumb pill (Navbar) should render `invisible` —
+ * mounted, so its layout space stays, but painting nothing.
  *
- * Lives in a module-level store rather than page state because the
- * breadcrumb is rendered by Navbar — a sibling of the page content, not an
- * ancestor — so a page that needs to hide it (the FAQs mobile search capsule
- * expands directly over that row) has no React tree path to reach it, the
- * same problem useArticleRoute solves for the open-article key.
+ * Module-level because Navbar is a sibling of the page content: a page that
+ * needs the row (the FAQs search capsule) has no tree path to it — the same
+ * problem useArticleRoute solves for the open-article key.
  *
- * A z-index mask alone isn't enough: iOS Safari's overscroll/rubber-band
- * bounce can shift `fixed` and `sticky` layers out of sync for a frame,
- * letting the breadcrumb show through beneath the mask. `visibility:hidden`
- * sidesteps that — nothing is painted regardless of layer alignment.
+ * A z-index mask isn't enough: iOS Safari's rubber-band bounce can desync
+ * fixed/sticky layers for a frame and let the breadcrumb through.
  *
- * Counted rather than boolean so two independent callers can't stomp on
- * each other's hide/show.
+ * Counted, not boolean, so two callers can't stomp on each other.
  */
 let hiddenCount = 0;
 const listeners = new Set<() => void>();

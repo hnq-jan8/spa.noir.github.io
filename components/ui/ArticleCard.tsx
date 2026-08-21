@@ -6,10 +6,9 @@ import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
 
 /**
- * Preview image with the same terminal-failure handling as MarkdownImage:
- * the images live on the Directus host, which can be unreachable from a
- * visitor's network even when the static site itself loads fine. Falling back
- * to a neutral placeholder keeps the card's geometry instead of collapsing it.
+ * Same failure handling as MarkdownImage: images live on the Directus host,
+ * which can be unreachable even when the static site loads fine. The
+ * placeholder keeps the card's geometry instead of collapsing it.
  */
 function PreviewImage({
   src,
@@ -31,11 +30,8 @@ function PreviewImage({
       </div>
     );
   }
-  // The zoom-on-hover transform is scoped to this wrapper's own fixed box
-  // (bleeding-hidden, sized by `className`) rather than applied to the
-  // <img> directly — otherwise the enlarged image has no crop boundary of
-  // its own and grows into the text column next to it instead of zooming
-  // in place.
+  // The hover zoom needs this fixed, overflow-hidden box to crop against —
+  // on the <img> alone it grows into the text column instead of zooming.
   return (
     <div className={`${className} overflow-hidden bg-gray-100`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -51,9 +47,8 @@ function PreviewImage({
 }
 
 /**
- * Strips markdown syntax so an auto-generated excerpt reads as plain prose.
- * CMS bodies also contain raw HTML (authors paste `<img>`/`<br>` directly),
- * which has to go too — otherwise the excerpt renders as visible tag soup.
+ * Strips markdown *and* raw HTML (authors paste `<img>`/`<br>` into CMS
+ * bodies) so an auto-generated excerpt reads as plain prose.
  */
 function toPlainText(markdown: string) {
   return markdown
@@ -73,16 +68,14 @@ function toPlainText(markdown: string) {
 /**
  * Heading to show on a list card.
  *
- * A blank `title` is the CMS's full-bleed convention — the body carries its
- * own hero headline instead. That works on the article page, but leaves a
- * list card with no heading at all, so fall back to the body's first
- * markdown heading, which is where that hero headline actually lives.
+ * A blank `title` is the CMS's full-bleed convention: the body carries its own
+ * hero headline. Fine on the article page, but a list card needs a heading, so
+ * fall back to the body's first heading.
  */
 export function titleOf(article: ResolvedArticle): string | null {
   const explicit = article.title?.trim();
   if (explicit) return explicit;
-  // Markdown heading first, then an HTML one — full-bleed CMS articles are
-  // often hand-written HTML, so `# ...` alone misses their actual headline.
+  // HTML too: full-bleed articles are often hand-written, so `# ...` misses them.
   const heading =
     article.body.match(/^\s{0,3}#{1,6}\s+(.+)$/m) ??
     article.body.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
@@ -94,8 +87,7 @@ export function titleOf(article: ResolvedArticle): string | null {
 export function excerptOf(article: ResolvedArticle, max = 180) {
   const explicit = article.previewExcerpt?.trim();
   if (explicit) return explicit;
-  // No hand-written excerpt — fall back to the body so older entries, and
-  // anything an editor publishes in a hurry, still show something useful.
+  // No hand-written excerpt — fall back to the body.
   const plain = toPlainText(article.body);
   return plain.length > max ? `${plain.slice(0, max).trimEnd()}…` : plain;
 }
@@ -124,9 +116,8 @@ export default function ArticleCard({
     <button
       type="button"
       onClick={onOpen}
-      // Row cards carry no padding either: the thumbnail runs flush to the
-      // top, left and bottom edges, and the text block supplies its own
-      // insets. overflow-hidden clips the image to the rounded corners.
+      // No padding on the card: the thumbnail runs flush to its edges and the
+      // text block supplies its own insets.
       className={`group w-full text-left bg-white rounded-2xl overflow-hidden shadow-[0_0_6px_rgba(0,0,0,0.03)] transition-colors hover:bg-cardHover active:bg-cardHover ${
         featured ? "" : "flex items-stretch"
       }`}

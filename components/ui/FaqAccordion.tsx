@@ -24,9 +24,8 @@ function AccordionPanel({
   panelId: string;
   children: React.ReactNode;
 }) {
-  // grid-rows 0fr/1fr trick (no JS height measuring). min-h-0 on the inner
-  // wrapper is required or the track never reaches 0fr. See
-  // lib/expandTransition.ts for the negative-delay timing trick.
+  // grid-rows 0fr/1fr, no JS measuring (lib/expandTransition.ts). min-h-0 on
+  // the inner wrapper is required or the track never reaches 0fr.
   return (
     <div
       id={panelId}
@@ -47,38 +46,27 @@ export default function FaqAccordion({
   reopenFirstSignal,
 }: {
   items: FaqItem[];
-  /** Skip when the caller already knows the first item is the same one
-   * that was showing before this remount (e.g. narrowing a search without
-   * the top result changing) — opens it plainly instead of replaying the
-   * expand-in, since nothing actually changed for the reader to notice. */
+  /** False when the first item is the same one that was already showing —
+   * opens it plainly instead of replaying the expand-in. */
   animateFirstOpen?: boolean;
-  /** Reports whenever item 0's open state changes, so a non-remounting
-   * caller (this component doesn't own that decision — see FaqsContent's
-   * own `animateFirstOpen` computation) can tell a plain unchanged-question
-   * remount apart from one where the reader had actually closed it. */
+  /** Reports item 0's open state so a non-remounting caller can tell an
+   * unchanged remount apart from one the reader had closed. */
   onFirstItemOpenChange?: (isOpen: boolean) => void;
-  /** Bump (e.g. pass the applied search string) whenever a new search just
-   * resolved, even one that left the result set untouched — a change here
-   * re-opens item 0 if it's currently closed, as confirmation the search
-   * actually re-ran. Only acts on updates, not the mount that first sets
-   * it, so it never fights animateFirstOpen's own opening sequence. */
+  /** Bump on every resolved search, even one that left the results untouched:
+   * re-opens a closed item 0 as confirmation the search re-ran. Updates only,
+   * so it never fights animateFirstOpen on mount. */
   reopenFirstSignal?: string | number;
 }) {
-  // Starts closed (not item 0 open) only when animating in — the mount
-  // effect below needs somewhere to animate *from*. Otherwise item 0 opens
-  // immediately, unanimated, same as a plain `defaultOpen`.
+  // Starts closed when animating in, so the mount effect has somewhere to
+  // animate from; otherwise item 0 is open immediately.
   const [openSet, setOpenSet] = useState<Set<number>>(() =>
     animateFirstOpen ? new Set() : new Set(items.length > 0 ? [0] : []),
   );
 
-  // FLIP: growing/shrinking a panel pushes every card below it through
-  // normal flow, which forces the browser to recompute their position on
-  // every animation frame (the actual jank source on mobile Safari — a
-  // single card's own layout is cheap, but reflowing the whole list below
-  // it every frame isn't). Instead we let the DOM jump straight to the new
-  // layout in one reflow, then paper over the jump by animating each
-  // shifted card's `transform` from its old position back to zero —
-  // transform runs on the compositor, not main-thread layout.
+  // FLIP: a panel resizing reflows every card below it on each frame — the
+  // jank source on mobile Safari. Let the DOM jump to the new layout in one
+  // reflow, then animate each shifted card's `transform` back to zero, which
+  // runs on the compositor instead.
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const prevRects = useRef<Map<number, number>>(new Map());
   const cancelRef = useRef(0);
@@ -101,10 +89,8 @@ export default function FaqAccordion({
     });
   };
 
-  // Plays the first card's own expand transition in on mount, standing in
-  // for a generic fade/slide reveal of the whole list. Double rAF (same
-  // trick as components/ui/Reveal.tsx) so Safari doesn't coalesce the
-  // initial paint with the very next frame and skip straight to open.
+  // The first card's expand stands in for a reveal of the whole list. Double
+  // rAF (as in Reveal.tsx) so Safari doesn't coalesce it into the first paint.
   useEffect(() => {
     if (!animateFirstOpen || items.length === 0) return;
     const outer = requestAnimationFrame(() => {
@@ -124,12 +110,9 @@ export default function FaqAccordion({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openSet]);
 
-  // Every applied search re-opens a closed item 0 — a plain state flip,
-  // not the mount effect's double-rAF dance, since the instance is already
-  // live and a normal isOpen:false→true change is all the CSS transition
-  // needs to catch. Skips its own mount firing (every effect runs once
-  // then) so it doesn't race the entrance animation above when both are
-  // triggered by the same first search.
+  // Every applied search re-opens a closed item 0 — a plain state flip, since
+  // the instance is already live. Skips its own mount run so it doesn't race
+  // the entrance animation above.
   const hasHandledMountRef = useRef(false);
   useEffect(() => {
     if (!hasHandledMountRef.current) {
@@ -178,12 +161,9 @@ export default function FaqAccordion({
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
-          // Rounded on the button itself, not just the card: the focus
-          // outline follows a button's *own* border-radius, so without this
-          // it stayed square and got hard-cut by the card's overflow-hidden.
-          // Top/bottom as separate longhands (not one `rounded-2xl` toggle)
-          // so the bottom pair can transition instead of snapping — square
-          // when open, since that edge then borders the answer panel.
+          // Rounded on the button itself: the focus outline follows the
+          // button's own radius, not the card's. Top/bottom as separate
+          // longhands so the bottom pair can transition when the panel opens.
           className={`w-full rounded-t-2xl ${isOpen ? "rounded-b-none" : "rounded-b-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-[background-color,border-radius] duration-300 ease-out hover:bg-cardHover active:bg-cardHover`}
           onClick={() => toggle(i)}
         >

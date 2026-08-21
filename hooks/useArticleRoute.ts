@@ -8,18 +8,13 @@ export const ARTICLE_PARAM = "a";
 /**
  * Which article the detail view is showing, kept in the URL query string.
  *
- * The site is a static export whose article text only exists in content.json
- * (fetched at runtime), so per-article HTML files would buy no SEO while
- * breaking the content-only deploy path — a release published through that
- * fast pipeline would 404 against a route list frozen at build time. Keeping
- * the key in a query param means every article is reachable from the one
- * prerendered page, so publishing stays a content-only deploy.
+ * Per-article routes would freeze the route list at build time, so an article
+ * published through the content-only deploy would 404. A query param keeps
+ * every article reachable from the one prerendered page.
  *
- * The open key lives in a module-level store rather than component state
- * because things outside the article page need it: the language selector has
- * to carry `?a=` across a locale switch, and the nav has to clear it when you
- * re-click the tab you're already on. Neither of those can see React state
- * owned by the page component.
+ * Module-level, not component state: the language selector (carrying `?a=`
+ * across a locale switch) and the nav (clearing it) both live outside the
+ * article page.
  */
 let currentKey: string | null = null;
 let initialised = false;
@@ -42,14 +37,9 @@ function setKey(next: string | null) {
 }
 
 /**
- * Bound once, ever, from the first `useArticleKey` mount — not from
- * `useArticleRoute`, which only the article-list pages call. Back/forward
- * can return to an article page from a tab (home, FAQs, flight info) that
- * never mounted that hook, so a listener scoped to the article page's own
- * lifetime would already be gone by the time the popstate for that came in,
- * leaving `currentKey` stuck at whatever `clearArticleRoute` last set it to
- * even though the URL bar is back to `?a=...`. A permanent, module-level
- * listener has no such gap.
+ * Bound once from the first `useArticleKey` mount, and never unbound: back/
+ * forward can return to an article from a tab that never mounted the article
+ * page, so a listener scoped to that page's lifetime would already be gone.
  */
 function bindPopstate() {
   if (popstateBound || typeof window === "undefined") return;
@@ -58,10 +48,9 @@ function bindPopstate() {
 }
 
 /**
- * Drops the detail view without touching history — for when something else
- * (a next/link nav) is already changing the URL. Clearing on *any* nav click
- * is what makes re-clicking the current tab behave like "back to list":
- * the pathname doesn't change, so nothing would otherwise remount.
+ * Drops the detail view without touching history, for when a next/link nav is
+ * already changing the URL. Clearing on any nav click is what makes
+ * re-clicking the current tab read as "back to list".
  */
 export function clearArticleRoute() {
   setKey(null);

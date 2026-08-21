@@ -1,3 +1,15 @@
+import {
+  LANGUAGES_QUERY,
+  UI_LABELS_QUERY,
+  OFFICIAL_UPDATES_QUERY,
+  FLIGHTS_QUERY,
+  FAQS_QUERY,
+  PRESS_RELEASES_QUERY,
+  SITE_CONFIG_QUERY,
+  SITE_METADATA_QUERY,
+  APP_SETTING_QUERY,
+} from "../scripts/directus-queries.mjs";
+
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
 
@@ -128,55 +140,39 @@ export interface UiLabel {
 // ─── Fetch functions (một lần gọi, đủ tất cả locale) ─────────────────────────
 
 export async function getOfficialUpdates(): Promise<OfficialUpdate[]> {
-  return get(
-    "/items/official_updates?fields=id,date,translations.languages_code,translations.title,translations.description,translations.preview_excerpt,translations.preview_image&sort=-date&filter[status][_eq]=published&filter[deleted_at][_null]=true",
-  );
+  return get(OFFICIAL_UPDATES_QUERY);
 }
 
 export async function getFlights(): Promise<Flight[]> {
-  return get(
-    "/items/flights?fields=flight_no,aircraft_type,capacity,dep,arr,srtd,atd,note&sort=sort&filter[deleted_at][_null]=true",
-  );
+  return get(FLIGHTS_QUERY);
 }
 
 export async function getFaqs(): Promise<Faq[]> {
-  return get(
-    "/items/faqs?fields=translations.languages_code,translations.question,translations.answer&sort=sort&filter[deleted_at][_null]=true",
-  );
+  return get(FAQS_QUERY);
 }
 
 export async function getPressReleases(): Promise<PressRelease[]> {
-  return get(
-    "/items/press_releases?fields=id,slug,published_at,translations.languages_code,translations.title,translations.body,translations.preview_excerpt,translations.preview_image&sort=sort&filter[status][_eq]=published&filter[deleted_at][_null]=true",
-  );
+  return get(PRESS_RELEASES_QUERY);
 }
 
 export async function getSiteConfig(): Promise<SiteConfig> {
-  return get(
-    "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy",
-  );
+  return get(SITE_CONFIG_QUERY);
 }
 
 export async function getSiteMetadata(): Promise<SiteMetadata> {
-  return get(
-    "/items/site_metadata/1?fields=official_site_url,favicon,logo_on_black,logo_on_white,translations.languages_code,translations.seo_title,translations.seo_description",
-  );
+  return get(SITE_METADATA_QUERY);
 }
 
 export async function getIsActiveFromAppSetting(): Promise<AppSetting> {
-  return get("/items/app_setting?fields=active", { bustCache: true });
+  return get(APP_SETTING_QUERY, { bustCache: true });
 }
 
 export async function getLanguages(): Promise<Language[]> {
-  return get(
-    "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true",
-  );
+  return get(LANGUAGES_QUERY);
 }
 
 export async function getUiLabels(): Promise<UiLabel[]> {
-  return get(
-    "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true",
-  );
+  return get(UI_LABELS_QUERY);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -133,14 +133,9 @@ export default function FlightTable({
         })}
       </div>
 
-      {/* Desktop / tablet, single flight: rotated — one field per row instead
-          of one column per field. An 8-column table for a single line of
-          data is a header row looking for the rest of its rows; turning the
-          columns into rows keeps it a plain <table> (no card chrome of its
-          own — it sits directly in FlightInfoContent's card) while reading
-          as a short fact list instead of a stretched-out grid. No/STT is
-          dropped (it only ever numbered rows against each other); Flight No
-          pairs with Route, and Type pairs with Capacity, on one row each. */}
+      {/* Single flight, md+: rotated to one field per row — an 8-column table
+          for one line of data reads as a header looking for its rows. No/STT is
+          dropped, since it only numbered rows against each other. */}
       {rows.length === 1 ? (
         <div className="hidden md:block">
           <table className="w-full max-w-2xl text-sm text-left">
@@ -153,18 +148,11 @@ export default function FlightTable({
                   {h.flightNo}
                 </th>
                 <td className="py-2">
-                  {/* py-2, not py-3 like the other rows: the badge's own
-                      py-1 already adds height on top of the shared 20px line
-                      box, so matching the other rows' py-3 here would make
-                      this row visibly taller than the rest. py-2 makes the
-                      total (badge height + padding) come out equal.
-                      Both spans share `leading-5` so their line boxes are the
-                      same height despite the 14px/12px font-size difference —
-                      centering two mismatched line-heights with items-center
-                      (or aligning their baselines, which differ by font metric
-                      even at matched line-height) is what read as "the badge
-                      sits lower" before; equal line-height makes items-center
-                      exact regardless of font metrics. */}
+                  {/* py-2, not py-3: the badge's own py-1 already adds height,
+                      so this row would end up taller than the others. Both spans
+                      share `leading-5` so their line boxes match despite the
+                      font-size difference — otherwise items-center reads as the
+                      badge sitting low. */}
                   <span className="inline-flex items-center gap-3">
                     <span className="font-medium text-gray-900 leading-5">
                       {rows[0].flightNo}
@@ -232,27 +220,20 @@ export default function FlightTable({
         </div>
       ) : (
         <div className="hidden md:block -mx-6">
-          {/* `clip` rather than `auto`: it is not a scrolling value, so this
-              box never becomes a scroll container and the sticky header below
-              keeps resolving against the viewport at every width. It still
-              stops an unusually wide row from spilling outside the card. No
-              height cap either, so the page is the only thing that scrolls
-              vertically. */}
+          {/* `clip`, not `auto`: it never becomes a scroll container, so the
+              sticky header below keeps resolving against the viewport while a
+              too-wide row still can't spill out of the card. */}
           <div className="overflow-x-clip px-6">
-            {/* Tighter column gaps below lg (see pr-4) drop the natural width
-                to ~591px, inside the ~672px available at 768px — that is what
-                lets the table fit without a scroll container in the first
-                place. */}
+            {/* Tighter gaps below lg (pr-4) keep the natural width inside the
+                space available at 768px, so no scroll container is needed. */}
             <table className="w-full text-sm text-left whitespace-nowrap">
               {/* Offset by the fixed navbar (h-14 from md up, and the table
                   only renders from md), since the scrollport here is the
                   viewport. */}
               <thead className="sticky top-14 bg-white z-10">
-                {/* The divider is an inset shadow on each th, not `border-b`
-                    on the tr: under `border-collapse: collapse` a row border
-                    is painted by the table grid, so it stays behind when the
-                    thead sticks. A shadow is painted by the th itself and
-                    travels. */}
+                {/* Inset shadow, not `border-b`: under border-collapse a row
+                    border is painted by the table grid and stays behind when
+                    the thead sticks. A shadow travels with the th. */}
                 <tr>
                   <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb] text-center">
                     {h.no}

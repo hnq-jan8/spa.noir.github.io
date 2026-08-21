@@ -39,29 +39,19 @@ export default async function RootLayout({
   // If status.json says active=false, redirect immediately — no flash.
   const earlyRedirectScript = `(function(){try{var x=new XMLHttpRequest();x.open('GET','${basePath}/status.json?_='+Date.now(),false);x.setRequestHeader('Cache-Control','no-cache, no-store');x.setRequestHeader('Pragma','no-cache');x.send(null);if(x.status===200){var s=JSON.parse(x.responseText);if(s.active===false){window.location.replace(${JSON.stringify(officialSiteUrl)});}}}catch(e){}})();`;
 
-  // A stale browser-cached HTML page (e.g. a tab left open across a deploy)
-  // can reference a hashed CSS/JS bundle that a later deploy overwrote,
-  // 404ing that asset and leaving the page unstyled. globals.css sets
-  // --app-css-loaded on <html> only once it has actually applied, so once
-  // the window is done loading we can detect that failure and recover with
-  // a single hard reload (guarded so it can't loop if the failure persists).
+  // A tab left open across a deploy can reference a hashed CSS bundle that no
+  // longer exists, leaving the page unstyled. globals.css sets
+  // --app-css-loaded only once it applied, so its absence after load means the
+  // stylesheet 404'd — recover with one guarded hard reload.
   const cssRecoveryScript = `(function(){function check(){try{var v=getComputedStyle(document.documentElement).getPropertyValue('--app-css-loaded').trim();if(v!=='1'){var KEY='darksite-css-recovery-ts';var last=sessionStorage.getItem(KEY);var now=Date.now();if(!last||now-parseInt(last,10)>15000){sessionStorage.setItem(KEY,String(now));window.location.reload();}}}catch(e){}}if(document.readyState==='complete'){check();}else{window.addEventListener('load',check);}})();`;
 
-  // If the site was redeployed (e.g. status.json flips back to active=false
-  // -> true) while this tab was away, the browser can restore this page from
-  // bfcache on "back" navigation instead of re-fetching it. The restored JS
-  // then tries to dynamically import a chunk whose hash no longer exists
-  // (overwritten by the new deploy) -> 404. By the time that surfaces as a
-  // thrown error it can show up as different things depending on where in
-  // React's lazy/hydration machinery it's caught (a raw ChunkLoadError, or a
-  // downstream minified React error like #423 during a hydration retry) —
-  // too varied to pattern-match reliably. Instead we catch it at the source:
-  // a same-origin <script>/<link> under _next/static/ failing to load fires
-  // a non-bubbling 'error' event on that element, only observable via a
-  // capture-phase listener on window. `pageshow` with `persisted:true` is
-  // the standard signal for a bfcache restore; both cases force a real
-  // reload so the page always re-fetches current HTML/JS instead of running
-  // stale code. The message-based checks remain as a fallback.
+  // Same problem for JS chunks: a bfcache-restored page imports a chunk hash
+  // the new deploy overwrote. The thrown error varies too much to pattern-match
+  // (ChunkLoadError, or a minified React error from a hydration retry), so
+  // catch it at the source — a failing _next/static <script>/<link> fires a
+  // non-bubbling 'error' event, visible only to a capture-phase listener — plus
+  // `pageshow` with persisted:true for the restore itself. Message matching
+  // stays as a fallback.
   const chunkRecoveryScript = `(function(){function reload(){try{var KEY='darksite-chunk-recovery-ts';var last=sessionStorage.getItem(KEY);var now=Date.now();if(!last||now-parseInt(last,10)>15000){sessionStorage.setItem(KEY,String(now));window.location.reload();}}catch(e){}}window.addEventListener('pageshow',function(e){if(e.persisted)reload();});function isChunkError(x){var msg=(x&&x.message)||(x&&x.reason&&x.reason.message)||'';var name=(x&&x.error&&x.error.name)||(x&&x.reason&&x.reason.name)||'';return name==='ChunkLoadError'||/loading chunk [\\w.-]+ failed/i.test(msg)||/loading css chunk/i.test(msg)||/minified react error #4(18|19|22|23|25)/i.test(msg);}window.addEventListener('error',function(e){var t=e&&e.target;if(t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')&&/\\/_next\\/static\\//.test(t.src||t.href||'')){reload();return;}if(isChunkError(e))reload();},true);window.addEventListener('unhandledrejection',function(e){if(isChunkError(e))reload();});})();`;
 
   return (
@@ -70,15 +60,9 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: earlyRedirectScript }} />
         <script dangerouslySetInnerHTML={{ __html: cssRecoveryScript }} />
         <script dangerouslySetInnerHTML={{ __html: chunkRecoveryScript }} />
-        {/*
-          Inlined (not linked) CSS, so it is part of the HTML response itself
-          and can't 404 the way the hashed Tailwind bundle can. Navbar/
-          LanguageSelector render desktop-only markup unconditionally and
-          normally rely on `hidden md:flex` (from the linked stylesheet) to
-          keep it off-screen on mobile. If that stylesheet fails to load,
-          this is the safety net that still hides it, instead of showing the
-          duplicated desktop nav/language list on top of the mobile ones.
-        */}
+        {/* Inlined so it can't 404 like the hashed Tailwind bundle: without
+            this, a failed stylesheet leaves the unconditionally-rendered
+            desktop nav/language markup stacked on top of the mobile ones. */}
         <style
           dangerouslySetInnerHTML={{
             __html: `@media (max-width:767px){[data-fallback-desktop-only]{display:none !important;}}`,

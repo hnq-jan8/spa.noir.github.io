@@ -3,11 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ImageOff } from "lucide-react";
 
-// Height held for an image that has not painted yet, and the exact height of
-// the failed-load placeholder — one constant on purpose. A broken image is the
-// case this component exists for, so the swap from <img> to placeholder has to
-// cost no reflow; that only holds while the two heights are identical, which is
-// too easy to break by accident if each side carries its own number.
+// One constant for both the unpainted <img> and the failure placeholder: the
+// swap between them only costs no reflow while the two heights are identical.
 const RESERVED_HEIGHT = "26px";
 
 interface MarkdownImageProps {
@@ -31,17 +28,15 @@ export default function MarkdownImage({
   const ref = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    // The page is a static export, so an image referencing a host that is gone
-    // usually fails while the HTML is still parsing — before hydration attaches
-    // onError, which then never fires. Re-check on mount: a request that is
-    // finished (complete) but produced no pixels (naturalWidth 0) has failed.
+    // On a static export the image usually fails while the HTML is still
+    // parsing, before hydration attaches onError — so re-check on mount:
+    // complete with naturalWidth 0 means it failed.
     const el = ref.current;
     if (el?.complete && el.naturalWidth === 0) setFailed(true);
   }, []);
 
   if (failed) {
-    // Dropping the <img> entirely also makes this terminal: nothing is left to
-    // re-request, so the height cannot flip back and forth with the load state.
+    // Dropping the <img> makes this terminal: nothing is left to re-request.
     return (
       <span
         style={{ height: RESERVED_HEIGHT }}
@@ -64,16 +59,13 @@ export default function MarkdownImage({
       alt={alt ?? ""}
       width={width}
       height={height}
-      // Without this an image that has not painted is 0px tall, so it would
-      // jump the moment it resolves either way. Holding the placeholder's
-      // height instead makes the failure path — the common one here — a
-      // straight swap at the same size. A spread, so an author who sized the
-      // image by hand still wins.
+      // An unpainted image is 0px tall and would jump on resolve; holding the
+      // placeholder's height makes the failure path a same-size swap. Spread so
+      // an author-supplied size still wins.
       style={{ minHeight: RESERVED_HEIGHT, ...style }}
       onError={() => setFailed(true)}
-      // object-contain rather than cover: with an author-supplied width/height
-      // the box can disagree with the image's own ratio, and cover would crop
-      // the overflow away silently.
+      // contain, not cover: an author-supplied box can disagree with the
+      // image's ratio, and cover would crop it silently.
       className={`rounded object-contain ${
         width !== undefined || style !== undefined ? "max-w-full" : "w-full"
       }`}

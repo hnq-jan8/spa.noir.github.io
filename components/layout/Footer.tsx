@@ -10,6 +10,8 @@ import { isHomePath } from "@/i18n/paths";
 
 const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 
+const OFFICIAL_SITE_MIN_W = "min-w-[164px]";
+
 const SOCIAL_ICONS = {
   facebook: {
     name: "Facebook",
@@ -42,7 +44,11 @@ const SOCIAL_ICONS = {
   },
 } as const;
 
-export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) {
+export default function Footer({
+  logoOnWhite,
+}: {
+  logoOnWhite: string | null;
+}) {
   const pathname = usePathname();
   const isHome = isHomePath(pathname);
   const data = useContentData();
@@ -81,24 +87,24 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
             {Object.entries(data.common.contacts)
               .filter(([, value]) => value)
               .map(([key, value]) => {
-              const isEmail = value.includes("@");
-              const href = isEmail
-                ? `mailto:${value}`
-                : `tel:${value.replace(/[^+\d]/g, "")}`;
-              return (
-                <div key={key}>
-                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
-                    {support[key]}
-                  </p>
-                  <a
-                    href={href}
-                    className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700 transition-colors"
-                  >
-                    {value}
-                  </a>
-                </div>
-              );
-            })}
+                const isEmail = value.includes("@");
+                const href = isEmail
+                  ? `mailto:${value}`
+                  : `tel:${value.replace(/[^+\d]/g, "")}`;
+                return (
+                  <div key={key}>
+                    <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
+                      {support[key]}
+                    </p>
+                    <a
+                      href={href}
+                      className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700 transition-colors"
+                    >
+                      {value}
+                    </a>
+                  </div>
+                );
+              })}
           </div>
         )}
 
@@ -139,7 +145,7 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
           </p>
           <a
             href="https://www.sunphuquocairways.com"
-            className="group relative inline-flex items-center gap-2 overflow-hidden bg-black/5 hover:bg-[#811721] active:bg-black/5 transition-colors duration-300 active:duration-100 text-gray-900 hover:text-gray-50 active:text-[#a21725] text-sm px-5 py-2 rounded-xl"
+            className={`group relative inline-flex items-center justify-center gap-2 ${OFFICIAL_SITE_MIN_W} overflow-hidden bg-black/5 hover:bg-[#811721] active:bg-black/5 transition-colors duration-300 active:duration-100 text-gray-900 hover:text-gray-50 active:text-[#a21725] text-sm px-5 py-2 rounded-xl`}
           >
             <span
               aria-hidden="true"
@@ -149,7 +155,9 @@ export default function Footer({ logoOnWhite }: { logoOnWhite: string | null }) 
                 backgroundImage: `url(${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/ic_flower.png)`,
               }}
             />
-            <span className="relative z-10">{footer?.["officialSite"]}</span>
+            <span className="relative z-10 whitespace-nowrap">
+              {footer?.["officialSite"]}
+            </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="14"

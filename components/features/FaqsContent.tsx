@@ -8,18 +8,14 @@ import { useHideBreadcrumbWhen } from "@/hooks/useBreadcrumbVisibility";
 import { useContentState } from "@/hooks/useContentData";
 import Reveal from "../ui/Reveal";
 
-/** Same curve *and* the same negative-delay trick as the FAQ accordion's
- * own expand/collapse (see lib/expandTransition.ts): starting the
- * transition already half-elapsed plays only the back, decelerating half
- * of the ease-out curve, so it reads as quick rather than a full 300ms
- * sweep. */
+/** Same curve + negative-delay trick as the FAQ accordion's own expand
+ * (lib/expandTransition.ts): only the decelerating half of the curve plays. */
 const CAPSULE_TRANSITION = "duration-300 delay-[-150ms] ease-out";
 
 /** Delay before a keystroke actually filters the list. */
 const SEARCH_DEBOUNCE_MS = 200;
 
-/** The pill itself — shared between the always-visible desktop dock and the
- * collapsible mobile overlay, which differ in positioning but not content. */
+/** Shared by the desktop dock and the mobile capsule — same field, different framing. */
 function SearchField({
   query,
   onChange,
@@ -39,10 +35,8 @@ function SearchField({
   placeholder?: string;
   clearLabel?: string;
 }) {
-  // Re-enables pointer events for its own contents — the desktop dock
-  // wraps this in a `pointer-events-none` sticky box (see below) so the
-  // wrapper's own empty padding can't swallow clicks meant for the card
-  // underneath it; this is what makes the actual field clickable again.
+  // pointer-events-auto: the desktop dock wraps this in a pointer-events-none
+  // sticky box so its empty padding can't swallow clicks on the card below.
   return (
     <div className="relative pointer-events-auto">
       <Search
@@ -58,15 +52,13 @@ function SearchField({
         onBlur={onBlur}
         placeholder={placeholder}
         aria-label={placeholder}
-        // Gray, not amber — matches the same fill a card gets on hover
-        // (see ArticleCard) rather than reaching for the accent color.
+        // Gray, not amber — same fill a card gets on hover, not the accent.
         className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-[0_0_5px_rgba(0,0,0,0.05)] transition-[background-color,border-color] focus:outline-none focus:bg-white focus:border-gray-400"
       />
       {query && (
         <button
           type="button"
-          // Clearing applies straight away — waiting out the debounce to see
-          // the full list return would read as an unresponsive button.
+          // Applies immediately — waiting out the debounce would read as a dead button.
           onClick={onClear}
           aria-label={clearLabel}
           className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 active:text-gray-700 hover:bg-gray-100 active:bg-gray-100"
@@ -80,34 +72,23 @@ function SearchField({
 
 export default function FaqsContent() {
   const { data, failed } = useContentState();
-  // `query` drives the field so typing stays responsive; `applied` drives the
-  // filtering and lags behind it. Without the split, every keystroke rebuilds
-  // the whole accordion — and because the list is keyed on its contents, that
-  // means a remount per character while the user is still typing.
+  // `query` drives the field, `applied` lags behind and drives the filtering:
+  // the list is keyed on its contents, so filtering per keystroke would remount
+  // the whole accordion while the user is still typing.
   const [query, setQuery] = useState("");
   const [applied, setApplied] = useState("");
-  // Below md the field starts collapsed into an icon beside the breadcrumb —
-  // opening it is a deliberate tap, not something that eats screen space by
-  // default the way the always-visible desktop field does.
+  // Below md the field starts collapsed into an icon beside the breadcrumb.
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  // Desktop (no breadcrumb at this size, so there's nothing else in that
-  // row to preserve space for): focusing the field docks it right under
-  // the tab nav, dropping the padding above it — reverts once the field is
-  // both empty and unfocused, same "empty AND unfocused" rule the mobile
-  // capsule uses to decide when it's actually done being used.
+  // Desktop: focusing docks the field under the tab nav and drops the padding
+  // above it; reverts once the field is both empty and unfocused.
   const [desktopFieldEngaged, setDesktopFieldEngaged] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const desktopInputRef = useRef<HTMLInputElement>(null);
   const prevFirstQuestionRef = useRef<string | undefined>(undefined);
-  // Reported by FaqAccordion (see its own onFirstItemOpenChange) since this
-  // component doesn't own that state — remounts reset it, so it's the only
-  // way to tell "still the same top question" apart from "...and the reader
-  // had actually closed it" below.
+  // Reported by FaqAccordion: it owns the state but remounts, this parent doesn't.
   const firstItemOpenRef = useRef(false);
-  // Deliberately separate from prevFirstQuestionRef: content loads
-  // asynchronously, so several renders can pass with an empty `filtered`
-  // before real questions exist — this only flips once real results have
-  // actually been shown once, however many empty renders preceded that.
+  // Flips only once real results have rendered — content loads async, so
+  // several empty `filtered` renders can precede them.
   const hasShownResultsRef = useRef(false);
   const isFirstAppliedRef = useRef(true);
 
@@ -116,9 +97,8 @@ export default function FaqsContent() {
     return () => clearTimeout(id);
   }, [query]);
 
-  // A fresh result set always opens on its own first card — scrolled away
-  // from that, the reader would land back on questions that no longer
-  // match. Skips the very first run so page load doesn't also jump.
+  // A fresh result set opens on its own first card; skip the first run so
+  // page load doesn't jump too.
   useEffect(() => {
     if (isFirstAppliedRef.current) {
       isFirstAppliedRef.current = false;
@@ -131,46 +111,29 @@ export default function FaqsContent() {
     if (mobileSearchOpen) inputRef.current?.focus();
   }, [mobileSearchOpen]);
 
-  // Masking the breadcrumb with the fixed curtain above isn't watertight —
-  // iOS Safari's overscroll bounce can momentarily desync fixed/sticky
-  // layers and let it peek through underneath. This makes the breadcrumb
-  // itself `invisible` via Navbar instead, closing that gap outright.
+  // iOS Safari's overscroll bounce can desync fixed/sticky layers and let the
+  // breadcrumb peek through the curtain — hide the breadcrumb itself instead.
   useHideBreadcrumbWhen(mobileSearchOpen);
 
   const faqs = data?.faqs.faqs ?? [];
   const labels = data?.faqs.labels["faqs"] ?? {};
   const normalized = applied.trim().toLocaleLowerCase();
-  // searchText (see lib/contentData.ts) spans every locale's question +
-  // answer, not just this page's — so a query in one language still
-  // surfaces the same FAQ item's translation into the other.
+  // searchText spans every locale (lib/contentData.ts), so a query in one
+  // language still finds the same item's other translations.
   const filtered = normalized
     ? faqs.filter((faq) => faq.searchText.includes(normalized))
     : faqs;
 
-  // FaqAccordion remounts on every result-set change (see its own `key`
-  // below), so it can't tell on its own whether its first card is the same
-  // one that was already showing — that comparison has to live up here, in
-  // the parent that doesn't remount. Narrowing a search whose top hit
-  // hasn't moved shouldn't replay a card the reader already saw open —
-  // *unless* they'd closed it themselves, in which case the remount would
-  // otherwise silently re-open it with no animation to explain why.
+  // FaqAccordion remounts per result set (its `key` below), so "is this still
+  // the card the reader already had open?" has to be tracked here, in the
+  // parent that survives. Don't replay the expand-in unless the top question
+  // changed or the reader had closed it themselves; the page's own first paint
+  // is announced by <Reveal>, not by the card popping open.
   //
-  // hasShownResultsRef excludes the very first *real* render specifically:
-  // that one isn't a search result at all, just the page's own initial
-  // paint, which the <Reveal> below already announces — playing the
-  // expand-in *again* on top of it would read as the first card popping
-  // open a beat after the list itself fades in, not as one single reveal.
-  //
-  // isFirstRealRender is memoized per accordionKey, not recomputed on every
-  // render, because content loads from a module-level cache (see
-  // useContentData.ts): navigating here client-side (vs. a hard reload)
-  // finds it already populated, so this component's *own* content-sync
-  // effects (poll/listener bumps) can re-render it — with a plain `const`
-  // here, one of those re-renders would land after the mount effect below
-  // had already flipped hasShownResultsRef, recompute false, and swap the
-  // just-mounted <Reveal> out for a bare accordion before the browser ever
-  // painted the faded-in state — the *reveal itself* going missing on
-  // client-side nav specifically, which is exactly what was reported.
+  // Memoized per accordionKey, not a plain const: content comes from a
+  // module-level cache (useContentData.ts), so a client-side nav can re-render
+  // this after mount — recomputing inline would drop <Reveal> before it ever
+  // painted, losing the entrance fade.
   const firstQuestion = filtered[0]?.question;
   const accordionKey = filtered.map((f) => f.question).join(" ");
   const isFirstRealRender = useMemo(
@@ -202,54 +165,30 @@ export default function FaqsContent() {
 
   return (
     <div
-      // Desktop pt only: engaging trims it from py-8's 32px down to 16px —
-      // the same top offset the field's own sticky wrapper (pt-[18px],
-      // below) already sits at once scrolled. Transitioning this one
-      // property slides the field *and* every card below it up together
-      // in a single animated reflow, landing them at exactly the natural
-      // scrolled-sticky gap rather than a hand-tuned distance that could
-      // drift out of sync with it.
-      //
-      // md:pt-[18px], not md:pt-4: the field's sticky wrapper stops 2px
-      // short of flush against the nav on purpose (see its own top-[58px]
-      // below). Landing this transition exactly there — rather than at
-      // pt-4's plain 16px, 2px past it — means the field's natural
-      // (pre-clamp) position never dips below its sticky offset mid-
-      // transition; if it did, sticky would clamp the field's own visual
-      // motion to a stop early while this padding kept easing the cards
-      // below it for a few more frames, reading as the two falling out of
-      // sync right at the end of the animation.
+      // Desktop pt only: engaging trims it to the offset the field's sticky
+      // wrapper already sits at, so field and cards slide up together in one
+      // reflow. md:pt-[18px] (not pt-4) matches the wrapper's top-[58px]
+      // exactly — 2px past it and sticky clamps the field early while the
+      // cards keep easing, which reads as the two falling out of sync.
       className={`container-page pb-8 md:pb-8 max-w-3xl mx-auto pt-4 transition-[padding-top] duration-300 ease-out ${
         desktopFieldEngaged ? "md:pt-[18px]" : "md:pt-8"
       } ${desktopFieldEngaged || mobileSearchOpen ? "min-h-[100dvh]" : ""}`}
     >
-      {/* While the search field is engaged (desktop: focused; mobile: the
-          capsule open) the content area is forced to at least a full
-          viewport tall (footer excluded — this div doesn't contain it) so
-          scrolling through results can't bring the footer's sticky
-          boundary into play mid-search: without this, a short result list
-          could let the field's own sticky wrapper reach that boundary and
-          un-stick while the reader is still actively typing/scrolling. */}
-      {/* Mobile: one capsule, right-anchored beside the breadcrumb (top-12/
-          pt-4 = 64px; this page has no hero above it to scroll past, so
-          that row is already in its stuck position from first paint), that
-          morphs its own width from a 34px circle into the full-width field
-          rather than swapping between two separate elements. Height stays
-          fixed at the icon's own 34px throughout — only the rightward-
-          anchored width grows, so it reads as the icon itself stretching
-          sideways into the field rather than also growing taller. The mask
-          behind it (z-[19]) fades in over the same band so the breadcrumb
-          and list scrolling underneath don't show through while it's open;
-          the capsule sits at z-20, above the breadcrumb's z-10. */}
+      {/* min-h while engaged: a short result list would otherwise let the
+          field's sticky wrapper reach the footer boundary and un-stick
+          mid-search.
+
+          Mobile: one capsule anchored beside the breadcrumb morphs its width
+          from a 34px circle into the full-width field (fixed height, so it
+          reads as the icon stretching sideways). The z-[19] mask below hides
+          the breadcrumb and list scrolling under it. */}
       <div
         className={`md:hidden fixed inset-x-0 top-12 h-[50px] bg-page z-[19] transition-opacity duration-200 pointer-events-none ${
           mobileSearchOpen ? "opacity-100" : "opacity-0"
         }`}
       />
-      {/* A hard-edged mask sliced a scrolling question in half right at its
-          own bottom edge — the top of a text line would vanish behind it
-          while the bottom half still showed. This fade continues past that
-          edge so a line crossing it dissolves instead of being cut. */}
+      {/* Fades past the mask's bottom edge so a text line crossing it
+          dissolves instead of being sliced in half. */}
       <div
         className={`md:hidden fixed inset-x-0 top-[98px] h-6 bg-gradient-to-b from-page to-transparent z-[19] transition-opacity duration-200 pointer-events-none ${
           mobileSearchOpen ? "opacity-100" : "opacity-0"
@@ -264,10 +203,8 @@ export default function FaqsContent() {
           <button
             type="button"
             onClick={() => {
-              // The capsule opens pinned to the breadcrumb's row — if the
-              // page were scrolled down, it'd expand over content the user
-              // wasn't looking at instead of the header area they just
-              // tapped near.
+              // The capsule is pinned to the breadcrumb row — scrolled down, it
+              // would expand over content the user wasn't looking at.
               window.scrollTo({ top: 0 });
               setMobileSearchOpen(true);
             }}
@@ -275,10 +212,8 @@ export default function FaqsContent() {
             className="absolute inset-0"
           />
         )}
-        {/* Collapsed: true-centered (left-1/2 -translate-x-1/2) in the 34px
-            circle. Open: docked as the field's prefix icon (left-2.5). Both
-            positions animate on the same curve as the capsule itself so the
-            icon visibly slides into place as it expands, instead of jumping. */}
+        {/* Centered in the circle when collapsed, docked as the field's prefix
+            icon when open — same curve as the capsule so it slides, not jumps. */}
         <Search
           className={`pointer-events-none absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-[left,transform] ${CAPSULE_TRANSITION} ${
             mobileSearchOpen ? "left-2.5 translate-x-0" : "left-1/2 -translate-x-1/2"
@@ -290,20 +225,16 @@ export default function FaqsContent() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          // Losing focus with nothing typed collapses back to the icon — an
-          // open, empty field left covering the breadcrumb reads as
-          // unfinished rather than dismissed.
+          // Blur with nothing typed collapses back to the icon: an open, empty
+          // field covering the breadcrumb reads as unfinished.
           onBlur={() => {
             if (!query.trim()) setMobileSearchOpen(false);
           }}
           placeholder={labels["searchPlaceholder"]}
           aria-label={labels["searchPlaceholder"]}
           tabIndex={mobileSearchOpen ? 0 : -1}
-          // Fades in/out over the same fast window the (now half-duration)
-          // capsule transition actually plays, so neither lags the other.
-          // 16px, not text-sm: iOS Safari auto-zooms the viewport on focus
-          // for any input under 16px, which would fight the capsule's own
-          // expand animation.
+          // text-base (16px), not text-sm: iOS Safari auto-zooms the viewport on
+          // focus for anything smaller, fighting the capsule's expand.
           className={`absolute inset-y-0 left-9 right-9 bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none transition-opacity duration-150 ${
             mobileSearchOpen
               ? "opacity-100"
@@ -313,12 +244,8 @@ export default function FaqsContent() {
         {mobileSearchOpen && query && (
           <button
             type="button"
-            // Clearing only empties the field — it doesn't collapse the
-            // capsule. Clicking the button blurs the input first (native
-            // focus-shift on click), so without refocusing here the field
-            // would be left open but unfocused, one tap away from a second
-            // "unfinished, empty" blur collapsing it before the user can
-            // type again.
+            // Clicking blurs the input (native focus shift), so refocus —
+            // otherwise the next blur collapses the capsule as "empty".
             onClick={() => {
               clearSearch();
               inputRef.current?.focus();
@@ -331,46 +258,29 @@ export default function FaqsContent() {
         )}
       </div>
 
-      {/* Desktop: a single, permanently-`sticky` wrapper (swapping to
-          `fixed` on engage used to tear down and remount the <input>,
-          dropping focus). `top` transitions directly rather than riding
-          the container's pt animation — a plain untransitioned swap only
-          animated near scrollY 0; scrolled further down, sticky stayed
-          clamped the whole time and the swap just snapped. */}
+      {/* Permanently sticky (swapping to `fixed` on engage remounts the input
+          and drops focus), and `top` transitions directly — riding the
+          container's pt animation only worked near scrollY 0. */}
       <div
         className={`hidden md:block sticky z-[9] pt-4 pb-6 -mt-4 -mb-2 pointer-events-none transition-[top] duration-300 ease-out ${
           desktopFieldEngaged ? "top-[58px]" : "top-[72px]"
         }`}
       >
         <div className="relative">
-          {/* Solid mask covers the band between the navbar and the field's
-              own translucent + blurred surface, so the list scrolling
-              underneath doesn't show through the gap above it. Sized for
-              the *unengaged* gap (top-[72px] above, 16px taller than the
-              engaged one) — the wider of the two — so it always reaches
-              all the way up to the nav's own bottom edge; overshooting
-              into the nav itself while engaged just paints over pixels
-              the nav (z-50, above this mask) already covers. Stops at the
-              field's vertical middle (field top +23px: pt-4's 16px plus
-              half of the ~46px-tall pill) so a question scrolling up is
-              hard-covered above that line and dissolves through the
-              field's backdrop-blur below it, rather than being masked a
-              second time over the gap beneath the field.
-
-              -inset-x-2, not inset-x-0: cards below carry a 6px shadow
-              blur that bled past a flush-edged mask, right at the pill's
-              rounded corners. */}
+          {/* Masks the band between the navbar and the field's translucent
+              surface. Sized for the taller, unengaged gap so it always reaches
+              the nav; stops at the field's vertical middle so text scrolling up
+              dissolves through the backdrop-blur below that line instead of
+              being masked twice. -inset-x-2 covers the cards' 6px shadow blur,
+              which bled past a flush edge at the pill's corners. */}
           <div className="absolute -inset-x-2 -top-8 h-[55px] bg-page pointer-events-none" />
           <SearchField
             query={query}
             onChange={setQuery}
             inputRef={desktopInputRef}
             onClear={() => {
-              // Clicking the button blurs the input first (native
-              // focus-shift on click) — without refocusing, an empty-now
-              // field would sit there unfocused, one stray blur-rule check
-              // away from collapsing before the user gets a chance to type
-              // again.
+              // Clicking blurs the input (native focus shift) — refocus so the
+              // now-empty field doesn't un-engage on the next blur check.
               clearSearch();
               desktopInputRef.current?.focus();
             }}
@@ -387,18 +297,14 @@ export default function FaqsContent() {
         </div>
       </div>
 
-      {/* Pulled up a touch, mobile-only, while the capsule is open — the
-          breadcrumb's own row still reserves its usual space (see
-          hooks/useBreadcrumbVisibility.ts), which reads as slightly too far
-          below the now full-width field. Reverts with the same transition
-          the capsule itself uses. */}
+      {/* Mobile, capsule open: the hidden breadcrumb still reserves its row
+          (hooks/useBreadcrumbVisibility.ts), leaving too much air below the
+          field. */}
       <div
         className={`transition-[margin-top] ${CAPSULE_TRANSITION} ${mobileSearchOpen ? "-mt-6 md:mt-0" : "mt-0"}`}
       >
       {filtered.length === 0 ? (
-        // Not wrapped in <Reveal> — a search producing no results is a
-        // search outcome, not a page appearing, so it shouldn't replay the
-        // entrance fade the way the very first paint below does.
+        // No <Reveal>: a search outcome isn't the page appearing.
         <div className="text-center py-16 px-4">
           {labels["noResultsTitle"] && (
             <p className="text-base font-semibold text-gray-900">
@@ -412,12 +318,8 @@ export default function FaqsContent() {
           )}
         </div>
       ) : (
-        // Remounts (not updates) whenever the filtered set itself changes —
-        // the accordion's open/collapse state is keyed by array index,
-        // which would otherwise point at the wrong question once filtering
-        // reorders/removes items. `animateFirstOpen` (computed above, in
-        // this non-remounting parent) separately decides whether that's
-        // worth replaying the first card's expand-in for.
+        // Remounts on every result-set change: the accordion keys its open
+        // state by array index, which filtering would otherwise misalign.
         (() => {
           const accordion = (
             <FaqAccordion
@@ -430,10 +332,8 @@ export default function FaqsContent() {
               reopenFirstSignal={applied}
             />
           );
-          // <Reveal> only for the page's own first paint — a search
-          // narrowing back into results (from a no-results or an empty
-          // starting state) is a search outcome, not the page appearing,
-          // so later mounts of this branch skip straight to the accordion.
+          // <Reveal> only for the page's own first paint — later mounts are
+          // search outcomes, not the page appearing.
           return isFirstRealRender ? <Reveal>{accordion}</Reveal> : accordion;
         })()
       )}

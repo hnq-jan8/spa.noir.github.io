@@ -43,8 +43,7 @@ export default function Navbar({
   // không chờ content.json; bản trong content.json ghi đè khi về.
   const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
   const a11y = data?.common.labels["a11y"] ?? bundledLabels(locale, "a11y");
-  // Full language names — the desktop selector shows the two-letter code at
-  // rest and expands to the name on hover, so it needs the name too.
+  // The desktop selector shows the code at rest and the full name on hover.
   const languageOptions = (data?.common.languages ?? routingLanguages).map(
     (lang) => ({
       code: lang.code,
@@ -102,10 +101,8 @@ export default function Navbar({
       ]
     : [];
 
-  // Switching language while reading an article has to land on the same
-  // article, not back at the list — the key rides along on the new locale's
-  // URL. Kept as a suffix rather than merging the whole query string so an
-  // unrelated param can't leak across a locale switch.
+  // Switching language mid-article has to land on the same article, so the key
+  // rides along. A suffix, not the whole query string, so nothing else leaks.
   const articleKey = useArticleKey();
   const localeSuffix = articleKey
     ? `?${ARTICLE_PARAM}=${encodeURIComponent(articleKey)}`
@@ -117,19 +114,16 @@ export default function Navbar({
   const isHomeActive = normalizedPath === `/${locale}`;
   const breadcrumbHidden = useBreadcrumbHidden();
 
-  // Directus serves official_updates sorted `-date`, so the head of the list
-  // is the newest one. Feeding its date (not a count) to the badge means a
-  // corrected/re-published update reads as new, while an unrelated edit
-  // elsewhere in content.json doesn't.
+  // official_updates arrives sorted `-date`, so [0] is newest. The badge keys
+  // off that date, not a count, so unrelated content edits don't trigger it.
   const updatesHref = `/${locale}/official-updates`;
   const hasUnreadUpdate = useUnreadUpdate(
     data?.officialUpdates.updates[0]?.date,
     normalizedPath === updatesHref,
   );
 
-  // Third breadcrumb crumb: only the two article-listing pages ever open a
-  // detail view, and only while they're the active tab (articleKey lingers
-  // briefly during a cross-tab navigation — see clearArticleRoute).
+  // Third crumb: only the two listing pages open a detail view, and only while
+  // active — articleKey lingers briefly during a cross-tab nav.
   const pressReleasesHref = `/${locale}/press-releases`;
   const openedArticle =
     articleKey &&
@@ -138,22 +132,16 @@ export default function Navbar({
         data?.pressReleases.releases.find((r) => r.key === articleKey) ??
         null)
       : null;
-  // Same glyph the two pages already use for themselves: Megaphone on the
-  // home card's official-update badge, FileText on its press-releases card
-  // — so the crumb echoes an icon the reader has already seen instead of
-  // introducing a new one.
+  // Same glyphs the home cards use for these two sections.
   const ArticleIcon = normalizedPath === updatesHref ? Megaphone : FileText;
 
   const scrollNav = (dir: "left" | "right") => scrollNavBy(dir, 120);
 
   return (
     <>
-      {/* `fixed` from `md:` up only. Below that, iOS Safari's URL bar
-          collapse leaves a fixed header's compositing layer painted at a
-          stale offset — `getBoundingClientRect().top` reads 0 but it's
-          drawn partway down the page, and never recovers. `sticky` rides
-          the scroller instead on mobile, where that bug actually shows up;
-          desktop Safari doesn't have it, so `fixed` there is safe. */}
+      {/* `fixed` from md up only: below that, iOS Safari's URL-bar collapse
+          leaves a fixed header painted at a stale offset it never recovers
+          from. `sticky` rides the scroller instead. */}
       <header
         ref={headerRef}
         className="sticky md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
@@ -202,10 +190,8 @@ export default function Navbar({
                         key={item.href}
                         href={item.href}
                         onClick={() => {
-                          // Re-clicking the tab you're already on keeps the
-                          // same pathname, so nothing remounts — the detail
-                          // view has to be dismissed explicitly or the URL
-                          // loses `?a=` while the article stays on screen.
+                          // Re-clicking the active tab keeps the same pathname,
+                          // so the detail view has to be dismissed explicitly.
                           clearArticleRoute();
                           if (isActive) invalidateContent();
                         }}
@@ -301,9 +287,8 @@ export default function Navbar({
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
               >
-                {/* The nav tabs live behind this button on mobile, so the
-                    unread dot has to surface on the trigger itself —
-                    otherwise it's only visible once the menu is already open. */}
+                {/* Nav tabs are behind this button on mobile, so the unread dot
+                    has to surface on the trigger itself. */}
                 {hasUnreadUpdate && !menuOpen && (
                   <span
                     aria-hidden="true"
@@ -355,11 +340,9 @@ export default function Navbar({
         />
       </header>
 
-      {/* Mobile breadcrumb — `invisible` (not just a lower-z-index mask)
-          whenever a page needs this row for something else, e.g. the FAQs
-          mobile search capsule; see hooks/useBreadcrumbVisibility.ts for why
-          a mask alone isn't reliable here. Kept mounted so its layout space
-          doesn't reflow the page underneath while it's toggled. */}
+      {/* `invisible`, not unmounted, when a page needs this row for something
+          else (FAQs search capsule) — keeps its layout space and is more
+          reliable than masking it (hooks/useBreadcrumbVisibility.ts). */}
       {activeItem && (
         <div
           className={`md:hidden sticky top-12 z-10 px-4 pt-4 pb-6 ${breadcrumbHidden ? "invisible" : ""}`}
@@ -382,16 +365,13 @@ export default function Navbar({
             <Link
               href={activeItem.href}
               onClick={() => {
-                // Same-pathname re-click behavior as the tab bar: close the
-                // article detail view (its own query param, invisible to
-                // Next's router) and refresh the list underneath it.
+                // Same as the tab bar: close the detail view (its query param is
+                // invisible to Next's router) and refresh the list.
                 clearArticleRoute();
                 invalidateContent();
               }}
-              // Current page's own weight (font-medium, near-black) moves to
-              // the icon crumb once an article is open — this one drops back
-              // to the same de-emphasized treatment as Trang chủ, since it's
-              // then just another link back up the chain, not where you are.
+              // With an article open, "you are here" moves to the icon crumb and
+              // this one drops back to a plain link.
               className={`inline-flex items-center min-h-[24px] truncate transition-colors hover:text-gray-600 active:text-gray-600 ${
                 openedArticle
                   ? "text-gray-700 hover:text-gray-950 active:text-gray-950"
@@ -406,10 +386,8 @@ export default function Navbar({
                   className="w-3 h-3 text-gray-400 flex-shrink-0"
                   strokeWidth={2}
                 />
-                {/* Icon-only, not the article's own title — a headline can run
-                    to a full sentence, which would blow out this pill's width
-                    or truncate down to something unreadable either way. The
-                    real title still reaches screen readers via sr-only text. */}
+                {/* Icon-only: a headline would blow out the pill's width or
+                    truncate to nothing. The title still reaches screen readers. */}
                 <span
                   aria-current="page"
                   className="inline-flex items-center min-h-[24px] text-gray-900 flex-shrink-0"

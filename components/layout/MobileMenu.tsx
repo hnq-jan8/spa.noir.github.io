@@ -54,10 +54,8 @@ export default function MobileMenu({
   return (
     <div
       id="mobile-menu"
-      // Inline style mirrors the closed-state Tailwind classes below, so
-      // the drawer stays hidden by default even if the stylesheet fails
-      // to load — otherwise it renders as plain unstyled content instead
-      // of staying off-screen.
+      // Mirrors the closed-state classes below so the drawer stays hidden even
+      // if the stylesheet fails to load.
       style={open ? undefined : { visibility: "hidden", pointerEvents: "none" }}
       className={`md:hidden fixed inset-x-0 top-12 h-[calc(100dvh-3rem)] z-40 bg-chrome text-white overflow-y-auto overscroll-contain ${
         open
@@ -76,9 +74,8 @@ export default function MobileMenu({
               href={item.href}
               onClick={() => {
                 onNavigate();
-                // Same reason as the desktop tabs: tapping the route you're
-                // already on doesn't remount anything, so the open article
-                // has to be dismissed by hand.
+                // As on the desktop tabs: same route = no remount, so the open
+                // article has to be dismissed by hand.
                 clearArticleRoute();
                 if (isActive) invalidateContent();
               }}
@@ -88,17 +85,15 @@ export default function MobileMenu({
                   : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
               }`}
             >
-              {/* Relative wrapper so the unread dot can sit as a superscript
-                  on the label's top-right corner. Anchored to the text, not
-                  to the row, so it stays put whatever the label's length. */}
+              {/* Anchors the unread dot to the text, not the row, so it sits on
+                  the label's corner whatever its length. */}
               <span className="relative">
                 {item.label}
                 {item.href === unreadHref && (
                   <span
                     aria-hidden="true"
-                    // Steady glow, not `animate-pulse-glow`: a badge marking
-                    // "there's something new" reads as a state, and a pulsing
-                    // one competes with the homepage's live "as of" dot.
+                    // Steady, not pulsing: it marks a state, and a pulse would
+                    // compete with the homepage's live "as of" dot.
                     className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_3px_1px_rgba(239,68,68,0.5)]"
                   />
                 )}

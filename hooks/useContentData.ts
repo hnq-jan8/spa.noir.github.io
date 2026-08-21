@@ -15,10 +15,8 @@ const listeners = new Set<() => void>();
 
 function fetchPayload(): Promise<ContentPayload> {
   if (cachedPromise) return cachedPromise;
-  // URL ổn định (không cache-bust bằng timestamp) + `no-cache`: vẫn revalidate
-  // mỗi lần nên không bao giờ dùng bản chưa xác thực, nhưng khi content không
-  // đổi thì chỉ tốn một 304 thay vì tải lại toàn bộ payload — hàm này chạy lại
-  // mỗi lần đổi route. Độ tươi do status.json (since) điều phối, xem ActivePoller.
+  // URL ổn định + `no-cache`: vẫn revalidate mỗi lần nhưng content không đổi
+  // thì chỉ tốn một 304. Độ tươi do status.json (since) điều phối.
   cachedPromise = fetch(`${basePath}/content.json`, {
     cache: "no-cache",
   })
@@ -38,22 +36,16 @@ function fetchPayload(): Promise<ContentPayload> {
 }
 
 export function invalidateContent() {
-  // Chỉ xoá promise để lần fetch tới đi thẳng ra network; giữ lại
-  // cachedPayload để UI vẫn có dữ liệu cũ hiển thị trong lúc revalidate.
+  // Giữ cachedPayload để UI còn dữ liệu cũ hiển thị trong lúc revalidate.
   cachedPromise = null;
   listeners.forEach((l) => l());
 }
 
-// Version đã trigger invalidate nhưng chưa fetch xong — tránh gọi
-// invalidateContent() lặp lại cho cùng một "since" khi có nhiều poller
-// (hoặc nhiều chu kỳ poll) bắn trùng lúc fetch còn đang chạy dở.
+// Đã invalidate nhưng chưa fetch xong — chặn nhiều poller bắn trùng cùng
+// một "since".
 let pendingSince: string | null = null;
 
-/**
- * Gọi từ poller nền (status.json.since) — chỉ invalidate khi bản đang
- * cache thực sự cũ hơn, tránh tải lại content.json mỗi chu kỳ poll dù
- * không có gì thay đổi.
- */
+/** Gọi từ poller nền: chỉ invalidate khi bản đang cache thực sự cũ hơn. */
 export function syncContentSince(since: string) {
   if (!cachedPayload || cachedPayload.generatedAt === since) return;
   if (pendingSince === since) return;

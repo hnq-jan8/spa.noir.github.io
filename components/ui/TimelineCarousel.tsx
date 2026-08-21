@@ -36,24 +36,14 @@ function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
 }
 
 /**
- * Vertical update feed at every breakpoint. Each node is a preview card —
- * title, excerpt, optional image — that opens the full update rather than
- * expanding in place, so a long update can't push the rest of the timeline
- * far off-screen.
+ * Vertical update feed. Each node opens the full update instead of expanding
+ * in place, so one long update can't push the rest of the timeline off-screen.
  *
- * The current-status group (isPassed) is set apart from older updates by
- * weight and color alone (bold heading, amber badge/date, larger image) —
- * not by an extra border, so the only vertical line in the layout is the
- * rail itself. Older nodes still show the full title + excerpt (same
- * content shape as latest), just de-emphasized: muted date, regular-weight
- * heading, no badge. Unlike the press-release list, no bordered/shadowed
- * card box is used anywhere here — this feed leans on the timeline rail
- * (dot + connecting line, which press releases don't have) to read as a
- * status log rather than a stack of article cards. `group` sits on the
- * whole row (not just the button), so the rail dot lights up together with
- * the date/title/excerpt/image — every group-hover here has a matching
- * group-active twin so the same feedback shows on a tap, since touch
- * devices never trigger :hover.
+ * The latest group is set apart by weight and color alone — no card box or
+ * border anywhere here, so the rail (dot + line) is the only vertical line and
+ * the feed reads as a status log, not a stack of article cards. `group` sits on
+ * the whole row so the dot lights up with the text; every group-hover has a
+ * group-active twin, since touch devices never trigger :hover.
  */
 export default function TimelineCarousel({
   items,
@@ -89,8 +79,7 @@ export default function TimelineCarousel({
     <div className="mb-12">
       {items.map((item, idx) => {
         const isGroupStart = groupStartOf[idx] === idx;
-        // The newest (first) group is the current status — highlighted in
-        // amber the same way the homepage's "as of" badge is.
+        // The newest group is the current status — amber, like the "as of" badge.
         const isPassed = groupStartOf[idx] === 0;
         const isLast = idx === items.length - 1;
         const excerpt = excerptOf(item, 200);
@@ -105,10 +94,7 @@ export default function TimelineCarousel({
           >
             <div className="flex flex-col items-center flex-shrink-0">
               <div
-                // Latest dot reads the same as every other dot at rest —
-                // hollow, white fill — just with an amber border instead of
-                // gray, so the timeline reads as one consistent dot style.
-                // Hover/active fills it solid amber and zooms in; no glow.
+                // Same hollow dot as the rest, amber border instead of gray.
                 className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 mt-1 transition-all duration-200 ${
                   isPassed
                     ? "bg-white border-amber-600 group-hover:scale-125 group-hover:bg-amber-600 group-active:scale-125 group-active:bg-amber-600"

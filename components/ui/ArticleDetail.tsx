@@ -7,9 +7,8 @@ import { titleOf } from "@/components/ui/ArticleCard";
 import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
 
-// Rough reading speed for mixed VI/EN prose. Deliberately a whole-word count
-// rather than characters — CJK-style per-character counting would badly
-// overestimate Vietnamese, which is written in spaced Latin words.
+// Rough reading speed for mixed VI/EN prose. Whole words, not characters:
+// per-character counting badly overestimates spaced Latin script.
 const WORDS_PER_MINUTE = 200;
 
 /**
@@ -27,19 +26,15 @@ export default function ArticleDetail({
   labels: Record<string, string>;
   onBack: () => void;
 }) {
-  // Entering the detail view is a navigation as far as the reader is
-  // concerned, so it should start at the top like any other page would.
+  // Opening the detail view reads as a navigation, so start at the top.
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [article.key]);
 
-  // Swaps the tab title to the article's own heading while it's open. This
-  // is client-side only — it can't help link-preview crawlers (Zalo/
-  // Facebook/Messenger don't execute JS), only the open tab/history/bookmark
-  // — but the site is static-export with no per-article route, so there's no
-  // server-rendered title to change instead. Captured once via ref rather
-  // than read fresh each run, since after the first swap `document.title`
-  // itself would be the article title, not the real page title to restore.
+  // Tab title follows the open article. Client-side only (no per-article
+  // route to render a real <title>), so it reaches the tab/history/bookmark
+  // but not link-preview crawlers. Captured once via ref — after the first
+  // swap `document.title` is already the article's.
   const originalTitleRef = useRef<string | null>(null);
   useEffect(() => {
     if (originalTitleRef.current === null) {
@@ -62,22 +57,17 @@ export default function ArticleDetail({
     Math.round(article.body.trim().split(/\s+/).length / WORDS_PER_MINUTE),
   );
 
-  // Mirrors ArticleContent's own check — a blank title is how a full-bleed
-  // CMS article opts out of the default headline block.
+  // Mirrors ArticleContent: a blank title opts the article out of the
+  // default headline block.
   const isFullBleed = !article.title || article.title.trim().length === 0;
 
   return (
     <div>
-      {/* Meta sits on this bar, outside the article card, rather than above
-          the headline inside it. A full-bleed article has no headline block
-          at all, so anything anchored there simply vanished on exactly the
-          articles most likely to be shared. */}
-      {/* Below md the mobile breadcrumb (see Navbar) already provides a way
-          back, so the Back button is redundant there and hidden — the meta
-          row is left on its own, flush left with the title below it. The
-          `md:px-1` offset is optical and only matters at md+, where the card
-          underneath has rounded corners and flush content would read as if
-          it overhangs the edge; below md there's no card, so no offset. */}
+      {/* Meta sits outside the article card: a full-bleed article has no
+          headline block, so anything anchored there vanished on exactly the
+          articles most likely to be shared. Back is hidden below md, where the
+          mobile breadcrumb already covers it; md:px-1 is an optical offset
+          against the card's rounded corners, which only exist at md+. */}
       <div className="print:hidden flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-4 mb-3 md:mb-4 md:px-1 text-xs">
         {labels["back"] && (
           <button
