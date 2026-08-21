@@ -15,8 +15,12 @@ const listeners = new Set<() => void>();
 
 function fetchPayload(): Promise<ContentPayload> {
   if (cachedPromise) return cachedPromise;
-  cachedPromise = fetch(`${basePath}/content.json?_=${Date.now()}`, {
-    cache: "no-store",
+  // URL ổn định (không cache-bust bằng timestamp) + `no-cache`: vẫn revalidate
+  // mỗi lần nên không bao giờ dùng bản chưa xác thực, nhưng khi content không
+  // đổi thì chỉ tốn một 304 thay vì tải lại toàn bộ payload — hàm này chạy lại
+  // mỗi lần đổi route. Độ tươi do status.json (since) điều phối, xem ActivePoller.
+  cachedPromise = fetch(`${basePath}/content.json`, {
+    cache: "no-cache",
   })
     .then((res) => {
       if (!res.ok) throw new Error(`content.json ${res.status}`);
