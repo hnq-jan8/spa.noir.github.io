@@ -4,11 +4,14 @@
 # bash, not sh: the comparison uses process substitution.
 #
 # `scripts/content-payload.mjs` is the single source that assembles
-# content.json, and the CMS's content-diff endpoint keeps a vendored copy so it
-# can rebuild the exact same payload and diff it against the deployed site. The
-# copy is manual, so a change here silently desyncs the endpoint — the diff then
-# reports phantom drift (arrays are compared whole, so one differing field flags
-# the entire list as changed).
+# content.json, and the CMS keeps one vendored copy, shared by every CMS-side
+# extension that needs it (content-diff-endpoint, deploy-content-endpoint) at
+# extensions/_shared/content-payload.mjs, so each can rebuild the exact same
+# payload (to diff against the deployed site, or to push it straight to
+# Azure Storage). The copy is manual, so a change here silently desyncs every
+# extension that imports it — content-diff-endpoint would then report phantom
+# drift (arrays are compared whole, so one differing field flags the entire
+# list as changed), and deploy-content-endpoint would ship a wrong shape.
 #
 # Only the leading block comment is allowed to differ: each copy documents its
 # own role. Everything after it must match byte for byte.
@@ -20,7 +23,7 @@
 set -e
 
 SRC="scripts/content-payload.mjs"
-COPY="${DARKSITE_CMS_PAYLOAD:-$HOME/Private/Projects/Directus/my-cms-project/extensions/content-diff-endpoint/src/content-payload.mjs}"
+COPY="${DARKSITE_CMS_PAYLOAD:-$HOME/Private/Projects/Directus/my-cms-project/extensions/_shared/content-payload.mjs}"
 
 # Nothing staged for the shared file — nothing to check.
 git diff --cached --name-only | grep -qx "$SRC" || exit 0
@@ -43,13 +46,16 @@ trap 'rm -f "$STAGED"' EXIT
 git show ":$SRC" > "$STAGED"
 
 if ! diff -q <(strip_header "$STAGED") <(strip_header "$COPY") > /dev/null; then
-  echo "pre-commit: $SRC is out of sync with the CMS content-diff endpoint."
+  echo "pre-commit: $SRC is out of sync with the CMS's shared vendored copy."
   echo
   diff -u <(strip_header "$COPY") <(strip_header "$STAGED") \
     --label "cms (vendored copy)" --label "darksite (staged)" || true
   echo
-  echo "Copy the body across (keep each file's own header), then rebuild the extension:"
-  echo "  cd $(dirname "$(dirname "$COPY")") && npm run build"
+  echo "Copy the body across (keep each file's own header), then rebuild every"
+  echo "extension that imports it — currently content-diff-endpoint and"
+  echo "deploy-content-endpoint:"
+  echo "  cd $(dirname "$(dirname "$COPY")")/content-diff-endpoint && npm run build"
+  echo "  cd $(dirname "$(dirname "$COPY")")/deploy-content-endpoint && npm run build"
   echo "…and restart Directus so it picks up dist/."
   echo
   echo "To commit anyway: git commit --no-verify"
