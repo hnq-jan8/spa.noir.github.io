@@ -24,7 +24,7 @@ export default function FlightInfoContent() {
 
   return (
     <div className="container-page pt-4 pb-8 md:py-8 md:max-w-6xl md:mx-auto">
-      <div className="md:bg-white md:rounded-2xl md:p-6 md:shadow-[0_0_6px_rgba(0,0,0,0.03)]">
+      <div className="md:bg-white md:rounded-2xl md:p-6 md:card-shadow">
         <Reveal>
           <FlightTable
             title={fi["title"]}

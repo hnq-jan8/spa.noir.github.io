@@ -17,7 +17,7 @@ export function CardLink({
   return (
     <Link
       {...linkProps}
-      className={`group bg-white rounded-2xl p-6 shadow-[0_0_6px_rgba(0,0,0,0.03)] transition-colors hover:bg-cardHover active:bg-cardHover ${className}`}
+      className={`group bg-white rounded-2xl p-6 card-shadow hover:bg-cardHover active:bg-cardHover ${className}`}
     >
       {children}
     </Link>

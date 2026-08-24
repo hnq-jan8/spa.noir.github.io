@@ -79,7 +79,7 @@ export default function MobileMenu({
                 clearArticleRoute();
                 if (isActive) invalidateContent();
               }}
-              className={`flex items-center px-6 py-4 text-xl transition-colors ${
+              className={`flex items-center px-6 py-4 text-xl ${
                 isActive
                   ? "text-white font-semibold bg-black/10"
                   : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
@@ -108,7 +108,7 @@ export default function MobileMenu({
           <button
             type="button"
             onClick={() => setLangExpanded((o) => !o)}
-            className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white active:text-white transition-colors`}
+            className={`w-full flex items-center gap-3 px-6 py-4 text-base ${langExpanded ? "text-white" : "text-gray-300"} hover:text-white active:text-white`}
             aria-expanded={langExpanded}
           >
             <svg
@@ -144,7 +144,7 @@ export default function MobileMenu({
                     key={lang.code}
                     href={`/${lang.code}${pathWithoutLocale}`}
                     onClick={onNavigate}
-                    className={`flex items-center justify-between pl-14 pr-6 py-3 text-base transition-colors ${
+                    className={`flex items-center justify-between pl-14 pr-6 py-3 text-base ${
                       isActive
                         ? "text-white font-semibold"
                         : "text-gray-300 hover:text-white hover:font-medium active:text-white active:font-medium"

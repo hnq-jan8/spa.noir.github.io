@@ -155,7 +155,7 @@ export default function FaqAccordion({
         ref={(el) => {
           cardRefs.current[i] = el;
         }}
-        className="bg-white rounded-2xl overflow-hidden shadow-[0_0_6px_rgba(0,0,0,0.03)]"
+        className="bg-white rounded-2xl overflow-hidden card-shadow"
       >
         <button
           type="button"
@@ -164,7 +164,7 @@ export default function FaqAccordion({
           // Rounded on the button itself: the focus outline follows the
           // button's own radius, not the card's. Top/bottom as separate
           // longhands so the bottom pair can transition when the panel opens.
-          className={`w-full rounded-t-2xl ${isOpen ? "rounded-b-none" : "rounded-b-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-[background-color,border-radius] duration-300 ease-out hover:bg-cardHover active:bg-cardHover`}
+          className={`w-full rounded-t-2xl ${isOpen ? "rounded-b-none" : "rounded-b-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-[border-radius] duration-300 ease-out hover:bg-cardHover active:bg-cardHover`}
           onClick={() => toggle(i)}
         >
           <span className="pr-4 text-gray-900 font-medium">

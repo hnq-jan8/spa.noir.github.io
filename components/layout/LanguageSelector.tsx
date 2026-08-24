@@ -80,7 +80,7 @@ function LanguageDropdownLinks({
             key={lang.code}
             href={`/${lang.code}${pathWithoutLocale}`}
             onClick={onSelect}
-            className={`flex items-center px-3 text-xs text-gray-200 transition-colors hover:text-white hover:font-medium active:text-white active:font-medium ${itemClassName}`}
+            className={`flex items-center px-3 text-xs text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium ${itemClassName}`}
           >
             <span>{lang.label}</span>
           </Link>
@@ -212,7 +212,7 @@ export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: 
         onClick={() => setOpen((o) => !o)}
         // Cùng nền với panel khi mở để đọc thành một khối liền. Chữ không đổi
         // màu: đây là ngôn ngữ đang chọn, không phải một lựa chọn bấm được.
-        className={`relative flex items-center px-2 lg:px-3 text-xs text-left text-gray-200 transition-colors h-full group-hover:bg-chrome-panelHover ${
+        className={`relative flex items-center px-2 lg:px-3 text-xs text-left text-gray-200 h-full group-hover:bg-chrome-panelHover ${
           visible ? "bg-chrome-panelHover" : ""
         }`}
       >

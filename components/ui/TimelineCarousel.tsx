@@ -95,7 +95,7 @@ export default function TimelineCarousel({
             <div className="flex flex-col items-center flex-shrink-0">
               <div
                 // Same hollow dot as the rest, amber border instead of gray.
-                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 mt-1 transition-all duration-200 ${
+                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 mt-1 transition-transform duration-200 ${
                   isPassed
                     ? "bg-white border-amber-600 group-hover:scale-125 group-hover:bg-amber-600 group-active:scale-125 group-active:bg-amber-600"
                     : "bg-white border-gray-400 group-hover:scale-125 group-hover:border-gray-500 group-hover:bg-gray-500 group-active:scale-125 group-active:border-gray-500 group-active:bg-gray-500"
@@ -111,7 +111,7 @@ export default function TimelineCarousel({
               {isGroupStart && item.date && (
                 <div className="flex items-center gap-2 mb-2.5">
                   <span
-                    className={`text-xs sm:text-sm transition-colors ${isPassed ? "text-amber-700 font-medium group-hover:text-amber-800 group-active:text-amber-800" : "text-gray-400 group-hover:text-gray-600 group-active:text-gray-600"}`}
+                    className={`text-xs sm:text-sm ${isPassed ? "text-amber-700 font-medium group-hover:text-amber-800 group-active:text-amber-800" : "text-gray-400 group-hover:text-gray-600 group-active:text-gray-600"}`}
                   >
                     {formatTimestamp(item.date, locale)}
                   </span>
@@ -126,12 +126,12 @@ export default function TimelineCarousel({
                 <div className="flex gap-4 items-start">
                   <div className="flex-1 min-w-0">
                     {heading && (
-                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance transition-colors group-hover:text-amber-800 group-active:text-amber-800">
+                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance group-hover:text-amber-800 group-active:text-amber-800">
                         {heading}
                       </h3>
                     )}
                     {excerpt && (
-                      <p className="text-sm text-gray-600 mb-2.5 transition-colors group-hover:text-gray-700 group-active:text-gray-700">
+                      <p className="text-sm text-gray-600 mb-2.5 group-hover:text-gray-700 group-active:text-gray-700">
                         {excerpt}
                       </p>
                     )}
@@ -150,18 +150,18 @@ export default function TimelineCarousel({
                   {item.previewImage && <Thumb src={item.previewImage} size="md" />}
                   <div className="flex-1 min-w-0">
                     {heading && (
-                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 text-balance mb-1 transition-colors group-hover:text-amber-800 group-active:text-amber-800">
+                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 text-balance mb-1 group-hover:text-amber-800 group-active:text-amber-800">
                         <span className="inline-flex items-center gap-1">
                           {heading}
                           <ChevronRight
-                            className="w-3.5 h-4 mt-0.5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                            className="w-3.5 h-4 mt-0.5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
                             strokeWidth={2}
                           />
                         </span>
                       </h4>
                     )}
                     {excerpt && (
-                      <p className="text-xs sm:text-sm text-gray-500 transition-colors group-hover:text-gray-700 group-active:text-gray-700">
+                      <p className="text-xs sm:text-sm text-gray-500 group-hover:text-gray-700 group-active:text-gray-700">
                         {excerpt}
                       </p>
                     )}

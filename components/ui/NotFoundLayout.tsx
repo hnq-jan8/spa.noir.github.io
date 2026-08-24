@@ -11,7 +11,7 @@ import Reveal from "@/components/ui/Reveal";
  * a symmetric pill), since two conflicting utilities in one class string
  * race on stylesheet order rather than composing. */
 export const NOT_FOUND_ACTION_CLASS =
-  "mt-6 bg-black/5 hover:bg-black/10 active:bg-black/10 transition-colors text-sm text-gray-900 py-2 rounded-xl";
+  "mt-6 bg-black/5 hover:bg-black/10 active:bg-black/10 text-sm text-gray-900 py-2 rounded-xl";
 
 export default function NotFoundLayout({
   title,

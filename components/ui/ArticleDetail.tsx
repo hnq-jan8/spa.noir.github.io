@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { ChevronLeft } from "lucide-react";
 import ArticleContent from "@/components/ui/ArticleContent";
+import Reveal from "@/components/ui/Reveal";
 import { titleOf } from "@/components/ui/ArticleCard";
 import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
@@ -73,7 +74,7 @@ export default function ArticleDetail({
           <button
             type="button"
             onClick={onBack}
-            className="hidden md:inline-flex group items-center gap-1 self-start text-sm text-gray-500 hover:text-amber-700 active:text-amber-700 transition-colors"
+            className="hidden md:inline-flex group items-center gap-1 self-start text-sm text-gray-500 hover:text-amber-700 active:text-amber-700"
           >
             <ChevronLeft
               className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1 group-active:-translate-x-1"
@@ -82,7 +83,10 @@ export default function ArticleDetail({
             {labels["back"]}
           </button>
         )}
-        <div className="flex items-center gap-3 text-gray-400 flex-wrap justify-start md:justify-end">
+        <Reveal
+          delay={100}
+          className="flex items-center gap-3 text-gray-400 flex-wrap justify-start md:justify-end"
+        >
           {article.date && (
             <span className="whitespace-nowrap">
               {formatTimestamp(article.date, locale)}
@@ -93,10 +97,10 @@ export default function ArticleDetail({
               {minutes} {labels["readingTime"]}
             </span>
           )}
-        </div>
+        </Reveal>
       </div>
       <div
-        className={`press-article-card md:bg-white md:rounded-2xl md:p-8 md:shadow-[0_0_6px_rgba(0,0,0,0.03)] ${isFullBleed ? "full-bleed" : ""}`}
+        className={`press-article-card md:bg-white md:rounded-2xl md:p-8 md:card-shadow md:border md:border-white ${isFullBleed ? "full-bleed" : ""}`}
       >
         <ArticleContent title={article.title} body={article.body} />
       </div>

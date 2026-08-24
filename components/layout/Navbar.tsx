@@ -195,7 +195,7 @@ export default function Navbar({
                           clearArticleRoute();
                           if (isActive) invalidateContent();
                         }}
-                        className={`text-xs whitespace-nowrap px-4 flex items-center transition-colors relative flex-shrink-0 ${
+                        className={`text-xs whitespace-nowrap px-4 flex items-center relative flex-shrink-0 ${
                           isActive
                             ? "text-white font-medium bg-black/15"
                             : "text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium"
@@ -372,7 +372,7 @@ export default function Navbar({
               }}
               // With an article open, "you are here" moves to the icon crumb and
               // this one drops back to a plain link.
-              className={`inline-flex items-center min-h-[24px] truncate transition-colors hover:text-gray-600 active:text-gray-600 ${
+              className={`inline-flex items-center min-h-[24px] truncate hover:text-gray-600 active:text-gray-600 ${
                 openedArticle
                   ? "text-gray-700 hover:text-gray-950 active:text-gray-950"
                   : "font-medium"

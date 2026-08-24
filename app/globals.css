@@ -44,6 +44,46 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  /* Shared card shadow: a very faint 0-offset glow to separate a card from
+     the page background, no border (see components/ui/Card.tsx). A manual
+     `md:` variant is defined alongside since Tailwind only auto-generates
+     responsive variants for its own utilities, not custom component classes. */
+  .card-shadow {
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.01);
+  }
+  @screen md {
+    .md\:card-shadow {
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.01);
+    }
+  }
+
+  /* The image-overlay grid tile's date fade (ArticleCard.tsx) — eased
+     stops so it reads as a smooth blend into the photo rather than a hard
+     edge. Hover retints white to cardHover via a plain selector swap, same
+     shape, same stops — an instant swap per the no-transition-on-color
+     rule (`background-image` can't transition smoothly like
+     `background-color` can anyway). Colors inlined from lib/theme-colors.js
+     since this is plain CSS, not Tailwind's palette. */
+  .card-fade {
+    background-image: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.85) 30%,
+      rgba(255, 255, 255, 0.45) 65%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+  .group:hover .card-fade,
+  .group:active .card-fade {
+    background-image: linear-gradient(
+      to top,
+      rgba(248, 249, 250, 1) 0%,
+      rgba(248, 249, 250, 0.85) 30%,
+      rgba(248, 249, 250, 0.45) 65%,
+      rgba(248, 249, 250, 0) 100%
+    );
+  }
+
   /* Horizontal inset a full-bleed CMS article cancels via
      `margin: calc(var(--article-pad) * -1)` to reach the edge. Below md
      there's no card box (see press-article-card usage), so this tracks

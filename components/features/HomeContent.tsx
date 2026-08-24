@@ -131,7 +131,7 @@ export default function HomeContent() {
         </p>
       </Reveal>
       <Reveal delay={50} className="relative mb-4">
-        <div className="relative z-[2] bg-surface rounded-2xl p-6 shadow-[0_0_6px_rgba(0,0,0,0.03)]">
+        <div className="relative z-[2] bg-surface rounded-2xl p-6 card-shadow border border-gray-200">
           <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
             {Object.entries(data.common.contacts)
               .filter(([, value]) => value)
@@ -147,7 +147,7 @@ export default function HomeContent() {
                   </p>
                   <a
                     href={href}
-                    className="text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700 transition-colors"
+                    className="text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700"
                   >
                     {value}
                   </a>
@@ -182,12 +182,12 @@ export default function HomeContent() {
           Settings-style, instead of three separate cards with gaps between
           them. */}
       <Reveal delay={100} className="min-[800px]:hidden mb-4">
-        <div className="bg-white rounded-2xl divide-y divide-gray-100 overflow-hidden shadow-[0_0_6px_rgba(0,0,0,0.03)]">
+        <div className="bg-white rounded-2xl divide-y divide-gray-100 overflow-hidden card-shadow">
           {browseItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-cardHover active:bg-cardHover transition-colors"
+              className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-cardHover active:bg-cardHover"
             >
               <item.Icon
                 className="w-5 h-5 text-gray-400 flex-shrink-0 mr-1 sm:mr-2"
@@ -230,7 +230,7 @@ export default function HomeContent() {
                   </div>
                 </div>
                 <ChevronRight
-                  className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                  className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
                   strokeWidth={2}
                 />
               </CardLink>
@@ -256,7 +256,7 @@ export default function HomeContent() {
               </div>
             </div>
             <ChevronRight
-              className="w-5 h-5 text-gray-300 flex-shrink-0 transition-all group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+              className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
               strokeWidth={2}
             />
           </CardLink>

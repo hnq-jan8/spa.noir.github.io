@@ -53,7 +53,7 @@ function SearchField({
         placeholder={placeholder}
         aria-label={placeholder}
         // Gray, not amber — same fill a card gets on hover, not the accent.
-        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-[0_0_5px_rgba(0,0,0,0.05)] transition-[background-color,border-color] focus:outline-none focus:bg-white focus:border-gray-400"
+        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-400"
       />
       {query && (
         <button
