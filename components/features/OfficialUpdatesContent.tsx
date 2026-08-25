@@ -5,6 +5,8 @@ import ArticleNotFound from "@/components/ui/ArticleNotFound";
 import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import Reveal from "@/components/ui/Reveal";
 import TimelineCarousel from "@/components/ui/TimelineCarousel";
+import ArticleDetailSkeleton from "@/components/ui/skeletons/ArticleDetailSkeleton";
+import OfficialUpdatesSkeleton from "@/components/ui/skeletons/OfficialUpdatesSkeleton";
 import { useArticleRoute } from "@/hooks/useArticleRoute";
 import { useContentState } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
@@ -15,7 +17,15 @@ export default function OfficialUpdatesContent() {
   const { data, failed } = useContentState();
   const { key, open, close } = useArticleRoute();
 
-  if (!data) return failed ? <ContentLoadError /> : null;
+  // Direct hit on an article link: skeleton the detail view, not the timeline.
+  if (!data)
+    return failed ? (
+      <ContentLoadError />
+    ) : key ? (
+      <ArticleDetailSkeleton />
+    ) : (
+      <OfficialUpdatesSkeleton />
+    );
 
   const updates = data.officialUpdates.updates;
   const labels = data.officialUpdates.labels["officialUpdates"] ?? {};

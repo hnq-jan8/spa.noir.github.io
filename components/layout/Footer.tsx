@@ -3,10 +3,14 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useContentData } from "@/hooks/useContentData";
+import { useContentState } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
 import { isHomePath } from "@/i18n/paths";
+import {
+  FooterContactsSkeleton,
+  FooterSocialSkeleton,
+} from "@/components/ui/skeletons/FooterSkeleton";
 
 const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 
@@ -51,7 +55,9 @@ export default function Footer({
 }) {
   const pathname = usePathname();
   const isHome = isHomePath(pathname);
-  const data = useContentData();
+  // `failed` too: on a dead content.json these blocks never arrive, and a
+  // skeleton left running forever reads as a hung page.
+  const { data, failed } = useContentState();
   const [logoBroken, setLogoBroken] = useState(false);
   const locale = useLocale();
   // Fallback về label bundle lúc build — hiện ngay, content.json ghi đè khi về.
@@ -82,6 +88,7 @@ export default function Footer({
         </div>
 
         {/* Contact info — chỉ hiện ở các trang con, trang chủ đã có riêng */}
+        {!isHome && !data && !failed && <FooterContactsSkeleton />}
         {!isHome && data && support && (
           <div className="grid grid-cols-1 min-[510px]:grid-cols-2 lg:grid-cols-4 gap-6">
             {Object.entries(data.common.contacts)
@@ -109,6 +116,7 @@ export default function Footer({
         )}
 
         {/* Social links */}
+        {!data && !failed && <FooterSocialSkeleton />}
         {socialLinks.length > 0 && (
           <div className="mt-8">
             <p className="text-xs text-gray-500 mb-3 uppercase tracking-wide">

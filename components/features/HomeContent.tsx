@@ -14,6 +14,7 @@ import { useLocale } from "@/hooks/useLocale";
 import { formatTimestamp } from "@/lib/siteData";
 import { ContentLoadError } from "@/components/ui/EmptyState";
 import { excerptOf, titleOf } from "@/components/ui/ArticleCard";
+import HomeSkeleton from "@/components/ui/skeletons/HomeSkeleton";
 import Reveal from "@/components/ui/Reveal";
 import { CardLink } from "@/components/ui/Card";
 
@@ -21,7 +22,7 @@ export default function HomeContent() {
   const locale = useLocale();
   const { data, failed } = useContentState();
 
-  if (!data) return failed ? <ContentLoadError /> : null;
+  if (!data) return failed ? <ContentLoadError /> : <HomeSkeleton />;
 
   // `?? {}`: assembleContentPayload drops a namespace with no ui_labels rows.
   const nav = data.common.labels["nav"] ?? {};

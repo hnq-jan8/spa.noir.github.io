@@ -6,6 +6,7 @@ import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import FaqAccordion from "@/components/ui/FaqAccordion";
 import { useHideBreadcrumbWhen } from "@/hooks/useBreadcrumbVisibility";
 import { useContentState } from "@/hooks/useContentData";
+import FaqsSkeleton from "@/components/ui/skeletons/FaqsSkeleton";
 import Reveal from "../ui/Reveal";
 
 /** Same curve + negative-delay trick as the FAQ accordion's own expand
@@ -148,7 +149,7 @@ export default function FaqsContent() {
     if (firstQuestion !== undefined) hasShownResultsRef.current = true;
   });
 
-  if (!data) return failed ? <ContentLoadError /> : null;
+  if (!data) return failed ? <ContentLoadError /> : <FaqsSkeleton />;
 
   if (faqs.length === 0) {
     return (

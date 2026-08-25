@@ -4,12 +4,13 @@ import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import FlightTable from "@/components/ui/FlightTable";
 import MarkdownContent from "@/components/ui/MarkdownContent";
 import Reveal from "@/components/ui/Reveal";
+import FlightInfoSkeleton from "@/components/ui/skeletons/FlightInfoSkeleton";
 import { useContentState } from "@/hooks/useContentData";
 
 export default function FlightInfoContent() {
   const { data, failed } = useContentState();
 
-  if (!data) return failed ? <ContentLoadError /> : null;
+  if (!data) return failed ? <ContentLoadError /> : <FlightInfoSkeleton />;
 
   const fi = data.flightInfo.labels["flightInfo"] ?? {};
   const flights = data.flightInfo.flights;

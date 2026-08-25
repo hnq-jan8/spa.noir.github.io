@@ -5,6 +5,8 @@ import ArticleDetail from "@/components/ui/ArticleDetail";
 import ArticleNotFound from "@/components/ui/ArticleNotFound";
 import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import Reveal from "@/components/ui/Reveal";
+import ArticleDetailSkeleton from "@/components/ui/skeletons/ArticleDetailSkeleton";
+import PressReleasesSkeleton from "@/components/ui/skeletons/PressReleasesSkeleton";
 import { useArticleRoute } from "@/hooks/useArticleRoute";
 import { useContentState } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
@@ -35,7 +37,16 @@ export default function PressReleasesContent() {
   const { data, failed } = useContentState();
   const { key, open, close } = useArticleRoute();
 
-  if (!data) return failed ? <ContentLoadError /> : null;
+  // `key` set before the content lands means a direct hit on an article link —
+  // skeleton the detail view, not the list it would never show.
+  if (!data)
+    return failed ? (
+      <ContentLoadError />
+    ) : key ? (
+      <ArticleDetailSkeleton />
+    ) : (
+      <PressReleasesSkeleton />
+    );
 
   const releases = data.pressReleases.releases;
   const labels = data.pressReleases.labels["pressReleases"] ?? {};

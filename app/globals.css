@@ -132,6 +132,50 @@
     border-radius: 0;
   }
 
+  /* Loading placeholder block. Neutral fill + a light sweep across it, so a
+     skeleton reads as "still coming" rather than as an empty gray card. The
+     sweep is a pseudo-element gradient (compositor-friendly transform), and
+     it stops entirely under prefers-reduced-motion — the fill alone still
+     carries the meaning. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-gray-200/70;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after {
+      animation: none;
+    }
+  }
+
+  /* Two darker fills for placeholders that sit on something other than the
+     page background: white cards, and the `surface` gray of the footer and
+     the home page's hotline card. The `md:` variant is written out by hand
+     (Tailwind only auto-generates responsive variants for its own utilities,
+     same as .card-shadow above) for the pages whose card box starts at md. */
+  .skeleton-on-card {
+    @apply bg-gray-200;
+  }
+  @screen md {
+    .md\:skeleton-on-card {
+      @apply bg-gray-200;
+    }
+  }
+  .skeleton-on-surface {
+    @apply bg-gray-300/70;
+  }
+
   .pill-badge {
     @apply border border-gray-400 rounded-full px-6 py-2.5 text-sm text-gray-700 text-center;
   }
@@ -149,5 +193,11 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@keyframes skeleton-sweep {
+  100% {
+    transform: translateX(100%);
   }
 }
