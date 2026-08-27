@@ -200,14 +200,18 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
     },
     faqs: {
       // searchText spans every locale, so a query in one language still finds
-      // the same item's translation in another.
-      faqs: payload.faqs.faqs.map((f) => ({
-        question: pickText(f.question, locale),
-        answer: pickText(f.answer, locale),
-        searchText: [...Object.values(f.question), ...Object.values(f.answer)]
-          .join(" ")
-          .toLocaleLowerCase(),
-      })),
+      // the same item's translation in another. An item missing its question
+      // or answer for this locale (null or blank, no default-locale fallback)
+      // is dropped rather than shown untranslated.
+      faqs: payload.faqs.faqs
+        .filter((f) => f.question[locale]?.trim() && f.answer[locale]?.trim())
+        .map((f) => ({
+          question: pickText(f.question, locale),
+          answer: pickText(f.answer, locale),
+          searchText: [...Object.values(f.question), ...Object.values(f.answer)]
+            .join(" ")
+            .toLocaleLowerCase(),
+        })),
       labels: resolveLabels(payload.faqs.labels, locale),
     },
     flightInfo: {
