@@ -98,19 +98,19 @@ export default function FlightTable({
               <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center py-3">
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-400 mb-1">{h.date}</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="font-medium text-gray-900">
                     {formatFlightDate(row.date) || "–"}
                   </p>
                 </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-400 mb-1">{h.srtd}</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="font-medium text-gray-900">
                     {row.srtd}
                   </p>
                 </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-400 mb-1">{h.atd}</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="font-medium text-gray-900">
                     {row.atd}
                   </p>
                 </div>

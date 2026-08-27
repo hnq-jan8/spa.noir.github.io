@@ -11,12 +11,12 @@ const TIME_ZONE = "Asia/Ho_Chi_Minh";
 const DAY_FIRST_LOCALES = new Set(["vi"]);
 
 const MONTHS_SHORT = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
 ];
 
 /**
- * Ngày khai thác chuyến bay dạng ddMMM ("27Aug") — đủ ngắn cho một ô bảng.
+ * Ngày khai thác chuyến bay dạng ddMMM ("27AUG") — đủ ngắn cho một ô bảng.
  *
  * Giá trị CMS là date-only ("2026-08-27"), nên tách thẳng từ chuỗi thay vì qua
  * `new Date` + timezone: parse date-only ra UTC midnight rồi format theo múi
