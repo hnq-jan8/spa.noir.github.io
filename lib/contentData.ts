@@ -82,8 +82,8 @@ export interface ResolvedArticle {
 
 export interface ContentFlightRow {
   no: number;
-  type: string;
-  capacity: number | string;
+  /** Date-only từ CMS ("2026-08-27"); FlightTable format sang ddMMM. */
+  date: string | null;
   flightNo: string;
   departure: string;
   arrival: string;

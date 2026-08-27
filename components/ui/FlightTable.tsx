@@ -1,11 +1,13 @@
 "use client";
 
-import { ArrowRight, Plane, Tag, Users } from "lucide-react";
+import { ArrowRight, Plane } from "lucide-react";
+
+import { formatFlightDate } from "@/lib/siteData";
 
 export interface FlightRow {
   no: number | string;
-  type: string;
-  capacity: number | string;
+  /** Date-only từ CMS ("2026-08-27"); hiển thị dạng ddMMM. */
+  date: string | null;
   flightNo: string;
   departure: string;
   arrival: string;
@@ -16,8 +18,7 @@ export interface FlightRow {
 
 interface FlightHeaders {
   no: string;
-  type: string;
-  capacity: string;
+  date: string;
   flightNo: string;
   route: string;
   srtd: string;
@@ -33,8 +34,7 @@ interface FlightTableProps {
 
 const defaultHeaders: FlightHeaders = {
   no: "No",
-  type: "Type",
-  capacity: "Capacity",
+  date: "Date",
   flightNo: "Flight No",
   route: "Route",
   srtd: "SRTD",
@@ -92,40 +92,27 @@ export default function FlightTable({
 
               <div className="mx-4 border-b pt-4 border-gray-200" />
 
-              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm text-center pt-3">
+              {/* Date joins the two times as even thirds — one date and two
+                  times balance in a way the old type/capacity pair needed its
+                  own row and second divider for. */}
+              <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center py-3">
+                <div className="flex flex-col justify-center">
+                  <p className="text-xs text-gray-400 mb-1">{h.date}</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {formatFlightDate(row.date) || "–"}
+                  </p>
+                </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-400 mb-1">{h.srtd}</p>
-                  <p className="text-lg font-bold text-gray-900">{row.srtd}</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {row.srtd}
+                  </p>
                 </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-400 mb-1">{h.atd}</p>
-                  <p className="text-lg font-bold text-gray-900">{row.atd}</p>
-                </div>
-              </div>
-
-              <div className="mx-4 border-b pt-3 border-gray-200" />
-
-              <div className="grid grid-cols-2 divide-x divide-gray-200 text-sm py-3 min-h-[74px]">
-                <div className="flex items-center justify-center gap-2">
-                  <Tag
-                    className="w-4 h-4 text-gray-400 flex-shrink-0"
-                    strokeWidth={2}
-                  />
-                  <div>
-                    <p className="text-gray-400 text-xs">{h.type}</p>
-                    <p className="font-medium text-gray-900">{row.type}</p>
-                  </div>
-                  <div className="w-3 flex-shrink-0" aria-hidden="true" />
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Users
-                    className="w-4 h-4 text-gray-400 flex-shrink-0"
-                    strokeWidth={2}
-                  />
-                  <div>
-                    <p className="text-gray-400 text-xs">{h.capacity}</p>
-                    <p className="font-medium text-gray-900">{row.capacity}</p>
-                  </div>
+                  <p className="text-lg font-bold text-gray-900">
+                    {row.atd}
+                  </p>
                 </div>
               </div>
             </div>
@@ -174,10 +161,10 @@ export default function FlightTable({
                   scope="row"
                   className="py-3 pr-8 font-medium text-gray-500 align-top whitespace-nowrap"
                 >
-                  {h.type} / {h.capacity}
+                  {h.date}
                 </th>
                 <td className="py-3 font-medium text-gray-900">
-                  {rows[0].type} · {rows[0].capacity}
+                  {formatFlightDate(rows[0].date) || "–"}
                 </td>
               </tr>
               <tr>
@@ -239,10 +226,7 @@ export default function FlightTable({
                     {h.no}
                   </th>
                   <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
-                    {h.type}
-                  </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
-                    {h.capacity}
+                    {h.date}
                   </th>
                   <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
                     {h.flightNo}
@@ -268,10 +252,7 @@ export default function FlightTable({
                       {row.no}
                     </td>
                     <td className="py-3 pr-4 lg:pr-8 text-gray-600">
-                      {row.type}
-                    </td>
-                    <td className="py-3 pr-4 lg:pr-8 text-gray-600">
-                      {row.capacity}
+                      {formatFlightDate(row.date) || "–"}
                     </td>
                     <td className="py-3 pr-4 lg:pr-8 font-semibold text-gray-700">
                       {row.flightNo}

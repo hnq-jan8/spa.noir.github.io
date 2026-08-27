@@ -61,8 +61,8 @@ export interface OfficialUpdate {
 
 export interface Flight {
   flight_no: string;
-  aircraft_type: string | null;
-  capacity: number | null;
+  /** Date-only ("2026-08-27"). */
+  date: string | null;
   dep: string | null;
   arr: string | null;
   srtd: string | null;

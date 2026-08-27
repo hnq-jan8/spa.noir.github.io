@@ -114,8 +114,8 @@ export function assembleContentPayload({
     flightInfo: {
       flights: flights.map((f, i) => ({
         no: i + 1,
-        type: f.aircraft_type ?? "–",
-        capacity: f.capacity ?? "–",
+        // Date-only từ CMS ("2026-08-27"); web tự format sang ddMMM.
+        date: f.date ?? null,
         flightNo: f.flight_no ?? "–",
         departure: f.dep ?? "–",
         arrival: f.arr ?? "–",
@@ -138,7 +138,7 @@ export function assembleContentPayload({
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.officialUpdates),
     },
     pressReleases: {
-      // Giữ nguyên thứ tự `sort` của biên tập viên; bài đầu là bài nổi bật.
+      // Thứ tự do query lo (sort=-published_at); bài đầu là bài mới nhất.
       releases: pressReleases.map((r) => ({
         id: String(r.id),
         slug: r.slug || String(r.id),

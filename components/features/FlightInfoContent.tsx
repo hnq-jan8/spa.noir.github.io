@@ -32,8 +32,7 @@ export default function FlightInfoContent() {
             rows={flights}
             headers={{
               no: fi["no"],
-              type: fi["type"],
-              capacity: fi["capacity"],
+              date: fi["date"],
               flightNo: fi["flightNo"],
               route: fi["route"],
               srtd: fi["srtd"],

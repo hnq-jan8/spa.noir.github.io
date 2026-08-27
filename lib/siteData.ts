@@ -10,6 +10,25 @@ const TIME_ZONE = "Asia/Ho_Chi_Minh";
 /** Tiếng Việt giữ dd/MM/yyyy; các ngôn ngữ còn lại dùng yyyy/MM/dd. */
 const DAY_FIRST_LOCALES = new Set(["vi"]);
 
+const MONTHS_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * Ngày khai thác chuyến bay dạng ddMMM ("27Aug") — đủ ngắn cho một ô bảng.
+ *
+ * Giá trị CMS là date-only ("2026-08-27"), nên tách thẳng từ chuỗi thay vì qua
+ * `new Date` + timezone: parse date-only ra UTC midnight rồi format theo múi
+ * giờ khác là chỗ dễ lệch một ngày. Tên tháng giữ tiếng Anh ở mọi locale, cùng
+ * quy ước với SRTD/ATD trong bảng này.
+ */
+export function formatFlightDate(value: string | null) {
+  const m = value ? /^(\d{4})-(\d{2})-(\d{2})/.exec(value) : null;
+  const month = m ? MONTHS_SHORT[Number(m[2]) - 1] : undefined;
+  return m && month ? `${m[3]}${month}` : "";
+}
+
 export function formatTimestamp(iso: string, locale: string) {
   const date = new Date(iso);
   // `Intl.format` throws RangeError on an invalid date, which would take the

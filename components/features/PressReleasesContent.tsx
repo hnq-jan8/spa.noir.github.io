@@ -99,7 +99,10 @@ export default function PressReleasesContent() {
     );
   }
 
-  const [featured, ...rest] = releases;
+  // Releases arrive newest-first (sort=-published_at in the Directus query), so
+  // the lead card is simply the most recent one — there's no editor-picked
+  // ordering behind it any more.
+  const [latest, ...rest] = releases;
   // Positions 2–3 stay the full-width list style; from position 4 on, items
   // are grouped into rows of 3. The remainder row (1 leftover → full width,
   // 2 → 2/1 split) comes first, right after the top 3 — every row after
@@ -111,11 +114,11 @@ export default function PressReleasesContent() {
     <div className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto">
       <Reveal>
         <ArticleCard
-          article={featured}
+          article={latest}
           locale={locale}
-          onOpen={() => open(featured.key)}
+          onOpen={() => open(latest.key)}
           readMoreLabel={labels["readMore"]}
-          badge={labels["featured"]}
+          badge={labels["latest"]}
           featured
         />
         {listItems.length > 0 && (
