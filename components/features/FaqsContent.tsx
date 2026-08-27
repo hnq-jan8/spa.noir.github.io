@@ -54,7 +54,7 @@ function SearchField({
         placeholder={placeholder}
         aria-label={placeholder}
         // Gray, not amber — same fill a card gets on hover, not the accent.
-        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-400"
+        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-500 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-400"
       />
       {query && (
         <button
@@ -236,7 +236,7 @@ export default function FaqsContent() {
           tabIndex={mobileSearchOpen ? 0 : -1}
           // text-base (16px), not text-sm: iOS Safari auto-zooms the viewport on
           // focus for anything smaller, fighting the capsule's expand.
-          className={`absolute inset-y-0 left-9 right-9 bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none transition-opacity duration-150 ${
+          className={`absolute inset-y-0 left-9 right-9 bg-transparent text-base text-gray-900 placeholder:text-gray-500 focus:outline-none transition-opacity duration-150 ${
             mobileSearchOpen
               ? "opacity-100"
               : "opacity-0 pointer-events-none"

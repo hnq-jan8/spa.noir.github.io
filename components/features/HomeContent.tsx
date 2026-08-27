@@ -64,7 +64,7 @@ export default function HomeContent() {
       <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6">
         <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
         <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 animate-pulse-glow" />
+          <span className="ripple-dot w-1.5 h-1.5 rounded-full bg-gray-900 flex-shrink-0" />
           <p className="flex flex-wrap items-center min-h-[24px] gap-x-1">
             <span>{home["asOf"]}:</span>
             <span className="whitespace-nowrap">{asOf}</span>
@@ -79,10 +79,11 @@ export default function HomeContent() {
             href={`/${locale}/official-updates`}
             // The left rule is a deliberate exception to the no-lines card rule:
             // an accent, not an outline, on the one card that must win the first
-            // glance. Warm surface, hence update/updateHover.
-            className="block border-l-4 border-l-amber-600 !bg-update hover:!bg-updateHover active:!bg-updateHover pb-4"
+            // glance. Plain white surface + default card hover, like every
+            // other card — the rule alone carries the emphasis.
+            className="block border-l-4 border-l-gray-900 pb-4"
           >
-            <p className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
+            <p className="flex items-center gap-1.5 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-2">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
               {home["officialUpdateBadge"]}
             </p>
@@ -95,11 +96,11 @@ export default function HomeContent() {
               {excerptOf(latestUpdate)}
             </p>
             <div className="flex items-center justify-between text-xs mt-5">
-              <span className="text-gray-400">
+              <span className="text-gray-500">
                 {latestUpdate.date &&
                   formatTimestamp(latestUpdate.date, locale)}
               </span>
-              <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
+              <span className="text-gray-600 font-semibold inline-flex items-center gap-1">
                 {home["viewAll"]}
                 <ChevronRight
                   className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
@@ -127,7 +128,7 @@ export default function HomeContent() {
           label and the block it introduces fade in as one unit, instead of
           the heading arriving first and reading as a separate element. */}
       <Reveal delay={50}>
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+        <p className="text-xs text-gray-500 uppercase tracking-wide mb-2 mt-6 pl-1.5">
           {home["supportSection"]}
         </p>
       </Reveal>
@@ -143,12 +144,12 @@ export default function HomeContent() {
                 : `tel:${value.replace(/[^+\d]/g, "")}`;
               return (
                 <div key={key}>
-                  <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">
+                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                     {support[key]}
                   </p>
                   <a
                     href={href}
-                    className="text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700"
+                    className="text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
                   >
                     {value}
                   </a>
@@ -174,7 +175,7 @@ export default function HomeContent() {
           these as one "look something up" set, separating them from the
           urgent update and the hotlines above. */}
       <Reveal delay={100}>
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+        <p className="text-xs text-gray-500 uppercase tracking-wide mb-2 mt-6 pl-1.5">
           {home["browseSection"]}
         </p>
       </Reveal>

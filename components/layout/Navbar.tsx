@@ -165,7 +165,7 @@ export default function Navbar({
                 alt="SUN PhuQuoc Airways"
                 width={185}
                 height={43}
-                className="h-7 md:h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_#202020]"
+                className="h-7 md:h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)]"
                 priority
               />
             </Link>
@@ -197,7 +197,7 @@ export default function Navbar({
                         }}
                         className={`text-xs whitespace-nowrap px-4 flex items-center relative flex-shrink-0 ${
                           isActive
-                            ? "text-white font-medium bg-black/15"
+                            ? "text-white font-medium bg-white/10"
                             : "text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium"
                         }`}
                       >
@@ -215,17 +215,17 @@ export default function Navbar({
                           <span className="relative">
                             {item.label}
                             {showDot && (
-                              <span className="absolute -top-0.5 -right-2 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_3px_1px_rgba(239,68,68,0.5)]" />
+                              <span className="absolute -top-0.5 -right-2 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]" />
                             )}
                           </span>
                         </span>
-                        {/* Amber, matching the site's single accent. White
-                            read as an artefact of the chrome against the page
-                            below it rather than as a deliberate marker. */}
+                        {/* White on the gray chrome — the only accent left in a
+                            black-and-white palette that still reads as a
+                            deliberate marker rather than an artefact. */}
                         {isActive && (
                           <span
                             aria-hidden="true"
-                            className="absolute inset-x-0 bottom-0 h-0.5 bg-amber-500"
+                            className="absolute inset-x-0 bottom-0 h-0.5 bg-white"
                           />
                         )}
                       </Link>
@@ -292,7 +292,7 @@ export default function Navbar({
                 {hasUnreadUpdate && !menuOpen && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-2.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_3px_1px_rgba(239,68,68,0.5)]"
+                    className="absolute top-2.5 right-1.5 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]"
                   />
                 )}
                 <span className="relative w-4 h-4 flex items-center justify-center ml-1">
@@ -354,7 +354,7 @@ export default function Navbar({
             <Link
               href={`/${locale}`}
               onClick={() => clearArticleRoute()}
-              className="inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-950 active:text-gray-950"
+              className="inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-900 active:text-gray-900"
             >
               {nav?.["home"]}
             </Link>
@@ -374,7 +374,7 @@ export default function Navbar({
               // this one drops back to a plain link.
               className={`inline-flex items-center min-h-[24px] truncate hover:text-gray-600 active:text-gray-600 ${
                 openedArticle
-                  ? "text-gray-700 hover:text-gray-950 active:text-gray-950"
+                  ? "text-gray-700 hover:text-gray-900 active:text-gray-900"
                   : "font-medium"
               }`}
             >

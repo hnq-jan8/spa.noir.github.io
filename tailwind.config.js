@@ -1,3 +1,4 @@
+const colors = require("tailwindcss/colors");
 const { COLORS } = require("./lib/theme-colors");
 
 /** @type {import('tailwindcss').Config} */
@@ -18,6 +19,11 @@ module.exports = {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       colors: {
+        // Thang xám của site là `neutral` (R=G=B) chứ không phải `gray` mặc
+        // định của Tailwind (ám xanh, H~215-220): bảng màu chỉ có trắng-đen nên
+        // mọi sắc độ đều phải trung tính. Đè lên tên `gray` để toàn bộ class
+        // `*-gray-*` sẵn có giữ nguyên, không phải sửa từng component.
+        gray: colors.neutral,
         chrome: {
           DEFAULT: COLORS.chrome,
           panelHover: COLORS.chromePanelHover,
@@ -25,23 +31,6 @@ module.exports = {
         page: COLORS.page,
         surface: COLORS.surface,
         cardHover: COLORS.cardHover,
-        update: COLORS.update,
-        updateHover: COLORS.updateHover,
-      },
-      keyframes: {
-        "pulse-glow": {
-          "0%, 100%": {
-            opacity: "1",
-            boxShadow: "0 0 3px 1px rgba(239, 68, 68, 0.5)",
-          },
-          "50%": {
-            opacity: ".5",
-            boxShadow: "0 0 0 0 rgba(239, 68, 68, 0)",
-          },
-        },
-      },
-      animation: {
-        "pulse-glow": "pulse-glow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

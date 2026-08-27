@@ -79,7 +79,7 @@ export default function TimelineCarousel({
     <div className="mb-12">
       {items.map((item, idx) => {
         const isGroupStart = groupStartOf[idx] === idx;
-        // The newest group is the current status — amber, like the "as of" badge.
+        // The newest group is the current status — near-black, the palette's strongest tone.
         const isPassed = groupStartOf[idx] === 0;
         const isLast = idx === items.length - 1;
         const excerpt = excerptOf(item, 200);
@@ -94,16 +94,16 @@ export default function TimelineCarousel({
           >
             <div className="flex flex-col items-center flex-shrink-0">
               <div
-                // Same hollow dot as the rest, amber border instead of gray.
+                // Same hollow dot as the rest, near-black border instead of gray.
                 className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 mt-1 transition-transform duration-200 ${
                   isPassed
-                    ? "bg-white border-amber-600 group-hover:scale-125 group-hover:bg-amber-600 group-active:scale-125 group-active:bg-amber-600"
+                    ? "bg-white border-gray-900 group-hover:scale-125 group-hover:bg-gray-900 group-active:scale-125 group-active:bg-gray-900"
                     : "bg-white border-gray-400 group-hover:scale-125 group-hover:border-gray-500 group-hover:bg-gray-500 group-active:scale-125 group-active:border-gray-500 group-active:bg-gray-500"
                 }`}
               />
               {!isLast && (
                 <div
-                  className={`w-px flex-1 mt-1 ${isPassed ? "bg-amber-500" : "bg-gray-300"}`}
+                  className={`w-px flex-1 mt-1 ${isPassed ? "bg-gray-500" : "bg-gray-300"}`}
                 />
               )}
             </div>
@@ -111,12 +111,12 @@ export default function TimelineCarousel({
               {isGroupStart && item.date && (
                 <div className="flex items-center gap-2 mb-2.5">
                   <span
-                    className={`text-xs sm:text-sm ${isPassed ? "text-amber-700 font-medium group-hover:text-amber-800 group-active:text-amber-800" : "text-gray-400 group-hover:text-gray-600 group-active:text-gray-600"}`}
+                    className={`text-xs sm:text-sm ${isPassed ? "text-gray-600 font-medium group-hover:text-gray-900 group-active:text-gray-900" : "text-gray-500 group-hover:text-gray-700 group-active:text-gray-700"}`}
                   >
                     {formatTimestamp(item.date, locale)}
                   </span>
                   {isPassed && latestLabel && (
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-50 rounded px-1.5 py-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wide text-white bg-gray-900 rounded px-1.5 py-0.5">
                       {latestLabel}
                     </span>
                   )}
@@ -126,7 +126,7 @@ export default function TimelineCarousel({
                 <div className="flex gap-4 items-start">
                   <div className="flex-1 min-w-0">
                     {heading && (
-                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance group-hover:text-amber-800 group-active:text-amber-800">
+                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance group-hover:text-gray-600 group-active:text-gray-600">
                         {heading}
                       </h3>
                     )}
@@ -135,7 +135,7 @@ export default function TimelineCarousel({
                         {excerpt}
                       </p>
                     )}
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600">
                       {viewDetailsLabel}
                       <ChevronRight
                         className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
@@ -150,7 +150,7 @@ export default function TimelineCarousel({
                   {item.previewImage && <Thumb src={item.previewImage} size="md" />}
                   <div className="flex-1 min-w-0">
                     {heading && (
-                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 text-balance mb-1 group-hover:text-amber-800 group-active:text-amber-800">
+                      <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1 group-hover:text-gray-600 group-active:text-gray-600">
                         <span className="inline-flex items-center gap-1">
                           {heading}
                           <ChevronRight

@@ -77,10 +77,10 @@
   .group:active .card-fade {
     background-image: linear-gradient(
       to top,
-      rgba(248, 249, 250, 1) 0%,
-      rgba(248, 249, 250, 0.85) 30%,
-      rgba(248, 249, 250, 0.45) 65%,
-      rgba(248, 249, 250, 0) 100%
+      rgba(250, 250, 250, 1) 0%,
+      rgba(250, 250, 250, 0.85) 30%,
+      rgba(250, 250, 250, 0.45) 65%,
+      rgba(250, 250, 250, 0) 100%
     );
   }
 
@@ -176,6 +176,36 @@
     @apply bg-gray-300/70;
   }
 
+  /* The "as of" pill's live dot: a single ring travelling outward and fading,
+     like a drop hitting water — replaces the old glow pulse, which read as a
+     colored halo the black-and-white palette has no room for. The ring is a
+     pseudo-element so the dot itself stays a plain `bg-*` + `rounded-full`
+     span, and it stops entirely under prefers-reduced-motion. */
+  .ripple-dot {
+    position: relative;
+  }
+  .ripple-dot::after {
+    content: "";
+    position: absolute;
+    /* Centred on the dot by translate, and grown by width/height rather than
+       `transform: scale` — scaling would magnify the 1px border along with the
+       ring and land the hairline off-centre on fractional pixels. */
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    border-radius: 9999px;
+    border: 1px solid rgb(23, 23, 23);
+    animation: dot-ripple 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ripple-dot::after {
+      animation: none;
+      opacity: 0;
+    }
+  }
+
   .pill-badge {
     @apply border border-gray-400 rounded-full px-6 py-2.5 text-sm text-gray-700 text-center;
   }
@@ -193,6 +223,20 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@keyframes dot-ripple {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 0.35;
+  }
+  70%,
+  100% {
+    width: 230%;
+    height: 230%;
+    opacity: 0;
   }
 }
 

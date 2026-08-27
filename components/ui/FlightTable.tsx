@@ -97,19 +97,19 @@ export default function FlightTable({
                   own row and second divider for. */}
               <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center py-3">
                 <div className="flex flex-col justify-center">
-                  <p className="text-xs text-gray-400 mb-1">{h.date}</p>
+                  <p className="text-xs text-gray-500 mb-1">{h.date}</p>
                   <p className="font-medium text-gray-900">
                     {formatFlightDate(row.date) || "–"}
                   </p>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <p className="text-xs text-gray-400 mb-1">{h.srtd}</p>
+                  <p className="text-xs text-gray-500 mb-1">{h.srtd}</p>
                   <p className="font-medium text-gray-900">
                     {row.srtd}
                   </p>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <p className="text-xs text-gray-400 mb-1">{h.atd}</p>
+                  <p className="text-xs text-gray-500 mb-1">{h.atd}</p>
                   <p className="font-medium text-gray-900">
                     {row.atd}
                   </p>
@@ -222,25 +222,25 @@ export default function FlightTable({
                     border is painted by the table grid and stays behind when
                     the thead sticks. A shadow travels with the th. */}
                 <tr>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb] text-center">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5] text-center">
                     {h.no}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5]">
                     {h.date}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5]">
                     {h.flightNo}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5]">
                     {h.route}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb] text-center">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5] text-center">
                     {h.srtd}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb] text-center">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5] text-center">
                     {h.atd}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e7eb]">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5]">
                     {h.note}
                   </th>
                 </tr>

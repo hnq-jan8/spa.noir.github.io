@@ -17,12 +17,12 @@ function NodeSkeleton({
       <div className="flex flex-col items-center flex-shrink-0">
         <div
           className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 mt-1 bg-white ${
-            latest ? "border-amber-600/50" : "border-gray-300"
+            latest ? "border-gray-900/50" : "border-gray-300"
           }`}
         />
         {!last && (
           <div
-            className={`w-px flex-1 mt-1 ${latest ? "bg-amber-500/40" : "bg-gray-200"}`}
+            className={`w-px flex-1 mt-1 ${latest ? "bg-gray-500/40" : "bg-gray-200"}`}
           />
         )}
       </div>

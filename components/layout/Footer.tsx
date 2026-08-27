@@ -105,7 +105,7 @@ export default function Footer({
                     </p>
                     <a
                       href={href}
-                      className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-amber-700 active:text-amber-700"
+                      className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
                     >
                       {value}
                     </a>
@@ -130,7 +130,7 @@ export default function Footer({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  className={`flex items-center justify-center py-1 ${"padX" in social ? social.padX : "px-1"} text-gray-900 hover:text-amber-700 active:text-amber-700`}
+                  className={`flex items-center justify-center py-1 ${"padX" in social ? social.padX : "px-1"} text-gray-900 hover:text-gray-600 active:text-gray-600`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -153,17 +153,11 @@ export default function Footer({
           </p>
           <a
             href="https://www.sunphuquocairways.com"
-            className={`group relative inline-flex items-center justify-center gap-2 ${OFFICIAL_SITE_MIN_W} overflow-hidden bg-black/5 hover:bg-[#811721] active:bg-black/5 text-gray-900 hover:text-gray-50 active:text-[#a21725] text-sm px-5 py-2 rounded-xl`}
+            // Same hover/active as every other pill button (see
+            // NotFoundLayout): a step darker on the neutral fill, no accent.
+            className={`group inline-flex items-center justify-center gap-2 ${OFFICIAL_SITE_MIN_W} bg-black/5 hover:bg-black/10 active:bg-black/10 text-gray-900 text-sm px-5 py-2 rounded-xl`}
           >
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -top-10 -right-8 h-32 w-32 rotate-[12deg] bg-contain bg-no-repeat opacity-0 mix-blend-soft-light transition-[transform,opacity] duration-300 ease-out
-                        group-hover:rotate-[30deg] group-hover:opacity-100"
-              style={{
-                backgroundImage: `url(${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/ic_flower.png)`,
-              }}
-            />
-            <span className="relative z-10 whitespace-nowrap">
+            <span className="whitespace-nowrap">
               {footer?.["officialSite"]}
             </span>
             <svg
@@ -176,7 +170,7 @@ export default function Footer({
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="relative z-10 transition-transform duration-300 ease-out translate-y-[0.02rem] group-hover:translate-x-1.5"
+              className="transition-transform duration-300 ease-out translate-y-[0.02rem] group-hover:translate-x-1.5 group-active:translate-x-1.5"
             >
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />

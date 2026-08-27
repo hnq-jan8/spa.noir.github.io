@@ -12,9 +12,9 @@ export default function HomeSkeleton() {
         <Skeleton className="h-[26px] w-56 max-w-full rounded-full" />
       </div>
 
-      {/* Latest official update. Keeps the amber left rule at reduced weight:
+      {/* Latest official update. Keeps the dark left rule at reduced weight:
           the card's identity is visible before its text is. */}
-      <div className="bg-update border-l-4 border-l-amber-600/30 rounded-2xl p-6 pb-4 card-shadow mb-4">
+      <div className="bg-white border-l-4 border-l-gray-900/30 rounded-2xl p-6 pb-4 card-shadow mb-4">
         <Skeleton className="h-3.5 w-32 mb-3" />
         <Skeleton className="h-5 w-11/12 mb-2" />
         <Skeleton className="h-5 w-2/3 mb-4" />

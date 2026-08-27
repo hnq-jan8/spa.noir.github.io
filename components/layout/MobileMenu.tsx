@@ -81,7 +81,7 @@ export default function MobileMenu({
               }}
               className={`flex items-center px-6 py-4 text-xl ${
                 isActive
-                  ? "text-white font-semibold bg-black/10"
+                  ? "text-white font-semibold bg-white/10"
                   : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
               }`}
             >
@@ -94,7 +94,7 @@ export default function MobileMenu({
                     aria-hidden="true"
                     // Steady, not pulsing: it marks a state, and a pulse would
                     // compete with the homepage's live "as of" dot.
-                    className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_3px_1px_rgba(239,68,68,0.5)]"
+                    className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]"
                   />
                 )}
               </span>
@@ -134,7 +134,7 @@ export default function MobileMenu({
           </button>
           <div
             style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
-            className={`${EXPAND_GRID_TRANSITION_CLASS} bg-black/10`}
+            className={`${EXPAND_GRID_TRANSITION_CLASS} bg-black/20`}
           >
             <div style={{ overflow: "hidden" }} className="overflow-hidden">
               {languageOptions.map((lang) => {

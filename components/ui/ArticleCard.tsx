@@ -157,7 +157,7 @@ export default function ArticleCard({
           )}
           <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
             {badge && (
-              <p className="text-amber-700 text-xs font-semibold uppercase tracking-wide mb-2">
+              <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-2">
                 {badge}
               </p>
             )}
@@ -170,11 +170,11 @@ export default function ArticleCard({
               <p className="text-sm text-gray-600 line-clamp-3">{excerpt}</p>
             )}
             <div className="flex items-center justify-between gap-4 text-xs mt-4 -mr-1">
-              <span className="text-gray-400">
+              <span className="text-gray-500">
                 {article.date && formatTimestamp(article.date, locale)}
               </span>
               {readMoreLabel && (
-                <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
+                <span className="text-gray-600 font-semibold inline-flex items-center gap-1">
                   {readMoreLabel}
                   <ChevronRight
                     className="w-3.5 h-4 pt-[0.1rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
@@ -233,7 +233,7 @@ export default function ArticleCard({
           // background instead of a photo.
           <div className="relative flex-1 pl-3.5 pr-3.5 sm:pl-4 sm:pr-4">
             {article.date && (
-              <p className="absolute top-2 sm:top-2.5 left-3.5 sm:left-4 text-xs text-gray-400">
+              <p className="absolute top-2 sm:top-2.5 left-3.5 sm:left-4 text-xs text-gray-500">
                 {formatTimestamp(article.date, locale)}
               </p>
             )}
@@ -272,7 +272,7 @@ export default function ArticleCard({
             // collapses onto the date (that's why the fallback below exists).
             <div className="relative flex-1 min-w-0 pl-3 sm:pl-3.5 pr-3 sm:pr-4">
               {article.date && (
-                <p className="absolute top-2 sm:top-2.5 left-3 sm:left-3.5 text-xs text-gray-400">
+                <p className="absolute top-2 sm:top-2.5 left-3 sm:left-3.5 text-xs text-gray-500">
                   {formatTimestamp(article.date, locale)}
                 </p>
               )}
@@ -294,7 +294,7 @@ export default function ArticleCard({
             // `excerpt` is already null when hideExcerpt.
             <div className="flex-1 min-w-0 flex flex-col justify-center pt-2 sm:pt-2.5 pl-3 sm:pl-3.5 pr-3 sm:pr-4 pb-3 sm:pb-4">
               {article.date && (
-                <p className="text-xs text-gray-400 mb-2">
+                <p className="text-xs text-gray-500 mb-2">
                   {formatTimestamp(article.date, locale)}
                 </p>
               )}

@@ -74,7 +74,7 @@ export default function ArticleDetail({
           <button
             type="button"
             onClick={onBack}
-            className="hidden md:inline-flex group items-center gap-1 self-start text-sm text-gray-500 hover:text-amber-700 active:text-amber-700"
+            className="hidden md:inline-flex group items-center gap-1 self-start text-sm text-gray-500 hover:text-gray-900 active:text-gray-900"
           >
             <ChevronLeft
               className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1 group-active:-translate-x-1"
@@ -85,7 +85,7 @@ export default function ArticleDetail({
         )}
         <Reveal
           delay={100}
-          className="flex items-center gap-3 text-gray-400 flex-wrap justify-start md:justify-end"
+          className="flex items-center gap-3 text-gray-500 flex-wrap justify-start md:justify-end"
         >
           {article.date && (
             <span className="whitespace-nowrap">
