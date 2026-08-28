@@ -54,7 +54,7 @@ export default function FlightTable({
       <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
 
       {/* Mobile: stacked cards, one card per flight; 2 cards per row when wide enough */}
-      <div className="md:hidden grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+      <div className="md:hidden grid grid-cols-1 min-[570px]:grid-cols-2 gap-3">
         {rows.map((row, idx) => {
           return (
             <div
@@ -72,7 +72,7 @@ export default function FlightTable({
                   </span>
                 </div>
 
-                <div className="flex gap-3 max-w-xs px-2 py-3 mx-auto items-center justify-center">
+                <div className="flex gap-3 max-w-xs px-4 py-3 mx-auto items-center justify-center">
                   <span className="text-3xl font-semibold text-gray-900 tracking-tight">
                     {row.departure}
                   </span>
@@ -90,12 +90,10 @@ export default function FlightTable({
                 </div>
               </div>
 
-              <div className="mx-4 border-b pt-4 border-gray-200" />
-
               {/* Date joins the two times as even thirds — one date and two
                   times balance in a way the old type/capacity pair needed its
                   own row and second divider for. */}
-              <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center py-3">
+              <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center pt-4 pb-3">
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-500 mb-1">{h.date}</p>
                   <p className="font-medium text-gray-900">
@@ -104,15 +102,11 @@ export default function FlightTable({
                 </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-500 mb-1">{h.srtd}</p>
-                  <p className="font-medium text-gray-900">
-                    {row.srtd}
-                  </p>
+                  <p className="font-medium text-gray-900">{row.srtd}</p>
                 </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-xs text-gray-500 mb-1">{h.atd}</p>
-                  <p className="font-medium text-gray-900">
-                    {row.atd}
-                  </p>
+                  <p className="font-medium text-gray-900">{row.atd}</p>
                 </div>
               </div>
             </div>

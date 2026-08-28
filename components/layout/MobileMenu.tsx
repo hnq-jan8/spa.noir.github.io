@@ -171,11 +171,10 @@ export default function MobileMenu({
                     key={lang.code}
                     href={`/${lang.code}${pathWithoutLocale}`}
                     onClick={onNavigate}
-                    // Faster/tighter stagger than the top-level items: this
-                    // list only reveals after the drawer is already open, so
-                    // it doesn't need as much runway.
-                    style={{ transitionDelay: langExpanded ? `${40 + index * 25}ms` : "0ms" }}
-                    className={`flex items-center justify-between pl-14 pr-6 py-2 text-base transition-[opacity,transform] duration-150 ease-out ${
+                    // Same stagger cadence as the top-level nav items above,
+                    // so both lists reveal at a matching pace.
+                    style={{ transitionDelay: langExpanded ? `${40 + index * 50}ms` : "0ms" }}
+                    className={`flex items-center justify-between pl-14 pr-6 py-2 text-base transition-[opacity,transform] duration-300 ease-out ${
                       langExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
                     } ${
                       isActive
