@@ -64,7 +64,14 @@ export default function HomeContent() {
       <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6">
         <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
         <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
-          <span className="ripple-dot w-1.5 h-1.5 rounded-full bg-gray-900 flex-shrink-0" />
+          {/* `aspect-square`, not `h-1.5` — with both width and height set
+              independently, fractional browser zoom can round them to
+              different physical pixel counts even though they're the same
+              declared value (width settles via flex distribution, height
+              via cross-axis sizing — two separate computations). Deriving
+              height from the already-rounded width in the same layout pass
+              guarantees a perfect circle at any zoom level. */}
+          <span className="w-1.5 aspect-square rounded-full bg-gray-900 flex-shrink-0 animate-pulse-glow" />
           <p className="flex flex-wrap items-center min-h-[24px] gap-x-1">
             <span>{home["asOf"]}:</span>
             <span className="whitespace-nowrap">{asOf}</span>

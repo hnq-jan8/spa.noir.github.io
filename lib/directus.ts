@@ -9,6 +9,7 @@ import {
   SITE_METADATA_QUERY,
   APP_SETTING_QUERY,
 } from "../scripts/directus-queries.mjs";
+import { buildAssetUrl } from "../scripts/asset-url.mjs";
 
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
@@ -178,7 +179,7 @@ export async function getUiLabels(): Promise<UiLabel[]> {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 export function assetUrl(id: string | null): string | null {
-  return id ? `${BASE}/assets/${id}` : null;
+  return buildAssetUrl(id, BASE);
 }
 
 export function t<T extends { translations: { languages_code: string }[] }>(

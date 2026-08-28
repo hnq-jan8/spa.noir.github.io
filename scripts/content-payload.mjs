@@ -7,6 +7,8 @@
  * content-payload.d.mts.
  */
 
+import { buildAssetUrl, rewriteAssetUrls } from "./asset-url.mjs";
+
 /** Namespace của ui_labels được nhúng vào từng phần của content.json. */
 export const LABEL_NAMESPACES = {
   common: ["nav", "footer", "support", "emptyState", "loadError", "a11y"],
@@ -52,15 +54,26 @@ function i18nMap(translations, field) {
   );
 }
 
+/** Như i18nMap nhưng cho field rich-text (description/body): rewrite <img src>. */
+function i18nRichText(translations, field, directusUrl) {
+  return Object.fromEntries(
+    translations.map((t) => [
+      t.languages_code,
+      rewriteAssetUrls(t[field], directusUrl),
+    ]),
+  );
+}
+
 /**
- * Như i18nMap nhưng cho field file (preview_image): UUID → URL asset Directus.
- * Ảnh trỏ thẳng sang Directus; MarkdownImage/PreviewImage đã xử lý ảnh hỏng.
+ * Như i18nMap nhưng cho field file (preview_image): UUID → URL asset (xem
+ * asset-url.mjs — Directus trực tiếp, hoặc `asset_url` nếu có).
+ * MarkdownImage/PreviewImage đã xử lý ảnh hỏng nên không cần fallback ở đây.
  */
 function i18nAsset(translations, field, directusUrl) {
   return Object.fromEntries(
     translations.map((t) => [
       t.languages_code,
-      t[field] ? `${directusUrl}/assets/${t[field]}` : null,
+      buildAssetUrl(t[field], directusUrl),
     ]),
   );
 }
@@ -131,7 +144,7 @@ export function assembleContentPayload({
         id: String(u.id),
         date: u.date,
         title: i18nMap(u.translations, "title"),
-        description: i18nMap(u.translations, "description"),
+        description: i18nRichText(u.translations, "description", directusUrl),
         previewExcerpt: i18nMap(u.translations, "preview_excerpt"),
         previewImage: i18nAsset(u.translations, "preview_image", directusUrl),
       })),
@@ -144,7 +157,7 @@ export function assembleContentPayload({
         slug: r.slug || String(r.id),
         publishedAt: r.published_at ?? null,
         title: i18nMap(r.translations, "title"),
-        body: i18nMap(r.translations, "body"),
+        body: i18nRichText(r.translations, "body", directusUrl),
         previewExcerpt: i18nMap(r.translations, "preview_excerpt"),
         previewImage: i18nAsset(r.translations, "preview_image", directusUrl),
       })),

@@ -32,6 +32,19 @@ module.exports = {
         surface: COLORS.surface,
         cardHover: COLORS.cardHover,
       },
+      keyframes: {
+        "pulse-glow": {
+          "0%, 100%": {
+            opacity: "1",
+          },
+          "50%": {
+            opacity: ".35",
+          },
+        },
+      },
+      animation: {
+        "pulse-glow": "pulse-glow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
     },
   },
   plugins: [],
