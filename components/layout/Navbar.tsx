@@ -7,6 +7,7 @@ import { Fragment, useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, FileText, Megaphone } from "lucide-react";
 import {
   DesktopLanguageSelector,
+  GlobeIcon,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
 import MobileMenu from "@/components/layout/MobileMenu";
@@ -54,6 +55,10 @@ export default function Navbar({
     languageOptions.find((lang) => lang.code === locale) ?? languageOptions[0];
 
   const [menuOpen, setMenuOpen] = useState(false);
+  // Sub-view inside the mobile drawer: false = nav list, true = full-screen
+  // language list. Lives here (not in MobileMenu) because the header's
+  // globe/back trigger has to swap based on it too.
+  const [mobileLangView, setMobileLangView] = useState(false);
   const [iconAnimating, setIconAnimating] = useState(false);
   const {
     ref: navRef,
@@ -78,6 +83,10 @@ export default function Navbar({
   useEffect(() => {
     return () => clearTimeout(iconAnimationTimeoutRef.current);
   }, []);
+
+  useEffect(() => {
+    if (!menuOpen) setMobileLangView(false);
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -279,6 +288,30 @@ export default function Navbar({
             />
 
             <div className="flex md:hidden items-stretch gap-1">
+              {/* Cùng vị trí với DesktopLanguageSelector ở size lớn hơn — chỉ
+                  hiện khi drawer đang mở, cạnh nút đóng. Bấm để chuyển sang
+                  màn hình chọn ngôn ngữ full-screen bên trong drawer; bấm lại
+                  để quay về danh sách nav. Không đổi icon — chỉ sáng lên khi
+                  đang ở màn ngôn ngữ, giống cách tab active sáng hơn tab
+                  thường trong menu mobile. */}
+              {menuOpen && languageOptions.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setMobileLangView((v) => !v)}
+                  className={`relative h-full min-w-[44px] px-2 flex items-center justify-center gap-1 active:text-white ${
+                    mobileLangView
+                      ? "text-white"
+                      : "text-gray-300 hover:text-white"
+                  }`}
+                  aria-label={nav?.["selectLanguage"]}
+                  aria-expanded={mobileLangView}
+                >
+                  <GlobeIcon className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-xs font-medium">
+                    {currentLanguage?.code.toUpperCase()}
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={toggleMenu}
@@ -328,10 +361,10 @@ export default function Navbar({
         {/* Mobile full-screen menu */}
         <MobileMenu
           open={menuOpen}
+          langView={mobileLangView}
           navItems={navItems}
           normalizedPath={normalizedPath}
           nav={nav}
-          currentLanguage={currentLanguage}
           languageOptions={languageOptions}
           pathWithoutLocale={`${pathWithoutLocale}${localeSuffix}`}
           locale={locale}

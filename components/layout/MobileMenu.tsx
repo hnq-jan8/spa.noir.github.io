@@ -1,14 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { clearArticleRoute } from "@/hooks/useArticleRoute";
 import { invalidateContent } from "@/hooks/useContentData";
-// Unlike the FAQ accordion's EXPAND_GRID_TRANSITION_CLASS, no negative delay:
-// this opens rarely enough that playing the whole curve reads better than
-// the half-elapsed perf trick used for the FAQ list.
-const LANGUAGE_EXPAND_CLASS = "grid transition-[grid-template-rows] duration-300 ease-out";
 
 interface NavItem {
   label: string;
@@ -20,16 +14,17 @@ interface LanguageOption {
 }
 
 /**
- * Drawer trượt toàn màn hình cho mobile (< md): danh sách route + accordion
- * chọn ngôn ngữ. Luôn được mount (ẩn/hiện bằng clip-path) để animate mượt;
- * `langExpanded` sống tại đây và tự đóng lại mỗi khi drawer đóng.
+ * Drawer trượt toàn màn hình cho mobile (< md): danh sách route, hoặc — khi
+ * `langView` bật (điều khiển bởi nút globe/back trong header, Navbar.tsx) —
+ * danh sách ngôn ngữ full-screen thay cho danh sách route. Luôn được mount
+ * (ẩn/hiện bằng clip-path) để animate mượt.
  */
 export default function MobileMenu({
   open,
+  langView,
   navItems,
   normalizedPath,
   nav,
-  currentLanguage,
   languageOptions,
   pathWithoutLocale,
   locale,
@@ -37,10 +32,11 @@ export default function MobileMenu({
   unreadHref,
 }: {
   open: boolean;
+  /** true = hiện danh sách ngôn ngữ full-screen thay vì danh sách route. */
+  langView: boolean;
   navItems: NavItem[];
   normalizedPath: string;
   nav: Record<string, string> | undefined;
-  currentLanguage: LanguageOption | undefined;
   languageOptions: LanguageOption[];
   pathWithoutLocale: string;
   locale: string;
@@ -48,12 +44,6 @@ export default function MobileMenu({
   /** Route carrying an unread official update, or null when there is none. */
   unreadHref?: string | null;
 }) {
-  const [langExpanded, setLangExpanded] = useState(false);
-
-  useEffect(() => {
-    if (!open) setLangExpanded(false);
-  }, [open]);
-
   return (
     <div
       id="mobile-menu"
@@ -73,123 +63,108 @@ export default function MobileMenu({
       role="dialog"
       aria-modal="true"
     >
-      <nav className="flex flex-col">
-        {navItems.map((item, index) => {
-          const isActive = normalizedPath === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => {
-                onNavigate();
-                // As on the desktop tabs: same route = no remount, so the open
-                // article has to be dismissed by hand.
-                clearArticleRoute();
-                if (isActive) invalidateContent();
-              }}
-              // Staggered reveal on open only — delay collapses to 0 on close
-              // so the drawer's own clip-path handles the exit.
-              style={{ transitionDelay: open ? `${100 + index * 50}ms` : "0ms" }}
-              className={`flex items-center px-6 py-4 text-xl transition-[opacity,transform] duration-300 ease-out ${
-                open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-              } ${
-                isActive
-                  ? "text-white font-semibold"
-                  : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
-              }`}
-            >
-              {/* Anchors the unread dot to the text, not the row, so it sits on
-                  the label's corner whatever its length. */}
-              <span className="relative">
-                {item.label}
-                {item.href === unreadHref && (
-                  <span
-                    aria-hidden="true"
-                    // Steady, not pulsing: it marks a state, and a pulse would
-                    // compete with the homepage's live "as of" dot.
-                    className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]"
-                  />
-                )}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Grid-stack: both panels share one cell so the drawer's height always
+          matches whichever is visible, no absolute positioning needed. The
+          language panel slides in from the right / nav slides out to the
+          left, mirrored on the way back — reads as moving to a sub-screen
+          rather than a plain crossfade. */}
+      <div className="grid">
+        <nav
+          className={`col-start-1 row-start-1 flex flex-col transition-[opacity,transform] duration-300 ease-out ${
+            langView
+              ? "opacity-0 -translate-x-6 pointer-events-none"
+              : "opacity-100 translate-x-0"
+          }`}
+          aria-hidden={langView}
+        >
+          {navItems.map((item, index) => {
+            const isActive = normalizedPath === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => {
+                  onNavigate();
+                  // As on the desktop tabs: same route = no remount, so the open
+                  // article has to be dismissed by hand.
+                  clearArticleRoute();
+                  if (isActive) invalidateContent();
+                }}
+                // Staggered reveal on open only — delay collapses to 0 on close
+                // so the drawer's own clip-path handles the exit.
+                style={{
+                  transitionDelay:
+                    open && !langView ? `${100 + index * 50}ms` : "0ms",
+                }}
+                className={`flex items-center px-6 py-4 text-xl transition-[opacity,transform] duration-300 ease-out ${
+                  open && !langView
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-3"
+                } ${
+                  isActive
+                    ? "text-white font-semibold"
+                    : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
+                }`}
+              >
+                {/* Anchors the unread dot to the text, not the row, so it sits on
+                    the label's corner whatever its length. */}
+                <span className="relative">
+                  {item.label}
+                  {item.href === unreadHref && (
+                    <span
+                      aria-hidden="true"
+                      // Steady, not pulsing: it marks a state, and a pulse would
+                      // compete with the homepage's live "as of" dot.
+                      className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]"
+                    />
+                  )}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      {languageOptions.length > 1 && (
-        <div className="mt-2 relative">
-          {/* Vertical guide line grown from the globe icon instead of a
-              background fill, tracking the accordion's own expand transition. */}
+        {languageOptions.length > 1 && (
           <div
-            aria-hidden="true"
-            style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
-            className={`absolute left-[33px] top-11 bottom-0 w-px ${LANGUAGE_EXPAND_CLASS}`}
+            className={`col-start-1 row-start-1 flex flex-col pt-2 transition-[opacity,transform] duration-300 ease-out ${
+              langView
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-6 pointer-events-none"
+            }`}
+            aria-hidden={!langView}
           >
-            <div style={{ overflow: "hidden" }} className="w-px bg-white/20 h-full" />
+            {nav?.["selectLanguage"] && (
+              <div className="px-5 pb-3 text-sm text-gray-400">
+                {nav["selectLanguage"]}
+              </div>
+            )}
+            {languageOptions.map((lang, index) => {
+              const isActive = lang.code === locale;
+              return (
+                <Link
+                  key={lang.code}
+                  href={`/${lang.code}${pathWithoutLocale}`}
+                  onClick={onNavigate}
+                  style={{
+                    transitionDelay: langView ? `${100 + index * 50}ms` : "0ms",
+                  }}
+                  className={`flex items-center justify-between px-6 py-4 text-xl transition-[opacity,transform] duration-300 ease-out ${
+                    langView
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-3"
+                  } ${
+                    isActive
+                      ? "text-white font-semibold"
+                      : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
+                  }`}
+                >
+                  <span>{lang.label}</span>
+                </Link>
+              );
+            })}
           </div>
-          <button
-            type="button"
-            onClick={() => setLangExpanded((o) => !o)}
-            style={{ transitionDelay: open ? `${100 + navItems.length * 50}ms` : "0ms" }}
-            className={`w-full flex items-center gap-3 px-6 py-4 text-base text-gray-300 transition-[opacity,transform] duration-300 ease-out ${
-              open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-            } hover:text-white active:text-white`}
-            aria-expanded={langExpanded}
-          >
-            <svg
-              className="w-5 h-5 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="flex-1 text-left">
-              {langExpanded ? nav?.["selectLanguage"] : currentLanguage?.label}
-            </span>
-            <ChevronDown
-              className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${langExpanded ? "rotate-180" : ""}`}
-              strokeWidth={2}
-            />
-          </button>
-          <div
-            style={{ gridTemplateRows: langExpanded ? "1fr" : "0fr" }}
-            className={LANGUAGE_EXPAND_CLASS}
-          >
-            {/* -mt-2 offsets the toggle button's own py-4 so the gap above
-                the first option matches the py-2 gap between options. */}
-            <div style={{ overflow: "hidden" }} className="overflow-hidden -mt-2">
-              {languageOptions.map((lang, index) => {
-                const isActive = lang.code === locale;
-                return (
-                  <Link
-                    key={lang.code}
-                    href={`/${lang.code}${pathWithoutLocale}`}
-                    onClick={onNavigate}
-                    // Same stagger cadence as the top-level nav items above,
-                    // so both lists reveal at a matching pace.
-                    style={{ transitionDelay: langExpanded ? `${40 + index * 50}ms` : "0ms" }}
-                    className={`flex items-center justify-between pl-14 pr-6 py-2 text-base transition-[opacity,transform] duration-300 ease-out ${
-                      langExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-                    } ${
-                      isActive
-                        ? "text-white font-semibold"
-                        : "text-gray-300 hover:text-white hover:font-medium active:text-white active:font-medium"
-                    }`}
-                  >
-                    <span>{lang.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
