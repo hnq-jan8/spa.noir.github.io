@@ -45,18 +45,15 @@ export default function OfficialUpdatesContent() {
     // an official update is a short status line, not an article meant to be
     // read start to finish, so the estimate would just be noise.
     const { readingTime: _readingTime, ...detailLabels } = labels;
-    const isFullBleed = !opened.title || opened.title.trim().length === 0;
     return (
       <div
         // Below md there's no white card (see press-article-card), so the
         // wrapper itself carries the white background — same mechanism as
         // PressReleasesContent (see that file for the full rationale) —
-        // otherwise the page's off-white bg-page would show through where a
-        // card used to be, and `flex-1` claims `main`'s leftover space so a
-        // short update's white still reaches the footer.
-        className={`relative z-0 flex-1 md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 ${
-          isFullBleed ? "pb-0" : "pb-8"
-        }`}
+        // and `flex flex-col flex-1` claims `main`'s leftover space so a
+        // short update's white still reaches the footer, with no bottom
+        // padding — ArticleDetail's own back bar owns that edge.
+        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 pb-0"
       >
         <ArticleDetail
           article={opened}

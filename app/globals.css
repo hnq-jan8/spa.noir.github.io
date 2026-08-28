@@ -91,6 +91,10 @@
      card's md:p-8. */
   .press-article-card {
     --article-pad: 1rem;
+    /* A blank/whitespace-only CMS body renders nothing, collapsing the card
+       to the height of its own padding. Floors it to a plausible reading
+       height at every breakpoint. */
+    min-height: 10rem;
   }
   @media (min-width: 640px) {
     .press-article-card {
@@ -100,6 +104,7 @@
   @screen md {
     .press-article-card {
       --article-pad: 2rem;
+      min-height: 18rem;
       /* Only clip at md+, where the card is an actual rounded box —
          below md this would block the negative-margin bleed above. */
       overflow: hidden;

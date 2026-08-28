@@ -63,7 +63,7 @@ export default function ArticleDetail({
   const isFullBleed = !article.title || article.title.trim().length === 0;
 
   return (
-    <div>
+    <div className="flex flex-col flex-1 md:block">
       {/* Meta sits outside the article card: a full-bleed article has no
           headline block, so anything anchored there vanished on exactly the
           articles most likely to be shared. Back is hidden below md, where the
@@ -104,6 +104,34 @@ export default function ArticleDetail({
       >
         <ArticleContent title={article.title} body={article.body} />
       </div>
+      {/* Mobile-only equivalent of the desktop back button above, placed
+          after the article body as a full-width, edge-to-edge action bar
+          instead of an inline link. `-mx-*` cancels container-page's
+          padding to bleed it to the screen edges; `mt-auto` (root div is a
+          flex column) rides a short article's leftover height down so the
+          bar sits flush against the footer instead of floating mid-page,
+          with `pt-6` as a floor when there's no leftover height to claim.
+          The divider below it matches Footer.tsx's own rule above its
+          copyright bar (same color + inset), so bar and footer read as one
+          continuous band. */}
+      {labels["back"] && (
+        <div className="print:hidden md:hidden -mx-4 sm:-mx-6 pt-6 mt-auto">
+          <button
+            type="button"
+            onClick={onBack}
+            className="group flex w-full items-center justify-center gap-1 bg-surface px-5 py-3 text-sm text-gray-900 hover:bg-[#e4e4e4] active:bg-[#e4e4e4]"
+          >
+            <ChevronLeft
+              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1 group-active:-translate-x-1"
+              strokeWidth={2}
+            />
+            {labels["back"]}
+          </button>
+          <div className="bg-surface px-4 sm:px-6">
+            <div className="border-t border-black/10" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

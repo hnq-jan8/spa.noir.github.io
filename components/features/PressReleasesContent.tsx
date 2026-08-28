@@ -62,18 +62,15 @@ export default function PressReleasesContent() {
   const opened = key ? releases.find((r) => r.key === key) : undefined;
 
   if (opened) {
-    // A full-bleed article (blank title) reaches the navbar/footer below md,
-    // where there is no card box to sit inside.
-    const isFullBleed = !opened.title || opened.title.trim().length === 0;
     return (
       <div
         // Below md there's no card, so this wrapper carries the white itself:
         // pulled up behind the sticky breadcrumb (negative margin + equal
-        // padding, z-0 under its z-10) and `flex-1` to claim main's leftover
-        // height, so a short article's white still reaches the footer.
-        className={`relative z-0 flex-1 md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 ${
-          isFullBleed ? "pb-0" : "pb-8"
-        }`}
+        // padding, z-0 under its z-10) and `flex flex-col flex-1` to claim
+        // main's leftover height, so a short article's white still reaches
+        // the footer, with no bottom padding — ArticleDetail's own back bar
+        // owns that edge (see its mt-auto).
+        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 pb-0"
       >
         <ArticleDetail
           article={opened}
