@@ -5,6 +5,12 @@ import { excerptOf, titleOf } from "@/components/ui/ArticleCard";
 import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
 
+// Underline grows left-to-right on hover/active instead of the heading
+// dimming — a background line (not text-decoration) so its width can
+// animate. ease-out reads as quick-start-slow-end, matching the dot's snap.
+const TITLE_UNDERLINE_CLASS =
+  "bg-[linear-gradient(currentColor,currentColor)] bg-no-repeat bg-left-bottom bg-[length:0%_1.5px] transition-[background-size] duration-300 ease-out group-hover:bg-[length:100%_1.5px] group-active:bg-[length:100%_1.5px]";
+
 function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
   const [failed, setFailed] = useState(false);
   const box = size === "lg" ? "w-20 h-20 rounded-xl" : "w-11 h-11 rounded-lg";
@@ -15,7 +21,11 @@ function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
         aria-hidden="true"
       >
         <ImageOff
-          className={size === "lg" ? "w-5 h-5 text-gray-500" : "w-3.5 h-3.5 text-gray-500"}
+          className={
+            size === "lg"
+              ? "w-5 h-5 text-gray-500"
+              : "w-3.5 h-3.5 text-gray-500"
+          }
           strokeWidth={1.5}
         />
       </div>
@@ -82,6 +92,10 @@ export default function TimelineCarousel({
         // The newest group is the current status — near-black, the palette's strongest tone.
         const isPassed = groupStartOf[idx] === 0;
         const isLast = idx === items.length - 1;
+        // The line below the last node of the passed group is the one spot
+        // where the rail's color actually changes — fade it instead of a
+        // hard cut so the two segments read as one continuous line.
+        const isHandoff = isPassed && !isLast && groupStartOf[idx + 1] !== 0;
         const excerpt = excerptOf(item, 200);
         const heading = titleOf(item);
 
@@ -103,11 +117,19 @@ export default function TimelineCarousel({
               />
               {!isLast && (
                 <div
-                  className={`w-px flex-1 mt-1 ${isPassed ? "bg-gray-500" : "bg-gray-300"}`}
+                  className={`w-px flex-1 mt-1 ${
+                    isHandoff
+                      ? "bg-gradient-to-b from-gray-500 to-gray-300 to-95%"
+                      : isPassed
+                        ? "bg-gray-500"
+                        : "bg-gray-300"
+                  }`}
                 />
               )}
             </div>
-            <div className={`flex-1 min-w-0 ${isLast ? "pb-1" : "pb-8 sm:pb-9"} pt-0.5`}>
+            <div
+              className={`flex-1 min-w-0 ${isLast ? "pb-1" : "pb-8 sm:pb-9"} pt-0.5`}
+            >
               {isGroupStart && item.date && (
                 <div className="flex items-center gap-2 mb-2.5">
                   <span
@@ -126,8 +148,8 @@ export default function TimelineCarousel({
                 <div className="flex gap-4 items-start">
                   <div className="flex-1 min-w-0">
                     {heading && (
-                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance group-hover:text-gray-600 group-active:text-gray-600">
-                        {heading}
+                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance">
+                        <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>
                       </h3>
                     )}
                     {excerpt && (
@@ -143,16 +165,22 @@ export default function TimelineCarousel({
                       />
                     </span>
                   </div>
-                  {item.previewImage && <Thumb src={item.previewImage} size="lg" />}
+                  {item.previewImage && (
+                    <Thumb src={item.previewImage} size="lg" />
+                  )}
                 </div>
               ) : (
                 <div className="flex gap-3 items-start">
-                  {item.previewImage && <Thumb src={item.previewImage} size="md" />}
+                  {item.previewImage && (
+                    <Thumb src={item.previewImage} size="md" />
+                  )}
                   <div className="flex-1 min-w-0">
                     {heading && (
-                      <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1 group-hover:text-gray-600 group-active:text-gray-600">
+                      <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1">
                         <span className="inline-flex items-center gap-1">
-                          {heading}
+                          <span className={TITLE_UNDERLINE_CLASS}>
+                            {heading}
+                          </span>
                           <ChevronRight
                             className="w-3.5 h-4 mt-0.5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
                             strokeWidth={2}
