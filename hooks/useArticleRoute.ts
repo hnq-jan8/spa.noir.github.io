@@ -93,6 +93,10 @@ export function useArticleRoute() {
     url.searchParams.delete(ARTICLE_PARAM);
     window.history.pushState(null, "", url);
     setKey(null);
+    // Mirrors `open`: the mobile back button sits at the bottom of the
+    // article, and without this the list reappears scrolled to wherever
+    // that scroll position happened to be instead of its own top.
+    window.scrollTo({ top: 0 });
   }, []);
 
   return { key, open, close };

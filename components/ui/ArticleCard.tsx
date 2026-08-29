@@ -270,9 +270,21 @@ export default function ArticleCard({
             // left below the date. `h-full` only resolves because `compact`
             // gives the button a definite height — drop compact and this
             // collapses onto the date (that's why the fallback below exists).
-            <div className="relative flex-1 min-w-0 pl-3 sm:pl-3.5 pr-3 sm:pr-4">
+            <div
+              // No image: the button has no padding of its own, so pl-3
+              // reads too close to the edge next to the featured card's
+              // p-5/p-6 above it — bump to match when there's no thumbnail
+              // to supply that left margin instead.
+              className={`relative flex-1 min-w-0 pr-3 sm:pr-4 ${
+                hasImage ? "pl-3 sm:pl-3.5" : "pl-5 sm:pl-6"
+              }`}
+            >
               {article.date && (
-                <p className="absolute top-2 sm:top-2.5 left-3 sm:left-3.5 text-xs text-gray-500">
+                <p
+                  className={`absolute top-2 sm:top-2.5 text-xs text-gray-500 ${
+                    hasImage ? "left-3 sm:left-3.5" : "left-5 sm:left-6"
+                  }`}
+                >
                   {formatTimestamp(article.date, locale)}
                 </p>
               )}
@@ -292,9 +304,18 @@ export default function ArticleCard({
             // a grid row's fixed height doesn't apply. Auto-height either
             // way, so no absolute positioning needed to center within it.
             // `excerpt` is already null when hideExcerpt.
-            <div className="flex-1 min-w-0 flex flex-col justify-center pt-2 sm:pt-2.5 pl-3 sm:pl-3.5 pr-3 sm:pr-4 pb-3 sm:pb-4">
+            <div
+              // hideExcerpt cards (position 4+'s mobile-stacked fallback)
+              // have nothing below the title — the same pt as an
+              // excerpt-carrying card reads top-heavy there, so it gets less.
+              className={`flex-1 min-w-0 flex flex-col justify-center pr-3 sm:pr-4 pb-4 sm:pb-5 ${
+                hideExcerpt ? "pt-2 sm:pt-2.5" : "pt-3 sm:pt-3.5"
+              } ${hasImage ? "pl-3 sm:pl-3.5" : "pl-5 sm:pl-6"}`}
+            >
               {article.date && (
-                <p className="text-xs text-gray-500 mb-2">
+                <p
+                  className={`text-xs text-gray-500 ${hideExcerpt ? "mb-1.5" : "mb-2.5"}`}
+                >
                   {formatTimestamp(article.date, locale)}
                 </p>
               )}

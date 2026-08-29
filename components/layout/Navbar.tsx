@@ -288,17 +288,23 @@ export default function Navbar({
             />
 
             <div className="flex md:hidden items-stretch gap-1">
-              {/* Cùng vị trí với DesktopLanguageSelector ở size lớn hơn — chỉ
-                  hiện khi drawer đang mở, cạnh nút đóng. Bấm để chuyển sang
-                  màn hình chọn ngôn ngữ full-screen bên trong drawer; bấm lại
-                  để quay về danh sách nav. Không đổi icon — chỉ sáng lên khi
+              {/* Cùng vị trí với DesktopLanguageSelector ở size lớn hơn —
+                  luôn mounted (không chỉ khi drawer mở) để fade theo cùng
+                  nhịp với drawer thay vì bật/tắt đột ngột; pointer-events tắt
+                  lúc ẩn nên không bấm/tab vào được. Bấm để chuyển sang màn
+                  hình chọn ngôn ngữ full-screen bên trong drawer; bấm lại để
+                  quay về danh sách nav. Không đổi icon — chỉ sáng lên khi
                   đang ở màn ngôn ngữ, giống cách tab active sáng hơn tab
                   thường trong menu mobile. */}
-              {menuOpen && languageOptions.length > 1 && (
+              {languageOptions.length > 1 && (
                 <button
                   type="button"
                   onClick={() => setMobileLangView((v) => !v)}
-                  className={`relative h-full min-w-[44px] px-2 flex items-center justify-center gap-1 active:text-white ${
+                  tabIndex={menuOpen ? 0 : -1}
+                  aria-hidden={!menuOpen}
+                  className={`relative h-full min-w-[44px] px-2.5 flex items-center justify-center gap-1.5 transition-opacity duration-300 ease-out active:text-white ${
+                    menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                  } ${
                     mobileLangView
                       ? "text-white"
                       : "text-gray-300 hover:text-white"
@@ -306,8 +312,8 @@ export default function Navbar({
                   aria-label={nav?.["selectLanguage"]}
                   aria-expanded={mobileLangView}
                 >
-                  <GlobeIcon className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-xs font-medium">
+                  <GlobeIcon className="w-[18px] h-[18px] flex-shrink-0" />
+                  <span className="text-sm font-medium">
                     {currentLanguage?.code.toUpperCase()}
                   </span>
                 </button>

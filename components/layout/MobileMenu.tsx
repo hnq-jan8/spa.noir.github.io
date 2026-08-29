@@ -55,7 +55,12 @@ export default function MobileMenu({
       // levels — safe since the header sits above it (z-50 > z-40) with an
       // opaque background. pt-2 compensates on the content side so the first
       // item doesn't end up 8px closer to the header.
-      className={`md:hidden fixed inset-x-0 top-[calc(3rem-8px)] h-[calc(100dvh-3rem+8px)] pt-2 z-40 bg-chrome text-white overflow-y-auto overscroll-contain ${
+      // overflow-x-hidden: the two grid-stacked panels below sit off-canvas
+      // via translate-x when hidden (for the slide-to-subscreen effect) —
+      // a transformed child still extends its ancestor's scrollable overflow
+      // even though it's invisible, which without this clip made the whole
+      // drawer horizontally scrollable by exactly that offset.
+      className={`md:hidden fixed inset-x-0 top-[calc(3rem-8px)] h-[calc(100dvh-3rem+8px)] pt-2 z-40 bg-chrome text-white overflow-y-auto overflow-x-hidden overscroll-contain ${
         open
           ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
           : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
