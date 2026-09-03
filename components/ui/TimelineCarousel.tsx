@@ -177,15 +177,13 @@ export default function TimelineCarousel({
                   <div className="flex-1 min-w-0">
                     {heading && (
                       <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1">
-                        <span className="inline-flex items-center gap-1">
-                          <span className={TITLE_UNDERLINE_CLASS}>
-                            {heading}
-                          </span>
-                          <ChevronRight
-                            className="w-3.5 h-4 mt-0.5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
-                            strokeWidth={2}
-                          />
-                        </span>
+                        <span className={TITLE_UNDERLINE_CLASS}>
+                          {heading}
+                        </span>{" "}
+                        <ChevronRight
+                          className="inline-block w-3.5 h-4 align-[-3px] text-gray-300 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                          strokeWidth={2}
+                        />
                       </h4>
                     )}
                     {excerpt && (
