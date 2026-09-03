@@ -157,7 +157,7 @@ export default function ArticleCard({
           )}
           <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
             {badge && (
-              <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-2">
+              <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-3">
                 {badge}
               </p>
             )}
@@ -281,8 +281,10 @@ export default function ArticleCard({
             >
               {article.date && (
                 <p
-                  className={`absolute top-2 sm:top-2.5 text-xs text-gray-500 ${
-                    hasImage ? "left-3 sm:left-3.5" : "left-5 sm:left-6"
+                  className={`absolute text-xs text-gray-500 ${
+                    hasImage
+                      ? "top-2 sm:top-2.5 left-3 sm:left-3.5"
+                      : "top-3 sm:top-3.5 left-5 sm:left-6"
                   }`}
                 >
                   {formatTimestamp(article.date, locale)}
@@ -290,8 +292,13 @@ export default function ArticleCard({
               )}
               {heading && (
                 // pt-3 clears the absolutely-positioned date above before
-                // centering starts, so a 2-line title can't run into it.
-                <div className="h-full pt-3 flex items-center">
+                // centering starts, so a 2-line title can't run into it. The
+                // no-image case gets a taller top inset for the date, so its
+                // own clearance (pt) shrinks correspondingly to keep the
+                // title centered where it was.
+                <div
+                  className={`h-full flex items-center ${hasImage ? "pt-3" : "pt-2"}`}
+                >
                   <h3 className="font-semibold text-sm sm:text-base leading-snug text-balance line-clamp-2">
                     {heading}
                   </h3>
