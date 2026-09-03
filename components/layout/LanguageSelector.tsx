@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { languages as configuredLanguages } from "@/i18n/routing";
 
 export function useDismissOnOutside(
@@ -36,6 +42,14 @@ export interface LanguageOption {
   label: string;
 }
 
+// Mở: menu cao dần lên (height, px) — không fade, chỉ một chuyển động để mắt
+// bám theo. Đóng: chỉ fade, height đứng yên cho tới khi đã mờ hẳn.
+//
+// Phải khớp với 100ms trong class fade ở dưới. Không ghép chuỗi class bằng
+// hằng số: Tailwind quét source tĩnh nên class dựng bằng template literal sẽ
+// không được sinh ra (cùng lý do lib/expandTransition.ts viết literal).
+const FADE_MS = 100;
+
 function ChevronDownIcon() {
   return (
     <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,119 +72,6 @@ export function GlobeIcon({ className = "w-3.5 h-3.5 flex-shrink-0" }: { classNa
   );
 }
 
-function LanguageDropdownLinks({
-  languages: options,
-  locale,
-  pathWithoutLocale,
-  onSelect,
-  itemClassName = "py-3",
-}: {
-  languages: LanguageOption[];
-  locale: string;
-  pathWithoutLocale: string;
-  onSelect?: () => void;
-  itemClassName?: string;
-}) {
-  return (
-    <>
-      {options
-        .filter((lang) => lang.code !== locale)
-        .map((lang) => (
-          <Link
-            key={lang.code}
-            href={`/${lang.code}${pathWithoutLocale}`}
-            onClick={onSelect}
-            className={`flex items-center px-3 text-xs text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium ${itemClassName}`}
-          >
-            <span>{lang.label}</span>
-          </Link>
-        ))}
-    </>
-  );
-}
-
-/**
- * One half of the trigger's label swap: the grid `0fr`/`1fr` track animates a
- * content-sized width without measuring anything in JS — the FAQ accordion's
- * technique (lib/expandTransition.ts), turned sideways.
- */
-function SwapText({ shown, children }: { shown: boolean; children: ReactNode }) {
-  return (
-    <span
-      style={{ gridTemplateColumns: shown ? "1fr" : "0fr" }}
-      className="grid transition-[grid-template-columns] duration-200 ease-out"
-    >
-      <span
-        className={`overflow-hidden min-w-0 whitespace-nowrap transition-opacity duration-200 ${
-          shown ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {children}
-      </span>
-    </span>
-  );
-}
-
-function LanguageTriggerContent({
-  languages: options,
-  locale,
-  expanded,
-  className,
-}: {
-  languages: LanguageOption[];
-  locale: string;
-  expanded: boolean;
-  className?: string;
-}) {
-  const current = options.find((lang) => lang.code === locale) ?? options[0];
-  // No `gap` between the two halves — one of them is always collapsed to
-  // zero width, and a gap would still reserve space around it.
-  return (
-    <span className={`relative ${className ?? ""}`}>
-      {/* Globe nằm ngoài luồng nên không thêm một track phải tính lại mỗi
-          frame — chỉ trượt theo mép trái đang chạy rồi mờ đi bằng
-          opacity + transform. */}
-      <span
-        aria-hidden
-        className={`absolute right-full mr-1.5 flex items-center transition-[opacity,transform] duration-200 ease-out ${
-          expanded ? "opacity-0 -translate-x-1" : "opacity-100 translate-x-0"
-        }`}
-      >
-        <GlobeIcon />
-      </span>
-      <SwapText shown={!expanded}>{locale.toUpperCase()}</SwapText>
-      <SwapText shown={expanded}>
-        {/* Mọi label chồng trong một ô grid, chỉ label đang chọn là hiện: ô
-            rộng bằng label dài nhất nên trigger khi mở khớp đúng bề rộng panel
-            (`w-full`). `pr-6` giữ chỗ cho chevron, vốn đã ra khỏi luồng. */}
-        <span className="grid pr-6">
-          {options.map((lang) => (
-            <span
-              key={lang.code}
-              aria-hidden={lang.code !== current.code}
-              className={`col-start-1 row-start-1 whitespace-nowrap ${
-                lang.code === current.code ? "" : "invisible"
-              }`}
-            >
-              {lang.label}
-            </span>
-          ))}
-        </span>
-      </SwapText>
-      {/* Nút nở sang trái (mép phải đứng yên), nên chevron neo `right-0` đứng
-          im — chỉ fade, không trượt ngang. */}
-      <span
-        aria-hidden
-        className={`absolute inset-y-0 right-0 flex items-center transition-opacity duration-200 ease-out ${
-          expanded ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <ChevronDownIcon />
-      </span>
-    </span>
-  );
-}
-
 interface LanguageSelectorProps {
   locale: string;
   pathWithoutLocale: string;
@@ -180,72 +81,202 @@ interface LanguageSelectorProps {
   selectLanguageLabel?: string;
 }
 
-export function DesktopLanguageSelector({ locale, pathWithoutLocale, languages: liveLanguages, selectLanguageLabel }: LanguageSelectorProps) {
+export function DesktopLanguageSelector({
+  locale,
+  pathWithoutLocale,
+  languages: liveLanguages,
+  selectLanguageLabel,
+}: LanguageSelectorProps) {
   const options = liveLanguages ?? languages;
-  const [open, setOpen] = useState(false);
-  // Hover tracked in JS too: the inline style guarding the hidden state
-  // out-specificities `group-hover:*`, which would otherwise disable hover.
-  const [hovered, setHovered] = useState(false);
-  const visible = open || hovered;
-  const containerRef = useRef<HTMLDivElement>(null);
-  useDismissOnOutside(containerRef, open, () => setOpen(false));
 
-  // The dropdown lists every language except the current one, so a
-  // single-language build would open an empty panel.
-  if (options.length <= 1) return null;
+  // Chỉ hover, không click-to-toggle.
+  //
+  // `open` đổi tức thì cả hai chiều: nó điều khiển mọi thứ mắt thấy ngay —
+  // trigger đổ nền, menu hiện/mờ. `tall` điều khiển chiều cao menu và chỉ
+  // trễ ở chiều đóng, nhờ vậy menu mờ đi ở nguyên chiều cao rồi mới xẹp
+  // (lúc đó đã vô hình). Mở thì cả hai set chung một nhịp — cùng một lần
+  // render — nên chiều cao bắt đầu chạy đúng frame trigger bắt đầu đổ nền.
+  const [open, setOpen] = useState(false);
+  const [tall, setTall] = useState(false);
+  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const show = () => {
+    if (collapseTimer.current) clearTimeout(collapseTimer.current);
+    setOpen(true);
+    setTall(true);
+  };
+  const hide = () => {
+    setOpen(false);
+    collapseTimer.current = setTimeout(() => setTall(false), FADE_MS);
+  };
+  useEffect(
+    () => () => {
+      if (collapseTimer.current) clearTimeout(collapseTimer.current);
+    },
+    [],
+  );
+
+  // Ba phép đo, đều lấy từ phần tử không bao giờ animate. Mọi thứ animate
+  // sau đó đều chạy trên số px cố định — không có layout nào phải tính lại
+  // theo nội dung ở từng frame.
+  //  • `restRef` / `openRef` — hai lớp chữ của trigger (thu gọn và mở), để
+  //    lấy bề rộng của chính nó ở mỗi trạng thái.
+  //  • `listRef` — danh sách bên trong thẻ menu, lấy chiều cao px để thẻ
+  //    animate tới. Đo phần bên trong chứ không đo chính thẻ, vì chiều cao
+  //    của thẻ là thứ đang bị điều khiển.
+  const restRef = useRef<HTMLSpanElement>(null);
+  const openRef = useRef<HTMLSpanElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<{ rest: number; open: number; h: number } | null>(null);
+  useLayoutEffect(() => {
+    const measure = () => {
+      if (!restRef.current || !openRef.current || !listRef.current) return;
+      setSize({
+        rest: restRef.current.offsetWidth,
+        open: openRef.current.offsetWidth,
+        h: listRef.current.offsetHeight,
+      });
+    };
+    measure();
+    // Font web về muộn thì chữ đổi bề rộng — đo lại, nếu không pill giữ số
+    // px đo bằng font fallback.
+    document.fonts?.ready.then(measure).catch(() => {});
+    // Component này ẩn bằng `hidden md:flex` (không unmount) dưới breakpoint
+    // md, nên offsetWidth đo lúc ẩn luôn ra 0. Resize từ mobile lên desktop
+    // không tự trigger effect trên (deps chỉ đổi theo options/locale), nút
+    // liền kẹt ở width 0 — vô hình — cho tới khi reload. Đo lại mỗi lần
+    // resize để bắt đúng thời điểm nó hiện trở lại.
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [options, locale]);
+
+  // Menu liệt kê mọi ngôn ngữ trừ ngôn ngữ hiện tại (nó đã nằm trên trigger
+  // rồi), nên bản build một ngôn ngữ sẽ mở ra một panel rỗng.
+  const rest = options.filter((lang) => lang.code !== locale);
+  if (rest.length === 0) return null;
 
   return (
     <div
-      ref={containerRef}
       data-fallback-desktop-only
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      // Globe nằm ngoài hộp nút nên nó ăn vào margin trái này. Dưới `lg` navbar
-      // có nút cuộn với icon tròn sát mép phải, `ml-2` là globe đè lên nó.
-      className="hidden md:flex relative items-stretch flex-shrink-0 ml-6 lg:ml-2 group w-max"
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      className="hidden md:flex relative items-stretch flex-shrink-0 ml-6 lg:ml-2 w-max"
     >
+      {/* Vùng đệm hover quanh trigger: nới rộng ra ngoài mép nút. Nằm ngoài
+          nút (nút đã `overflow-hidden` nên bỏ trong đó sẽ bị cắt), nhưng vẫn
+          là con của vùng nghe hover — rê chuột trượt qua mép vẫn tính là còn
+          hover, và di qua lại giữa nó với nút không làm rời vùng nghe. */}
+      <span aria-hidden className="absolute -inset-3" />
+
       <button
         type="button"
         aria-label={selectLanguageLabel}
         aria-haspopup="menu"
-        aria-expanded={visible}
-        onClick={() => setOpen((o) => !o)}
-        // Cùng nền với panel khi mở để đọc thành một khối liền. Chữ không đổi
-        // màu: đây là ngôn ngữ đang chọn, không phải một lựa chọn bấm được.
-        className={`relative flex items-center px-2 lg:px-3 text-xs text-left text-gray-200 h-full group-hover:bg-chrome-panelHover ${
-          visible ? "bg-chrome-panelHover" : ""
+        aria-expanded={open}
+        // Chỉ `width` (px đo sẵn) và màu nền animate. Chữ KHÔNG chạy theo:
+        // hai lớp chữ dưới đây đứng nguyên vị trí cuối của mình và chỉ mờ
+        // vào/mờ ra. Trước đây bề rộng chạy bằng track grid `0fr→1fr`, tức
+        // mỗi frame phải dựng lại layout của chữ — Safari đuối ở đúng chỗ đó
+        // và cái lộ ra là chữ giật. Giờ chữ đứng yên, nút chỉ nở ra và
+        // `overflow-hidden` xén phần chưa tới.
+        //
+        // Lúc nghỉ: không nền, đọc như các tab nav bên cạnh. Lúc hover: đổ
+        // nền trắng thành viên pill — cùng cách xử lý với nút ngôn ngữ ở
+        // mobile. `self-center` + chiều cao cố định giữ hộp không đổi kích
+        // thước dọc. `justify-end` neo nội dung vào mép phải, mép đứng yên
+        // khi nút nở sang trái, nên lớp chữ trong luồng cũng không xê dịch.
+        style={{ width: size ? (open ? size.open : size.rest) : undefined }}
+        className={`relative self-center flex items-center justify-end h-9 rounded-full overflow-hidden text-xs font-medium transition-[width,background-color] duration-200 delay-[-25ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          open ? "bg-gray-100" : "bg-transparent"
         }`}
       >
-        <LanguageTriggerContent
-          languages={options}
-          locale={locale}
-          expanded={visible}
-          className="flex items-center font-medium"
-        />
+        {/* Lớp thu gọn: nằm trong luồng nên nó là bề rộng mặc định của nút
+            trước khi đo xong (và cũng là thứ được đo). */}
+        <span
+          ref={restRef}
+          className={`flex items-center gap-1.5 px-3 whitespace-nowrap text-gray-200 transition-opacity duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            open ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+          {locale.toUpperCase()}
+        </span>
+
+        {/* Lớp mở: `absolute` neo phải, ra khỏi luồng — bề rộng nút đổi bao
+            nhiêu nó cũng không xê dịch một pixel nào. */}
+        <span
+          ref={openRef}
+          aria-hidden
+          className={`absolute inset-y-0 right-0 flex items-center gap-1.5 pl-2.5 pr-3 whitespace-nowrap text-black transition-opacity duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            open ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+          {/* Mọi label chồng trong một ô grid, chỉ label đang chọn là hiện:
+              ô rộng bằng label dài nhất, nên bề rộng pill (và menu bên dưới,
+              vốn lấy theo nó) đủ chỗ cho mọi ngôn ngữ, không nhảy số khi đổi
+              ngôn ngữ. Label ngắn hơn thì tự căn giữa trong ô (button mặc
+              định `text-align: center`).
+
+              `px-2` là chỗ dư cho chính label *dài nhất*: không có nó thì ô
+              vừa khít label đó, dư 0px, nên riêng nó không căn giữa được và
+              trông lệch hẳn sang trái so với các ngôn ngữ khác. */}
+          <span className="grid px-2">
+            {options.map((lang) => (
+              <span
+                key={lang.code}
+                className={`col-start-1 row-start-1 whitespace-nowrap ${
+                  lang.code === locale ? "" : "invisible"
+                }`}
+              >
+                {lang.label}
+              </span>
+            ))}
+          </span>
+          <ChevronDownIcon />
+        </span>
       </button>
+
       <div
-        // Đổ xuống bằng grid-template-rows 0fr→1fr, timing khớp
-        // EXPAND_GRID_TRANSITION_CLASS (thêm opacity/visibility nên không dùng
-        // lại hằng đó nguyên vẹn). Inline style giữ trạng thái ẩn để panel
-        // không hiện thường trực nếu stylesheet lỗi.
-        style={{
-          gridTemplateRows: visible ? "1fr" : "0fr",
-          ...(visible ? null : { opacity: 0, visibility: "hidden" as const }),
-        }}
-        className={`absolute top-full right-0 w-full grid transition-[grid-template-rows,opacity,visibility] duration-300 delay-[-150ms] ease-out z-50 ${
-          visible ? "opacity-100 visible" : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
+        // Khung tĩnh: chỉ lo vị trí, bề rộng và vùng đệm hover — không
+        // animate gì, nên không có gì ở đây giật được. Không `overflow-hidden`
+        // để shadow của thẻ toả tự do ra phần padding.
+        // `box-content` cho `width` tính đúng phần nội dung: thẻ trắng rộng
+        // đúng bằng trigger, padding nằm ngoài phép đo. `-right-5` bù đúng
+        // `px-5` nên mép phải thẻ thẳng hàng mép phải trigger. `pt-2` vừa là
+        // khe hở tới trigger vừa là cầu nối hover qua khe đó.
+        style={{ width: size?.open }}
+        className={`absolute top-full -right-5 box-content px-5 pt-2 pb-5 z-50 ${
+          open
+            ? "visible opacity-100 [transition:opacity_0s,visibility_0s]"
+            : "invisible opacity-0 pointer-events-none [transition:opacity_100ms_ease-in,visibility_0s_linear_100ms]"
         }`}
       >
-        {/* overflow-hidden là nửa còn lại của kỹ thuật 0fr/1fr. Nền + shadow
-            nằm trên lớp này để lúc đóng không còn vệt shadow của hộp cao 0px. */}
-        <div className="overflow-hidden bg-chrome-panelHover shadow-lg">
-          <LanguageDropdownLinks
-            languages={options}
-            locale={locale}
-            pathWithoutLocale={pathWithoutLocale}
-            itemClassName="h-14 whitespace-nowrap"
-            onSelect={() => setOpen(false)}
-          />
+        {/* Chính thẻ này co giãn — không phải một lớp mask trượt qua nó. Nhờ
+            vậy bo góc dưới và shadow luôn hiện, chạy xuống theo thẻ, thay vì
+            đáy bị cắt phẳng suốt lúc animate. `overflow-hidden` để danh sách
+            bên trong bị thẻ cắt theo bo góc.
+
+            Delay âm −62ms (¼ của 250ms) là mẹo của FAQ accordion
+            (lib/expandTransition.ts, ở đó dùng ½): trình duyệt vào transition
+            ở trạng thái đã chạy sẵn ¼ đường cong, nên bỏ qua đoạn đầu và bớt
+            được chừng ấy lần tính lại layout — đỡ cảm giác ì lúc bắt đầu. */}
+        <div
+          style={{ height: tall && size ? size.h : 0 }}
+          className="overflow-hidden rounded-[20px] bg-white shadow-[0_0_24px_rgba(0,0,0,0.18)] [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
+        >
+          <div ref={listRef}>
+            {rest.map((lang, index) => (
+              <Link
+                key={lang.code}
+                href={`/${lang.code}${pathWithoutLocale}`}
+                className={`flex items-center h-11 px-4 text-sm text-gray-700 whitespace-nowrap hover:bg-gray-50 active:bg-gray-50 ${
+                  index !== rest.length - 1 ? "border-b border-gray-100" : ""
+                }`}
+              >
+                {lang.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>

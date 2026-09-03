@@ -157,27 +157,49 @@ export default function Navbar({
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">
-            {/* Logo */}
-            <Link
-              href={`/${locale}`}
-              className="group flex items-center flex-shrink-0 mr-2 py-1"
-              onClick={(e) => {
-                setMenuOpen(false);
-                e.currentTarget.blur();
-                clearArticleRoute();
-                if (isHomeActive) invalidateContent();
-              }}
-            >
-              <Image
-                src={logoBroken ? FALLBACK_LOGO : logoOnBlack || FALLBACK_LOGO}
-                onError={() => setLogoBroken(true)}
-                alt="SUN PhuQuoc Airways"
-                width={185}
-                height={43}
-                className="h-7 md:h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)]"
-                priority
-              />
-            </Link>
+            {/* Logo — crossfades with the "Select language" label on mobile
+                while the drawer's language sub-screen is open, same slot the
+                logo normally owns. Desktop has no langView state, so the
+                logo stays fully opaque there regardless of this flag. Both
+                layers stay mounted (never unmount) so they fade in sync with
+                the drawer instead of snapping. */}
+            <div className="relative self-center flex items-center flex-shrink-0 mr-2 py-1 h-7 md:h-9">
+              <Link
+                href={`/${locale}`}
+                className={`group flex items-center transition-opacity ease-out ${
+                  mobileLangView && menuOpen
+                    ? "duration-100 opacity-0 pointer-events-none md:duration-300 md:opacity-100 md:pointer-events-auto"
+                    : "duration-200 opacity-100"
+                }`}
+                onClick={(e) => {
+                  setMenuOpen(false);
+                  e.currentTarget.blur();
+                  clearArticleRoute();
+                  if (isHomeActive) invalidateContent();
+                }}
+              >
+                <Image
+                  src={logoBroken ? FALLBACK_LOGO : logoOnBlack || FALLBACK_LOGO}
+                  onError={() => setLogoBroken(true)}
+                  alt="SUN PhuQuoc Airways"
+                  width={185}
+                  height={43}
+                  className="h-7 md:h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)]"
+                  priority
+                />
+              </Link>
+              {nav?.["selectLanguage"] && (
+                <span
+                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-400 transition-opacity ease-out ${
+                    mobileLangView && menuOpen
+                      ? "duration-200 opacity-100"
+                      : "duration-100 opacity-0 pointer-events-none"
+                  }`}
+                >
+                  {nav["selectLanguage"]}
+                </span>
+              )}
+            </div>
 
             {/* Tablet + Desktop nav */}
             <div
@@ -302,12 +324,12 @@ export default function Navbar({
                   onClick={() => setMobileLangView((v) => !v)}
                   tabIndex={menuOpen ? 0 : -1}
                   aria-hidden={!menuOpen}
-                  className={`relative h-full min-w-[44px] px-2.5 flex items-center justify-center gap-1.5 transition-opacity duration-300 ease-out active:text-white ${
+                  className={`relative z-50 self-center h-9 min-w-[44px] pl-2.5 pr-3 flex items-center justify-center gap-1.5 rounded-full transition-[opacity,background-color,color] duration-300 ease-out ${
                     menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                   } ${
                     mobileLangView
-                      ? "text-white"
-                      : "text-gray-300 hover:text-white"
+                      ? "bg-white text-black"
+                      : "text-gray-300 hover:text-white active:text-white"
                   }`}
                   aria-label={nav?.["selectLanguage"]}
                   aria-expanded={mobileLangView}
@@ -370,7 +392,6 @@ export default function Navbar({
           langView={mobileLangView}
           navItems={navItems}
           normalizedPath={normalizedPath}
-          nav={nav}
           languageOptions={languageOptions}
           pathWithoutLocale={`${pathWithoutLocale}${localeSuffix}`}
           locale={locale}

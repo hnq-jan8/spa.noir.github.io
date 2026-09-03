@@ -24,7 +24,6 @@ export default function MobileMenu({
   langView,
   navItems,
   normalizedPath,
-  nav,
   languageOptions,
   pathWithoutLocale,
   locale,
@@ -36,7 +35,6 @@ export default function MobileMenu({
   langView: boolean;
   navItems: NavItem[];
   normalizedPath: string;
-  nav: Record<string, string> | undefined;
   languageOptions: LanguageOption[];
   pathWithoutLocale: string;
   locale: string;
@@ -69,16 +67,14 @@ export default function MobileMenu({
       aria-modal="true"
     >
       {/* Grid-stack: both panels share one cell so the drawer's height always
-          matches whichever is visible, no absolute positioning needed. The
-          language panel slides in from the right / nav slides out to the
-          left, mirrored on the way back — reads as moving to a sub-screen
-          rather than a plain crossfade. */}
+          matches whichever is visible, no absolute positioning needed. Plain
+          opacity crossfade between nav and the language panel — no slide. */}
       <div className="grid">
         <nav
-          className={`col-start-1 row-start-1 flex flex-col transition-[opacity,transform] duration-300 ease-out ${
+          className={`col-start-1 row-start-1 flex flex-col transition-opacity duration-300 ease-out ${
             langView
-              ? "opacity-0 -translate-x-6 pointer-events-none"
-              : "opacity-100 translate-x-0"
+              ? "opacity-0 pointer-events-none"
+              : "opacity-100"
           }`}
           aria-hidden={langView}
         >
@@ -131,18 +127,13 @@ export default function MobileMenu({
 
         {languageOptions.length > 1 && (
           <div
-            className={`col-start-1 row-start-1 flex flex-col pt-2 transition-[opacity,transform] duration-300 ease-out ${
+            className={`col-start-1 row-start-1 flex flex-col transition-opacity duration-300 ease-out ${
               langView
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-6 pointer-events-none"
+                ? "opacity-100"
+                : "opacity-0 pointer-events-none"
             }`}
             aria-hidden={!langView}
           >
-            {nav?.["selectLanguage"] && (
-              <div className="px-5 pb-3 text-sm text-gray-400">
-                {nav["selectLanguage"]}
-              </div>
-            )}
             {languageOptions.map((lang, index) => {
               const isActive = lang.code === locale;
               return (
