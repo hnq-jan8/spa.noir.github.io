@@ -166,7 +166,13 @@ export default function Navbar({
             <div className="relative self-center flex items-center flex-shrink-0 mr-2 py-1 h-7 md:h-9">
               <Link
                 href={`/${locale}`}
-                className={`group flex items-center transition-opacity ease-out ${
+                // transform-gpu: Safari repaints/re-hints an element's text or
+                // image on every opacity step unless it's promoted to its own
+                // compositing layer — with two overlapping layers crossfading
+                // this fast (100-200ms), that per-frame repaint shows up as a
+                // visible stutter. Forcing a GPU layer here (and on the label
+                // span below) makes Safari composite the fade instead.
+                className={`group flex items-center transform-gpu transition-opacity ease-out ${
                   mobileLangView && menuOpen
                     ? "duration-100 opacity-0 pointer-events-none md:duration-300 md:opacity-100 md:pointer-events-auto"
                     : "duration-200 opacity-100"
@@ -190,7 +196,7 @@ export default function Navbar({
               </Link>
               {nav?.["selectLanguage"] && (
                 <span
-                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-400 transition-opacity ease-out ${
+                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-400 transform-gpu transition-opacity ease-out ${
                     mobileLangView && menuOpen
                       ? "duration-200 opacity-100"
                       : "duration-100 opacity-0 pointer-events-none"
