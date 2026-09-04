@@ -63,10 +63,10 @@ export default function FaqAccordion({
     animateFirstOpen ? new Set() : new Set(items.length > 0 ? [0] : []),
   );
 
-  // FLIP: a panel resizing reflows every card below it on each frame — the
-  // jank source on mobile Safari. Let the DOM jump to the new layout in one
-  // reflow, then animate each shifted card's `transform` back to zero, which
-  // runs on the compositor instead.
+  // FLIP: panel đổi kích thước sẽ reflow mọi card bên dưới ở từng frame —
+  // đúng chỗ Safari mobile giật. Cho DOM nhảy thẳng tới layout mới trong một
+  // lần reflow, rồi animate `transform` của các card lệch về 0 (chạy trên
+  // compositor).
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const prevRects = useRef<Map<number, number>>(new Map());
   const cancelRef = useRef(0);

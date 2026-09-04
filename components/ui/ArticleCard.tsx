@@ -6,9 +6,8 @@ import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
 
 /**
- * Same failure handling as MarkdownImage: images live on the Directus host,
- * which can be unreachable even when the static site loads fine. The
- * placeholder keeps the card's geometry instead of collapsing it.
+ * Ảnh nằm trên host Directus, có thể chết dù site tĩnh vẫn chạy — placeholder
+ * giữ nguyên hình dạng card thay vì để nó xẹp (giống MarkdownImage).
  */
 function PreviewImage({
   src,
@@ -66,11 +65,8 @@ function toPlainText(markdown: string) {
 }
 
 /**
- * Heading to show on a list card.
- *
- * A blank `title` is the CMS's full-bleed convention: the body carries its own
- * hero headline. Fine on the article page, but a list card needs a heading, so
- * fall back to the body's first heading.
+ * Tiêu đề cho card danh sách. `title` rỗng là quy ước bài full-bleed (thân bài
+ * tự mang hero headline) — card vẫn cần tiêu đề nên lấy heading đầu của body.
  */
 export function titleOf(article: ResolvedArticle): string | null {
   const explicit = article.title?.trim();
@@ -114,9 +110,8 @@ export default function ArticleCard({
   layout?: "list" | "grid";
   /** "list" layout without the excerpt paragraph — the wide half of a 2/1 grid split. */
   hideExcerpt?: boolean;
-  /** Force the shared grid-row height (h-24 sm:h-28) — the "list" layout's
-   * wide half needs this to line up with its "grid" neighbor; the plain
-   * mobile fallback (no grid, no neighbor to match) doesn't. */
+  /** Ép chiều cao chung của hàng lưới (h-24 sm:h-28): nửa rộng của layout
+   * "list" cần nó để thẳng hàng với ô "grid" bên cạnh. */
   compact?: boolean;
 }) {
   const excerpt =
@@ -137,9 +132,8 @@ export default function ArticleCard({
           ? ""
           : layout === "grid"
             ? // Both halves of a grid row share this fixed height so they
-              // line up regardless of which layout each one renders. No
-              // excerpt on either half, so this only needs to fit a date
-              // line + a wrapped title, not a card2/3-sized block.
+              // line up regardless of which layout each one renders. Không
+              // nửa nào có excerpt nên chỉ cần đủ chỗ cho ngày + tiêu đề.
               "h-24 sm:h-28 flex flex-col"
             : compact
               ? "h-24 sm:h-28 flex items-stretch"
@@ -227,10 +221,8 @@ export default function ArticleCard({
             </div>
           </div>
         ) : (
-          // No image to overlay text on — same top inset and centered-title
-          // treatment as the 1x2/1x3 tiles (date pinned tight to the top,
-          // title centered in the space below it), just on a flat white
-          // background instead of a photo.
+          // Không có ảnh để phủ chữ lên: vẫn giữ cách bố trí của tile 1x2/1x3
+          // (ngày ghim sát trên, tiêu đề căn giữa phần còn lại), nền trắng.
           <div className="relative flex-1 pl-3.5 pr-3.5 sm:pl-4 sm:pr-4">
             {article.date && (
               <p className="absolute top-2 sm:top-2.5 left-3.5 sm:left-4 text-xs text-gray-500">
@@ -264,17 +256,13 @@ export default function ArticleCard({
             />
           )}
           {hideExcerpt && compact ? (
-            // Fixed-height compact half of a grid row: date is pinned with
-            // its own absolute top inset (out of flow) so title can center
-            // against the box's *full* height instead of just the space
-            // left below the date. `h-full` only resolves because `compact`
-            // gives the button a definite height — drop compact and this
-            // collapses onto the date (that's why the fallback below exists).
+            // Nửa compact của hàng lưới: ngày ghim absolute (ra khỏi luồng)
+            // để tiêu đề căn giữa theo TOÀN BỘ chiều cao hộp. `h-full` chỉ
+            // giải được nhờ `compact` cho nút một chiều cao xác định — bỏ
+            // compact là nó xẹp lên ngày, nên mới có nhánh fallback bên dưới.
             <div
-              // No image: the button has no padding of its own, so pl-3
-              // reads too close to the edge next to the featured card's
-              // p-5/p-6 above it — bump to match when there's no thumbnail
-              // to supply that left margin instead.
+              // Không ảnh thì nút không có padding riêng, pl-3 sát mép quá so
+              // với p-5/p-6 của card nổi bật phía trên — nới ra cho khớp.
               className={`relative flex-1 min-w-0 pr-3 sm:pr-4 ${
                 hasImage ? "pl-3 sm:pl-3.5" : "pl-5 sm:pl-6"
               }`}
@@ -291,11 +279,9 @@ export default function ArticleCard({
                 </p>
               )}
               {heading && (
-                // pt-3 clears the absolutely-positioned date above before
-                // centering starts, so a 2-line title can't run into it. The
-                // no-image case gets a taller top inset for the date, so its
-                // own clearance (pt) shrinks correspondingly to keep the
-                // title centered where it was.
+                // pt-3 chừa chỗ cho ngày (absolute) trước khi căn giữa, để
+                // tiêu đề 2 dòng không đâm vào. Nhánh không ảnh có inset trên
+                // cao hơn nên pt giảm tương ứng, giữ tiêu đề đúng chỗ cũ.
                 <div
                   className={`h-full flex items-center ${hasImage ? "pt-3" : "pt-2"}`}
                 >
@@ -306,15 +292,12 @@ export default function ArticleCard({
               )}
             </div>
           ) : (
-            // Either a regular card (full excerpt, auto height) or
-            // hideExcerpt without compact — mobile's stacked fallback, where
-            // a grid row's fixed height doesn't apply. Auto-height either
-            // way, so no absolute positioning needed to center within it.
-            // `excerpt` is already null when hideExcerpt.
+            // Card thường (có excerpt) hoặc hideExcerpt mà không compact —
+            // fallback xếp chồng ở mobile. Cả hai đều auto-height nên không
+            // cần absolute để căn giữa.
             <div
-              // hideExcerpt cards (position 4+'s mobile-stacked fallback)
-              // have nothing below the title — the same pt as an
-              // excerpt-carrying card reads top-heavy there, so it gets less.
+              // hideExcerpt không có gì dưới tiêu đề nên cùng pt với card có
+              // excerpt sẽ nhìn nặng đầu — giảm bớt.
               className={`flex-1 min-w-0 flex flex-col justify-center pr-3 sm:pr-4 pb-4 sm:pb-5 ${
                 hideExcerpt ? "pt-2 sm:pt-2.5" : "pt-3 sm:pt-3.5"
               } ${hasImage ? "pl-3 sm:pl-3.5" : "pl-5 sm:pl-6"}`}

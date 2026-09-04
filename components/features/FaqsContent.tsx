@@ -6,7 +6,10 @@ import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import FaqAccordion from "@/components/ui/FaqAccordion";
 import { useHideBreadcrumbWhen } from "@/hooks/useBreadcrumbVisibility";
 import { useContentState } from "@/hooks/useContentData";
-import FaqsSkeleton from "@/components/ui/skeletons/FaqsSkeleton";
+import FaqsSkeleton, {
+  FaqsSearchFieldSkeleton,
+} from "@/components/ui/skeletons/FaqsSkeleton";
+import { loadingProps } from "@/components/ui/Skeleton";
 import Reveal from "../ui/Reveal";
 
 /** Same curve + negative-delay trick as the FAQ accordion's own expand
@@ -73,9 +76,8 @@ function SearchField({
 
 export default function FaqsContent() {
   const { data, failed } = useContentState();
-  // `query` drives the field, `applied` lags behind and drives the filtering:
-  // the list is keyed on its contents, so filtering per keystroke would remount
-  // the whole accordion while the user is still typing.
+  // `query` cho ô nhập, `applied` trễ hơn và mới là thứ lọc: danh sách key
+  // theo nội dung nên lọc từng phím sẽ remount accordion khi đang gõ.
   const [query, setQuery] = useState("");
   const [applied, setApplied] = useState("");
   // Below md the field starts collapsed into an icon beside the breadcrumb.
@@ -125,16 +127,13 @@ export default function FaqsContent() {
     ? faqs.filter((faq) => faq.searchText.includes(normalized))
     : faqs;
 
-  // FaqAccordion remounts per result set (its `key` below), so "is this still
-  // the card the reader already had open?" has to be tracked here, in the
-  // parent that survives. Don't replay the expand-in unless the top question
-  // changed or the reader had closed it themselves; the page's own first paint
-  // is announced by <Reveal>, not by the card popping open.
+  // FaqAccordion remount theo mỗi tập kết quả (`key` bên dưới), nên "vẫn là
+  // thẻ người đọc đang mở?" phải theo dõi ở đây — component cha sống sót.
+  // Chỉ diễn lại animation mở khi câu đầu đổi hoặc người đọc đã tự đóng.
   //
-  // Memoized per accordionKey, not a plain const: content comes from a
-  // module-level cache (useContentData.ts), so a client-side nav can re-render
-  // this after mount — recomputing inline would drop <Reveal> before it ever
-  // painted, losing the entrance fade.
+  // Memo theo accordionKey chứ không phải const thường: content đến từ cache
+  // module-level nên một lần nav client-side có thể re-render lại sau mount,
+  // tính lại inline sẽ giết <Reveal> trước khi nó kịp vẽ.
   const firstQuestion = filtered[0]?.question;
   const accordionKey = filtered.map((f) => f.question).join(" ");
   const isFirstRealRender = useMemo(
@@ -143,15 +142,16 @@ export default function FaqsContent() {
   );
   const animateFirstOpen =
     !isFirstRealRender &&
-    (prevFirstQuestionRef.current !== firstQuestion || !firstItemOpenRef.current);
+    (prevFirstQuestionRef.current !== firstQuestion ||
+      !firstItemOpenRef.current);
   useEffect(() => {
     prevFirstQuestionRef.current = firstQuestion;
     if (firstQuestion !== undefined) hasShownResultsRef.current = true;
   });
 
-  if (!data) return failed ? <ContentLoadError /> : <FaqsSkeleton />;
+  if (!data && failed) return <ContentLoadError />;
 
-  if (faqs.length === 0) {
+  if (data && faqs.length === 0) {
     return (
       <div className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto">
         <EmptyState data={data} />
@@ -166,14 +166,14 @@ export default function FaqsContent() {
 
   return (
     <div
-      // Desktop pt only: engaging trims it to the offset the field's sticky
-      // wrapper already sits at, so field and cards slide up together in one
-      // reflow. md:pt-[18px] (not pt-4) matches the wrapper's top-[58px]
-      // exactly — 2px past it and sticky clamps the field early while the
-      // cards keep easing, which reads as the two falling out of sync.
+      // Chỉ pt ở desktop: lúc engage nó co về đúng offset mà khung sticky của
+      // ô tìm kiếm đang đứng, để ô và card trượt lên cùng một nhịp.
+      // md:pt-[18px] khớp chính xác top-[58px] — lệch 2px là sticky kẹp ô sớm
+      // trong khi card còn đang chạy, nhìn ra ngay là hai thứ rời nhau.
       className={`container-page pb-8 md:pb-8 max-w-3xl mx-auto pt-4 transition-[padding-top] duration-300 ease-out ${
         desktopFieldEngaged ? "md:pt-[18px]" : "md:pt-8"
       } ${desktopFieldEngaged || mobileSearchOpen ? "min-h-[100dvh]" : ""}`}
+      {...loadingProps(!data)}
     >
       {/* min-h while engaged: a short result list would otherwise let the
           field's sticky wrapper reach the footer boundary and un-stick
@@ -217,7 +217,9 @@ export default function FaqsContent() {
             icon when open — same curve as the capsule so it slides, not jumps. */}
         <Search
           className={`pointer-events-none absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-[left,transform] ${CAPSULE_TRANSITION} ${
-            mobileSearchOpen ? "left-2.5 translate-x-0" : "left-1/2 -translate-x-1/2"
+            mobileSearchOpen
+              ? "left-2.5 translate-x-0"
+              : "left-1/2 -translate-x-1/2"
           }`}
           strokeWidth={2}
         />
@@ -237,9 +239,7 @@ export default function FaqsContent() {
           // text-base (16px), not text-sm: iOS Safari auto-zooms the viewport on
           // focus for anything smaller, fighting the capsule's expand.
           className={`absolute inset-y-0 left-9 right-9 bg-transparent text-base text-gray-900 placeholder:text-gray-500 focus:outline-none transition-opacity duration-150 ${
-            mobileSearchOpen
-              ? "opacity-100"
-              : "opacity-0 pointer-events-none"
+            mobileSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         />
         {mobileSearchOpen && query && (
@@ -275,26 +275,29 @@ export default function FaqsContent() {
               being masked twice. -inset-x-2 covers the cards' 6px shadow blur,
               which bled past a flush edge at the pill's corners. */}
           <div className="absolute -inset-x-2 -top-8 h-[55px] bg-page pointer-events-none" />
-          <SearchField
-            query={query}
-            onChange={setQuery}
-            inputRef={desktopInputRef}
-            onClear={() => {
-              // Clicking blurs the input (native focus shift) — refocus so the
-              // now-empty field doesn't un-engage on the next blur check.
-              clearSearch();
-              desktopInputRef.current?.focus();
-            }}
-            onFocus={() => {
-              window.scrollTo({ top: 0 });
-              setDesktopFieldEngaged(true);
-            }}
-            onBlur={() => {
-              if (!query.trim()) setDesktopFieldEngaged(false);
-            }}
-            placeholder={labels["searchPlaceholder"]}
-            clearLabel={labels["clearSearch"]}
-          />
+          {!data && <FaqsSearchFieldSkeleton />}
+          {data && (
+            <SearchField
+              query={query}
+              onChange={setQuery}
+              inputRef={desktopInputRef}
+              onClear={() => {
+                // Clicking blurs the input (native focus shift) — refocus so the
+                // now-empty field doesn't un-engage on the next blur check.
+                clearSearch();
+                desktopInputRef.current?.focus();
+              }}
+              onFocus={() => {
+                window.scrollTo({ top: 0 });
+                setDesktopFieldEngaged(true);
+              }}
+              onBlur={() => {
+                if (!query.trim()) setDesktopFieldEngaged(false);
+              }}
+              placeholder={labels["searchPlaceholder"]}
+              clearLabel={labels["clearSearch"]}
+            />
+          )}
         </div>
       </div>
 
@@ -304,40 +307,46 @@ export default function FaqsContent() {
       <div
         className={`transition-[margin-top] ${CAPSULE_TRANSITION} ${mobileSearchOpen ? "-mt-6 md:mt-0" : "mt-0"}`}
       >
-      {filtered.length === 0 ? (
-        // No <Reveal>: a search outcome isn't the page appearing.
-        <div className="text-center py-16 px-4">
-          {labels["noResultsTitle"] && (
-            <p className="text-base font-semibold text-gray-900">
-              {labels["noResultsTitle"]}
-            </p>
-          )}
-          {labels["noResultsHint"] && (
-            <p className="mt-1 text-sm text-gray-500">
-              {labels["noResultsHint"]}
-            </p>
-          )}
-        </div>
-      ) : (
-        // Remounts on every result-set change: the accordion keys its open
-        // state by array index, which filtering would otherwise misalign.
-        (() => {
-          const accordion = (
-            <FaqAccordion
-              key={accordionKey}
-              items={filtered}
-              animateFirstOpen={animateFirstOpen}
-              onFirstItemOpenChange={(isOpen) => {
-                firstItemOpenRef.current = isOpen;
-              }}
-              reopenFirstSignal={applied}
-            />
-          );
-          // <Reveal> only for the page's own first paint — later mounts are
-          // search outcomes, not the page appearing.
-          return isFirstRealRender ? <Reveal>{accordion}</Reveal> : accordion;
-        })()
-      )}
+        {!data ? (
+          // Placeholder đi chung <Reveal> với accordion thật nên React giữ
+          // nguyên thẻ bọc, chỉ đổi ruột (xem Reveal.tsx).
+          <Reveal>
+            <FaqsSkeleton />
+          </Reveal>
+        ) : filtered.length === 0 ? (
+          // No <Reveal>: a search outcome isn't the page appearing.
+          <div className="text-center py-16 px-4">
+            {labels["noResultsTitle"] && (
+              <p className="text-base font-semibold text-gray-900">
+                {labels["noResultsTitle"]}
+              </p>
+            )}
+            {labels["noResultsHint"] && (
+              <p className="mt-1 text-sm text-gray-500">
+                {labels["noResultsHint"]}
+              </p>
+            )}
+          </div>
+        ) : (
+          // Remounts on every result-set change: the accordion keys its open
+          // state by array index, which filtering would otherwise misalign.
+          (() => {
+            const accordion = (
+              <FaqAccordion
+                key={accordionKey}
+                items={filtered}
+                animateFirstOpen={animateFirstOpen}
+                onFirstItemOpenChange={(isOpen) => {
+                  firstItemOpenRef.current = isOpen;
+                }}
+                reopenFirstSignal={applied}
+              />
+            );
+            // <Reveal> only for the page's own first paint — later mounts are
+            // search outcomes, not the page appearing.
+            return isFirstRealRender ? <Reveal>{accordion}</Reveal> : accordion;
+          })()
+        )}
       </div>
     </div>
   );

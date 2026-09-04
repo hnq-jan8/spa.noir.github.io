@@ -17,6 +17,14 @@ function shouldSkipAnimation() {
   );
 }
 
+/**
+ * Hiệu ứng vào trang: mờ + nhích lên, chạy đúng MỘT lần cho mỗi khối.
+ *
+ * Skeleton và nội dung thật nằm chung một <Reveal> (`{data ? <thật/> :
+ * <placeholder/>}` trong các *Content), nên content.json về chỉ đổi ruột —
+ * thẻ bọc không unmount nên hiệu ứng không khởi động lại. Không phải canh
+ * mốc thời gian nào: về sớm hay muộn mắt cũng chỉ thấy một lần fade.
+ */
 export default function Reveal({
   children,
   className = "",

@@ -7,7 +7,9 @@ import { useContentData } from "@/hooks/useContentData";
 import { bundledLabels } from "@/i18n/labels";
 import { getSavedLocale } from "@/i18n/preference";
 import { routing } from "@/i18n/routing";
-import NotFoundLayout, { NOT_FOUND_ACTION_CLASS } from "@/components/ui/NotFoundLayout";
+import NotFoundLayout, {
+  NOT_FOUND_ACTION_CLASS,
+} from "@/components/ui/NotFoundLayout";
 
 export default function NotFoundContent() {
   const params = useParams();
@@ -21,7 +23,8 @@ export default function NotFoundContent() {
   }, [paramLocale]);
   const locale = paramLocale ?? savedLocale ?? routing.defaultLocale;
   const data = useContentData();
-  const t = data?.common.labels["notFound"] ?? bundledLabels(locale, "notFound");
+  const t =
+    data?.common.labels["notFound"] ?? bundledLabels(locale, "notFound");
 
   return (
     <NotFoundLayout
@@ -29,7 +32,10 @@ export default function NotFoundContent() {
       description={t?.["description"]}
       action={
         t?.["backHome"] && (
-          <Link href={`/${locale}`} className={`inline-block px-5 ${NOT_FOUND_ACTION_CLASS}`}>
+          <Link
+            href={`/${locale}`}
+            className={`inline-block px-5 ${NOT_FOUND_ACTION_CLASS}`}
+          >
             {t["backHome"]}
           </Link>
         )

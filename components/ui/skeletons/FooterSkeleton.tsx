@@ -13,7 +13,11 @@ export function FooterContactsSkeleton() {
         // 16 + 4 + 24: the label's text-xs line box, its mb-1, and the
         // inline-flex link below it.
         <div key={i}>
-          <SkeletonText box="h-4 mb-1" bar="h-3 w-24" fill="skeleton-on-surface" />
+          <SkeletonText
+            box="h-4 mb-1"
+            bar="h-3 w-24"
+            fill="skeleton-on-surface"
+          />
           <SkeletonText box="h-6" bar="h-4 w-32" fill="skeleton-on-surface" />
         </div>
       ))}

@@ -1,4 +1,10 @@
-import Skeleton, { SkeletonScreen } from "@/components/ui/Skeleton";
+import Skeleton, { SkeletonText } from "@/components/ui/Skeleton";
+
+/**
+ * Placeholder cho từng khối của FlightInfoContent — bảng chuyến bay và mục
+ * chính sách. Mỗi khối nằm chung một <Reveal> với khối thật nó thay thế,
+ * nên hộp phải khớp hộp thật để lúc bàn giao trang không co giãn.
+ */
 
 /** One stacked flight card — the below-md layout of FlightTable. */
 function FlightCardSkeleton() {
@@ -35,56 +41,58 @@ function FlightCardSkeleton() {
 }
 
 /**
- * Mirrors FlightInfoContent: the table (stacked cards below md, a 7-column
- * grid from md up) inside the md+ white card, then the policy section.
+ * Tiêu đề mục + bảng: cards xếp chồng dưới md, lưới 7 cột từ md trở lên.
  */
-export default function FlightInfoSkeleton() {
+export function FlightTableSkeleton() {
   return (
-    <SkeletonScreen className="container-page pt-4 pb-8 md:py-8 md:max-w-6xl md:mx-auto">
-      <div className="md:bg-white md:rounded-2xl md:p-6 md:card-shadow">
-        <Skeleton className="h-7 w-52 mb-4 md:skeleton-on-card" />
+    <>
+      <SkeletonText box="h-9 mb-4" bar="h-7 w-52 md:skeleton-on-card" />
 
-        <div className="md:hidden grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
-          <FlightCardSkeleton />
-          <FlightCardSkeleton />
-        </div>
+      <div className="md:hidden grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+        <FlightCardSkeleton />
+        <FlightCardSkeleton />
+      </div>
 
-        {/* The md+ table: a header row of seven, then body rows. Widths follow
-            the real column proportions so nothing jumps on swap — index 3 is
-            the wider Route column. */}
-        <div className="hidden md:block -mx-6">
-          <div className="px-6">
-            <div className="grid grid-cols-[3rem_1fr_1fr_1.6fr_1fr_1fr_1fr] gap-x-4 lg:gap-x-8 items-center border-b border-gray-200 pb-2">
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                <Skeleton key={i} className="skeleton-on-card h-4 w-full" />
-              ))}
-            </div>
-            {[0, 1, 2, 3, 4].map((row) => (
-              <div
-                key={row}
-                className="grid grid-cols-[3rem_1fr_1fr_1.6fr_1fr_1fr_1fr] gap-x-4 lg:gap-x-8 items-center border-b border-gray-100 py-3"
-              >
-                {[0, 1, 2, 3, 4, 5, 6].map((col) => (
-                  <Skeleton
-                    key={col}
-                    className={`skeleton-on-card h-4 ${col === 3 ? "w-full" : "w-3/4"}`}
-                  />
-                ))}
-              </div>
+      {/* The md+ table: a header row of seven, then body rows. Widths follow
+          the real column proportions so nothing jumps on swap — index 3 is
+          the wider Route column. */}
+      <div className="hidden md:block -mx-6">
+        <div className="px-6">
+          <div className="grid grid-cols-[3rem_1fr_1fr_1.6fr_1fr_1fr_1fr] gap-x-4 lg:gap-x-8 items-center border-b border-gray-200 pb-2">
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="skeleton-on-card h-4 w-full" />
             ))}
           </div>
-        </div>
-
-        <div className="mt-10">
-          <Skeleton className="h-7 w-40 mb-4 md:skeleton-on-card" />
-          <div className="max-w-3xl">
-            <Skeleton className="h-3.5 w-full mb-2 md:skeleton-on-card" />
-            <Skeleton className="h-3.5 w-full mb-2 md:skeleton-on-card" />
-            <Skeleton className="h-3.5 w-11/12 mb-2 md:skeleton-on-card" />
-            <Skeleton className="h-3.5 w-3/5 md:skeleton-on-card" />
-          </div>
+          {[0, 1, 2, 3, 4].map((row) => (
+            <div
+              key={row}
+              className="grid grid-cols-[3rem_1fr_1fr_1.6fr_1fr_1fr_1fr] gap-x-4 lg:gap-x-8 items-center border-b border-gray-100 py-3"
+            >
+              {[0, 1, 2, 3, 4, 5, 6].map((col) => (
+                <Skeleton
+                  key={col}
+                  className={`skeleton-on-card h-4 ${col === 3 ? "w-full" : "w-3/4"}`}
+                />
+              ))}
+            </div>
+          ))}
         </div>
       </div>
-    </SkeletonScreen>
+    </>
+  );
+}
+
+/** Tiêu đề "chính sách đổi/hoàn vé" + đoạn markdown bên dưới. */
+export function FlightPolicySkeleton() {
+  return (
+    <>
+      <SkeletonText box="h-9 mb-4" bar="h-7 w-40 md:skeleton-on-card" />
+      <div className="max-w-3xl">
+        <Skeleton className="h-3.5 w-full mb-2 md:skeleton-on-card" />
+        <Skeleton className="h-3.5 w-full mb-2 md:skeleton-on-card" />
+        <Skeleton className="h-3.5 w-11/12 mb-2 md:skeleton-on-card" />
+        <Skeleton className="h-3.5 w-3/5 md:skeleton-on-card" />
+      </div>
+    </>
   );
 }

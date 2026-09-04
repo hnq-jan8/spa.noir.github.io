@@ -5,15 +5,15 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "spa:lastSeenUpdate";
 
 /**
- * Drives the "new official update" dot on the nav tab. `newestDate` can change
- * mid-session (background content re-fetch), which is the case the badge
- * exists for — hence a persisted timestamp, not an in-memory "seen" flag.
+ * Chấm "có cập nhật mới" trên tab nav. `newestDate` có thể đổi giữa phiên (poller
+ * tải lại content) — chính là ca badge sinh ra để phục vụ, nên dùng timestamp
+ * lưu lại chứ không phải cờ "đã xem" trong bộ nhớ.
  *
- *  - localStorage is read in an effect, never during render, so prerendered
- *    HTML and first paint agree (`ready` gates the badge until hydration).
- *  - A first-ever visit seeds the timestamp instead of badging: the dot means
- *    strictly "something arrived since you were last here".
- *  - Compares with `>`, so retracting the newest update doesn't read as new.
+ *  - Đọc localStorage trong effect, không đọc lúc render, để HTML prerender và
+ *    first paint khớp nhau (`ready` chặn badge tới khi hydrate xong).
+ *  - Lần đầu vào chỉ gieo mốc chứ không báo: chấm nghĩa là "có cái mới KỂ TỪ
+ *    lần bạn ghé".
+ *  - So bằng `>` nên gỡ bài mới nhất xuống không bị hiểu là có bài mới.
  */
 export function useUnreadUpdate(
   newestDate: string | null | undefined,

@@ -1,13 +1,14 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import PressReleasesContent from "@/components/features/PressReleasesContent";
+import { navMetadata } from "@/i18n/metadata";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "nav" });
-  return { title: t("pressReleases") };
-}
+export const generateMetadata = navMetadata("pressReleases");
 
-export default async function PressReleases({ params }: { params: Promise<{ locale: string }> }) {
+export default async function PressReleases({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   setRequestLocale(locale);
   return <PressReleasesContent />;

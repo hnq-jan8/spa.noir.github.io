@@ -46,14 +46,13 @@ function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
 }
 
 /**
- * Vertical update feed. Each node opens the full update instead of expanding
- * in place, so one long update can't push the rest of the timeline off-screen.
+ * Feed cập nhật dọc. Mỗi node mở bài đầy đủ chứ không bung tại chỗ, để một bài
+ * dài không đẩy cả timeline ra khỏi màn hình.
  *
- * The latest group is set apart by weight and color alone — no card box or
- * border anywhere here, so the rail (dot + line) is the only vertical line and
- * the feed reads as a status log, not a stack of article cards. `group` sits on
- * the whole row so the dot lights up with the text; every group-hover has a
- * group-active twin, since touch devices never trigger :hover.
+ * Nhóm mới nhất chỉ tách ra bằng độ đậm và màu — không card, không viền, nên
+ * rail (chấm + đường) là đường dọc duy nhất và feed đọc ra như status log.
+ * `group` đặt trên cả hàng để chấm sáng cùng chữ; mọi group-hover đều có cặp
+ * group-active vì thiết bị cảm ứng không bao giờ :hover.
  */
 export default function TimelineCarousel({
   items,
@@ -177,9 +176,7 @@ export default function TimelineCarousel({
                   <div className="flex-1 min-w-0">
                     {heading && (
                       <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1">
-                        <span className={TITLE_UNDERLINE_CLASS}>
-                          {heading}
-                        </span>{" "}
+                        <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>{" "}
                         <ChevronRight
                           className="inline-block w-3.5 h-4 align-[-3px] text-gray-300 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
                           strokeWidth={2}

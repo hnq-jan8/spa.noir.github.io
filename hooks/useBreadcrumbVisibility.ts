@@ -3,17 +3,14 @@
 import { useEffect, useState } from "react";
 
 /**
- * Whether the mobile breadcrumb pill (Navbar) should render `invisible` —
- * mounted, so its layout space stays, but painting nothing.
+ * Breadcrumb mobile (Navbar) có phải render `invisible` không — vẫn mount để
+ * giữ chỗ layout, chỉ không vẽ gì.
  *
- * Module-level because Navbar is a sibling of the page content: a page that
- * needs the row (the FAQs search capsule) has no tree path to it — the same
- * problem useArticleRoute solves for the open-article key.
- *
- * A z-index mask isn't enough: iOS Safari's rubber-band bounce can desync
- * fixed/sticky layers for a frame and let the breadcrumb through.
- *
- * Counted, not boolean, so two callers can't stomp on each other.
+ * Để ở module vì Navbar là anh em với nội dung trang: trang cần giấu nó (ô
+ * tìm kiếm FAQs) không có đường đi trong cây tới đó — cùng vấn đề mà
+ * useArticleRoute giải. Mask bằng z-index không đủ: rubber-band của iOS Safari
+ * làm lệch layer fixed/sticky một frame và breadcrumb lọt qua. Đếm chứ không
+ * dùng boolean để hai nơi gọi không giẫm lên nhau.
  */
 let hiddenCount = 0;
 const listeners = new Set<() => void>();

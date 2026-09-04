@@ -1,21 +1,19 @@
 import type { ReactNode } from "react";
 
 /**
- * One placeholder block. Geometry comes entirely from `className` so each
- * page skeleton can mirror its real layout box for box — the point is that
- * nothing shifts when the content lands. On a white card or the `surface`
- * gray, add .skeleton-on-card / .skeleton-on-surface: the default fill is
- * tuned for the page background and disappears against those.
+ * Một khối placeholder. Hình dạng hoàn toàn do `className` quyết định để mỗi
+ * skeleton bám đúng hộp thật. Trên nền card trắng hoặc `surface` xám phải
+ * thêm .skeleton-on-card / .skeleton-on-surface, vì màu mặc định chỉ hợp với
+ * nền trang và sẽ chìm mất.
  */
 export default function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`skeleton ${className}`} aria-hidden="true" />;
 }
 
 /**
- * A bar centred in the line box of the text it stands in for. The bar stays
- * slim (a full-height block reads as a button, not as text) while the row
- * keeps the real element's height — `box` is that height plus any margin,
- * `bar` the mark inside it.
+ * Bar mảnh đặt giữa line box của đoạn chữ nó thay (khối cao bằng cả dòng đọc
+ * ra thành cái nút, không phải chữ). `box` giữ chiều cao thật + margin,
+ * `bar` là vệt bên trong.
  */
 export function SkeletonText({
   box,
@@ -35,21 +33,10 @@ export function SkeletonText({
 }
 
 /**
- * Page-level wrapper for a set of blocks. `role="status"` + `aria-busy`
- * announce the wait without any text — every visible string on this site
- * comes from the CMS (ui_labels), and the labels themselves are part of what
- * is still loading here.
+ * a11y cho khung trang lúc còn placeholder. Khung là MỘT phần tử dùng chung
+ * cho cả hai trạng thái nên không bọc riêng `role="status"` quanh mỗi bên
+ * được. Không kèm chữ: mọi nhãn đều từ CMS, mà nhãn cũng đang chờ tải.
  */
-export function SkeletonScreen({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div role="status" aria-busy="true" className={className}>
-      {children}
-    </div>
-  );
+export function loadingProps(loading: boolean) {
+  return loading ? ({ role: "status", "aria-busy": true } as const) : {};
 }

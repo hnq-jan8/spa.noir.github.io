@@ -9,11 +9,13 @@ function pick<T>(map: I18n<T>, locale: string): T {
 }
 
 /**
- * Same as `pick`, but coerces to a string: the CMS accepts an empty body and a
- * locale can be missing its translation row entirely, while consumers call
- * string methods (`body.trim()`, `body.match()`) on the result directly.
+ * Như `pick` nhưng ép về string: CMS cho phép body rỗng và một locale có thể
+ * thiếu hẳn hàng dịch, trong khi nơi dùng gọi thẳng `.trim()`/`.match()`.
  */
-function pickText(map: I18n<string | null> | undefined, locale: string): string {
+function pickText(
+  map: I18n<string | null> | undefined,
+  locale: string,
+): string {
   return (map ? pick(map, locale) : null) ?? "";
 }
 
@@ -24,7 +26,9 @@ function resolveLabels(labels: LabelMap, locale: string): ResolvedLabelMap {
   return Object.fromEntries(
     Object.entries(labels).map(([ns, keys]) => [
       ns,
-      Object.fromEntries(Object.entries(keys).map(([key, i18n]) => [key, pick(i18n, locale)])),
+      Object.fromEntries(
+        Object.entries(keys).map(([key, i18n]) => [key, pick(i18n, locale)]),
+      ),
     ]),
   );
 }
@@ -65,10 +69,9 @@ export interface ContentReleaseItem {
 }
 
 /**
- * Hình dạng chung sau khi pick locale cho cả official update lẫn thông cáo —
- * hai collection có tên field khác nhau (description/body, date/published_at),
- * quy về một shape ở đây để card danh sách và trang chi tiết dùng chung một
- * component thay vì viết hai bản gần giống nhau.
+ * Shape chung sau khi pick locale cho official update lẫn thông cáo: hai
+ * collection khác tên field (description/body, date/published_at), quy về một
+ * mối để card và trang chi tiết dùng chung component.
  */
 export interface ResolvedArticle {
   /** Khoá dùng trên URL trang chi tiết (`?a=`). */
@@ -182,7 +185,10 @@ export interface ContentData {
 
 // ─── Locale resolution ──────────────────────────────────────────────────────
 
-export function resolveLocale(payload: ContentPayload, locale: string): ContentData {
+export function resolveLocale(
+  payload: ContentPayload,
+  locale: string,
+): ContentData {
   return {
     generatedAt: payload.generatedAt,
     common: {
@@ -199,10 +205,9 @@ export function resolveLocale(payload: ContentPayload, locale: string): ContentD
       labels: resolveLabels(payload.home.labels, locale),
     },
     faqs: {
-      // searchText spans every locale, so a query in one language still finds
-      // the same item's translation in another. An item missing its question
-      // or answer for this locale (null or blank, no default-locale fallback)
-      // is dropped rather than shown untranslated.
+      // searchText gộp mọi locale nên gõ tiếng nào cũng tìm ra bản dịch của
+      // cùng một mục. Mục thiếu câu hỏi/trả lời ở locale này thì bỏ hẳn, không
+      // hiển thị bản chưa dịch.
       faqs: payload.faqs.faqs
         .filter((f) => f.question[locale]?.trim() && f.answer[locale]?.trim())
         .map((f) => ({

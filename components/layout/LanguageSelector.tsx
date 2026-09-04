@@ -43,12 +43,9 @@ export interface LanguageOption {
   label: string;
 }
 
-// Mở: menu cao dần lên (height, px) — không fade, chỉ một chuyển động để mắt
-// bám theo. Đóng: chỉ fade, height đứng yên cho tới khi đã mờ hẳn.
-//
-// Phải khớp với 100ms trong class fade ở dưới. Không ghép chuỗi class bằng
-// hằng số: Tailwind quét source tĩnh nên class dựng bằng template literal sẽ
-// không được sinh ra (cùng lý do lib/expandTransition.ts viết literal).
+// Mở: chỉ chạy height. Đóng: chỉ fade, height đứng yên tới khi mờ hẳn.
+// Khớp 100ms ở class fade bên dưới — không ghép class bằng template literal,
+// Tailwind chỉ quét source tĩnh.
 const FADE_MS = 100;
 
 function ChevronDownIcon() {
@@ -128,18 +125,11 @@ export function DesktopLanguageSelector({
 }: LanguageSelectorProps) {
   const options = liveLanguages ?? languages;
 
-  // Chỉ hover, không click-to-toggle.
-  //
-  // `open` đổi tức thì cả hai chiều: nó điều khiển mọi thứ mắt thấy ngay —
-  // trigger đổ nền, menu hiện/mờ. `tall` điều khiển chiều cao menu và chỉ
-  // trễ ở chiều đóng, nhờ vậy menu mờ đi ở nguyên chiều cao rồi mới xẹp
-  // (lúc đó đã vô hình). Mở thì cả hai set chung một nhịp — cùng một lần
-  // render — nên chiều cao bắt đầu chạy đúng frame trigger bắt đầu đổ nền.
+  // Chỉ hover, không click-to-toggle. `open` đổi tức thì cả hai chiều;
+  // `tall` (chiều cao menu) chỉ trễ ở chiều đóng, để menu mờ hẳn rồi mới xẹp.
   const [open, setOpen] = useState(false);
   const [tall, setTall] = useState(false);
-  // Ngôn ngữ đang được rê chuột tới trong danh sách — chữ trên pill đổi
-  // theo tức thời, rời khỏi dòng nào (hoặc đóng menu) thì rơi về lại tên
-  // ngôn ngữ hiện tại (không phải nhãn "select language" nữa).
+  // Ngôn ngữ đang rê chuột tới: chữ trên pill đổi theo (xem `pillLabel`).
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const show = () => {
@@ -159,34 +149,20 @@ export function DesktopLanguageSelector({
     [],
   );
 
-  // Ba phép đo, đều lấy từ phần tử không bao giờ animate. Mọi thứ animate
-  // sau đó đều chạy trên số px cố định — không có layout nào phải tính lại
-  // theo nội dung ở từng frame.
-  //  • `restRef` / `openRef` — hai lớp chữ của trigger (thu gọn và mở), để
-  //    lấy bề rộng của chính nó ở mỗi trạng thái.
-  //  • `listRef` — danh sách bên trong thẻ menu, lấy chiều cao px để thẻ
-  //    animate tới. Đo phần bên trong chứ không đo chính thẻ, vì chiều cao
-  //    của thẻ là thứ đang bị điều khiển.
+  // Đo trên các phần tử không bao giờ animate, để mọi animation sau đó chạy
+  // trên px cố định — không frame nào phải tính lại layout theo nội dung.
+  // `listRef` đo phần bên trong thẻ menu, vì chiều cao thẻ là thứ đang bị
+  // điều khiển.
   const restRef = useRef<HTMLSpanElement>(null);
   const openRef = useRef<HTMLSpanElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  // Bản sao ẩn của danh sách, riêng cho việc đo bề rộng — không bao giờ bị
-  // gán `width` cố định như thẻ dropdown thật. Lý do cần bản sao riêng:
-  // lần đo đầu (trước khi font web tải xong) có thể ra một số nhỏ hơn thật,
-  // rồi bị khoá vào `style width` của thẻ dropdown; từ đó `listRef` — nằm
-  // bên trong thẻ đã bị khoá — không còn phản ánh bề rộng tự nhiên nữa, nên
-  // lần đo lại sau khi font sẵn sàng (`document.fonts.ready`) chỉ đọc lại
-  // đúng cái số đã khoá (không thể lớn hơn), làm menu vĩnh viễn hẹp hơn nội
-  // dung thật — check icon ở dòng ngôn ngữ dài nhất bị tràn ra ngoài mép.
+  // Bản sao ẩn để đo bề rộng, vì nó không bao giờ bị gán `width` cố định.
+  // Đo thẳng trên thẻ thật sẽ khoá số đo đầu (font web chưa về, hẹp hơn) và
+  // lần đo lại chỉ đọc được đúng số đã khoá — menu kẹt hẹp, check icon tràn.
   const measureListRef = useRef<HTMLDivElement>(null);
-  // Bản sao ẩn liệt kê nhãn "select language" của MỌI ngôn ngữ (không chỉ
-  // trang hiện tại) — pill giờ đổi chữ này theo ngôn ngữ đang rê chuột tới
-  // (xem `pillLabel`), nên bề rộng phải đủ cho bản dịch dài nhất trong TẤT
-  // CẢ ngôn ngữ, không riêng bản dịch của trang đang mở. Thiếu bản sao này,
-  // mỗi trang tự đo theo đúng bản dịch của chính nó — trang "en" (chữ
-  // "Select language" dài) ra pill rộng hơn hẳn trang "vi"/"kr", pill và
-  // dropdown lệch bề rộng nhau giữa các ngôn ngữ dù thiết kế muốn chúng
-  // giống hệt nhau trên toàn site.
+  // Nhãn "select language" của MỌI ngôn ngữ: pill đổi chữ theo dòng đang rê
+  // chuột, nên bề rộng phải đủ cho bản dịch dài nhất. Đo theo riêng bản dịch
+  // của trang hiện tại thì mỗi locale ra một bề rộng pill khác nhau.
   const measureSelectLabelRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{
     rest: number;
@@ -202,20 +178,13 @@ export function DesktopLanguageSelector({
         !measureSelectLabelRef.current
       )
         return;
-      // Pill lúc mở và thẻ dropdown phải luôn cùng một bề rộng, và bề rộng
-      // đó phải giống hệt nhau trên mọi trang locale — lấy max giữa nhãn
-      // "select language" dài nhất trong mọi ngôn ngữ và label ngôn ngữ dài
-      // nhất trong danh sách (đều đo qua bản sao không bao giờ bị ràng buộc
-      // bề rộng ở trên), rồi dùng chung một số cho cả hai chỗ.
+      // Pill lúc mở và thẻ dropdown dùng chung một bề rộng, giống nhau trên
+      // mọi locale: max giữa nhãn "select language" dài nhất và label ngôn
+      // ngữ dài nhất.
       //
-      // `GLOBE_CLEARANCE` là khoảng cách tối thiểu từ mép trái nút tới chữ
-      // (`left-3` + rộng `w-3.5` + đệm an toàn 4px) — globe giờ neo trái độc
-      // lập, không còn nằm trong nhóm chữ được đo. Chữ giờ căn giữa cả nút
-      // (`justify-center`) nên mép trái của nó cách đều mép nút một khoảng
-      // bằng nửa phần dư ra `(open - text) / 2` — muốn khoảng đó không nhỏ
-      // hơn `GLOBE_CLEARANCE`, bề rộng nút tối thiểu phải là text + 2×clearance.
-      // Đệm an toàn giữ ở mức tối thiểu (4px, không phải 8px) vì pill đang
-      // rộng hơn cần thiết.
+      // `GLOBE_CLEARANCE` = khoảng tối thiểu từ mép nút tới chữ (`left-3` +
+      // `w-3.5` + 4px đệm). Chữ căn giữa nút nên mỗi bên dư `(open - text)/2`
+      // — muốn khoảng đó ≥ clearance thì nút tối thiểu phải là text + 2×.
       const GLOBE_CLEARANCE = 12 + 14 + 4;
       setSize({
         rest: restRef.current.offsetWidth,
@@ -230,39 +199,25 @@ export function DesktopLanguageSelector({
     // Font web về muộn thì chữ đổi bề rộng — đo lại, nếu không pill giữ số
     // px đo bằng font fallback.
     document.fonts?.ready.then(measure).catch(() => {});
-    // Component này ẩn bằng `hidden md:flex` (không unmount) dưới breakpoint
-    // md, nên offsetWidth đo lúc ẩn luôn ra 0. Resize từ mobile lên desktop
-    // không tự trigger effect trên (deps chỉ đổi theo options/locale), nút
-    // liền kẹt ở width 0 — vô hình — cho tới khi reload. Đo lại mỗi lần
-    // resize để bắt đúng thời điểm nó hiện trở lại.
+    // Dưới md component chỉ bị `hidden` (không unmount) nên offsetWidth ra 0.
+    // Không đo lại khi resize thì nút kẹt width 0 — vô hình — tới lúc reload.
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [options, locale, selectLanguageLabel]);
 
-  // Menu liệt kê mọi ngôn ngữ, kể cả ngôn ngữ hiện tại (đánh dấu bằng icon
-  // check tròn) — trigger giờ chỉ hiện chữ "select language" nên không còn
-  // lý do giấu ngôn ngữ đang chọn khỏi danh sách.
+  // Menu liệt kê cả ngôn ngữ hiện tại (đánh dấu bằng icon check tròn).
   if (options.length <= 1) return null;
 
-  // Chữ hiển thị trên pill lúc mở vẫn là nhãn "select language" — không
-  // phải tên ngôn ngữ — nhưng đổi theo NGÔN NGỮ đang rê chuột tới: rê vào
-  // "English" thì hiện "Select language", rê vào dòng tiếng Hàn thì hiện
-  // bản tiếng Hàn của chính nhãn đó. Không rê vào dòng nào thì rơi về nhãn
-  // của ngôn ngữ hiện tại (`selectLanguageLabel`, lấy theo CMS đang tải).
-  //
-  // Component chỉ có sẵn bản dịch nhãn của TRANG hiện tại (`selectLanguageLabel`
-  // — từ CMS, có thể mới hơn bundle build-time). Các ngôn ngữ khác không có
-  // nội dung CMS đang tải cho trang này, nên tra theo `bundledLabels` — cùng
-  // catalog build-time mà Navbar dùng làm fallback trước khi content.json về.
+  // Pill luôn hiện nhãn "select language" (không phải tên ngôn ngữ), nhưng
+  // dịch theo dòng đang rê chuột: rê dòng tiếng Hàn thì hiện bản tiếng Hàn.
+  // Chỉ trang hiện tại có nhãn từ CMS; các ngôn ngữ khác tra `bundledLabels`.
   const pillLabel =
     hoveredCode && hoveredCode !== locale
       ? (bundledLabels(hoveredCode, "nav")["selectLanguage"] ??
         selectLanguageLabel)
       : selectLanguageLabel;
 
-  // Mọi bản dịch có thể xuất hiện trên pill — dùng để đo bề rộng tối thiểu
-  // cần thiết (xem `measureSelectLabelRef`), không riêng bản dịch của trang
-  // đang mở.
+  // Mọi bản dịch có thể xuất hiện trên pill, dùng để đo bề rộng tối thiểu.
   const allSelectLanguageLabels = [
     selectLanguageLabel,
     ...options.map((lang) => bundledLabels(lang.code, "nav")["selectLanguage"]),
@@ -280,35 +235,22 @@ export function DesktopLanguageSelector({
         aria-label={selectLanguageLabel}
         aria-haspopup="menu"
         aria-expanded={open}
-        // Chỉ `width` (px đo sẵn) và màu nền animate. Chữ KHÔNG chạy theo:
-        // hai lớp chữ dưới đây đứng nguyên vị trí cuối của mình và chỉ mờ
-        // vào/mờ ra. Trước đây bề rộng chạy bằng track grid `0fr→1fr`, tức
-        // mỗi frame phải dựng lại layout của chữ — Safari đuối ở đúng chỗ đó
-        // và cái lộ ra là chữ giật. Giờ chữ đứng yên, nút chỉ nở ra và
-        // `overflow-hidden` xén phần chưa tới.
-        //
-        // Lúc nghỉ: không nền, đọc như các tab nav bên cạnh. Lúc hover: đổ
-        // nền trắng thành viên pill — cùng cách xử lý với nút ngôn ngữ ở
-        // mobile. `self-center` + chiều cao cố định giữ hộp không đổi kích
-        // thước dọc. `justify-end` neo nội dung vào mép phải, mép đứng yên
-        // khi nút nở sang trái, nên lớp chữ trong luồng cũng không xê dịch.
+        // Chỉ `width` (px đo sẵn) và nền animate; hai lớp chữ đứng yên và chỉ
+        // mờ vào/ra. Bản cũ nở bằng grid `0fr→1fr` phải dựng lại layout chữ
+        // mỗi frame — Safari giật ở đúng chỗ đó. `justify-end` neo nội dung
+        // vào mép phải để chữ không xê dịch khi nút nở sang trái.
         style={{ width: size ? (open ? size.open : size.rest) : undefined }}
-        // Delay âm chỉ áp cho `width` (mẹo vào giữa đường cong, đỡ ì lúc bắt
-        // đầu nở) — `background-color` phải fade đúng nhịp bấm chuột, không
-        // ăn theo delay đó, nên tách hai property ra hai khai báo transition
-        // riêng thay vì gộp chung `transition-[width,background-color]`.
+        // Delay âm chỉ cho `width` (vào giữa đường cong, đỡ ì lúc bắt đầu nở);
+        // `background-color` phải đúng nhịp nên tách thành hai khai báo.
         className={`relative self-center flex items-center justify-end h-9 rounded-full overflow-hidden text-xs font-medium [transition:width_200ms_cubic-bezier(0.32,0.72,0,1)_-100ms,background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
           open ? "bg-gray-100" : "bg-transparent"
         }`}
       >
-        {/* Lớp thu gọn: nằm trong luồng nên nó là bề rộng mặc định của nút
-            trước khi đo xong (và cũng là thứ được đo). */}
+        {/* Lớp thu gọn: nằm trong luồng nên là bề rộng mặc định của nút. */}
         <span
           ref={restRef}
-          // Thêm dịch trái nhẹ (`-translate-x-1`) song song với fade — trôi
-          // cùng chiều với pill đang nở sang trái, thay vì đứng yên một chỗ
-          // rồi chỉ mờ đi. Transform không ảnh hưởng layout/đo đạc (không
-          // đổi offsetWidth) nên không đụng tới phép tính bề rộng ở trên.
+          // Dịch trái nhẹ song song với fade, trôi cùng chiều pill đang nở.
+          // Transform không đổi offsetWidth nên không đụng phép đo ở trên.
           className={`flex items-center gap-1.5 px-3 whitespace-nowrap text-gray-200 transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
             open ? "opacity-0 -translate-x-2" : "opacity-100 translate-x-0"
           }`}
@@ -317,12 +259,9 @@ export function DesktopLanguageSelector({
           {locale.toUpperCase()}
         </span>
 
-        {/* Lớp mở — chỉ chữ: căn giữa cả nút, không kéo chevron theo (chevron
-            đứng riêng, neo phải như cũ — xem lớp bên dưới). `left-1/2
-            -translate-x-1/2` (thay vì `inset-0`) để span vẫn co theo đúng
-            bề rộng nội dung của nó — `inset-0` (đặt cả 4 cạnh) buộc span
-            giãn full bề rộng nút, khiến `offsetWidth` đo ra bằng bề rộng
-            nút thay vì bề rộng chữ, làm phép tính bên dưới sai lệch. */}
+        {/* Lớp mở, chỉ chữ, căn giữa nút. `left-1/2 -translate-x-1/2` chứ
+            không `inset-0`: `inset-0` ép span giãn full nút, offsetWidth đo ra
+            bề rộng nút thay vì bề rộng chữ. */}
         <span
           ref={openRef}
           aria-hidden
@@ -335,8 +274,7 @@ export function DesktopLanguageSelector({
           {pillLabel}
         </span>
 
-        {/* Chevron của lớp mở: đứng riêng, neo phải cố định — không theo
-            chữ căn giữa ở trên. Cùng nhịp ẩn-ngay-lúc-đóng với chữ. */}
+        {/* Chevron neo phải cố định, không theo chữ căn giữa ở trên. */}
         <span
           aria-hidden
           className={`absolute inset-y-0 right-0 flex items-center pr-3 text-black transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
@@ -346,12 +284,8 @@ export function DesktopLanguageSelector({
           <ChevronDownIcon />
         </span>
 
-        {/* Globe của lớp mở: neo trái theo chính nút (không theo nhóm chữ ở
-            trên), nên khi nút nở/co theo chiều rộng đo được, icon luôn bám
-            sát mép trái — không bị kéo xa mép khi nhóm chữ bên phải hẹp hơn
-            bề rộng nút (trường hợp ngôn ngữ dài nhất trong danh sách quyết
-            định bề rộng, chứ không phải chữ "select language"). Cùng nhịp
-            ẩn-ngay-lúc-đóng với chữ. */}
+        {/* Globe neo trái theo chính nút, không theo nhóm chữ — để nó luôn
+            bám mép trái kể cả khi bề rộng do label danh sách quyết định. */}
         <span
           aria-hidden
           className={`absolute inset-y-0 left-3 flex items-center transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
@@ -363,25 +297,13 @@ export function DesktopLanguageSelector({
       </button>
 
       <div
-        // Khung tĩnh: chỉ lo vị trí và bề rộng — không animate gì, nên không
-        // có gì ở đây giật được. Không `overflow-hidden` để shadow của thẻ
-        // toả tự do ra phần padding.
-        // `box-content` cho `width` tính đúng phần nội dung, padding nằm
-        // ngoài phép đo. Dùng chung `size.open` với pill — đã lấy max với
-        // label ngôn ngữ dài nhất — nên lúc mở, pill và thẻ dropdown luôn
-        // cùng một bề rộng. `-right-5` bù đúng `px-5` nên mép phải thẻ thẳng
-        // hàng mép phải trigger. `pt-1` là khe hở nhỏ giữa header và thẻ —
-        // sát hẳn (pt-0) nhìn không ổn, nhưng cũng không lùi xa như trước.
+        // Khung tĩnh: chỉ lo vị trí và bề rộng, không animate gì. `box-content`
+        // để padding nằm ngoài `width`; `px-5` chừa chỗ cho shadow toả, `-right-5`
+        // bù lại nên mép phải thẳng hàng trigger; `pt-1` là khe hở tới pill.
         //
-        // `pointer-events-none` luôn luôn (không chỉ lúc đóng) — phần
-        // `px-5` (đệm hai bên) chỉ để chừa chỗ cho shadow toả ra, không
-        // phải vùng hover: rê chuột ra khỏi pill/thẻ trắng vào đúng dải đệm
-        // này phải đóng menu ngay, không giữ mở nhờ đứng trong div cha.
-        // Thẻ trắng bên trong tự bật lại `pointer-events-auto` để nhận
-        // hover/click. Riêng khe hở phía trên (`pt-1`, giữa pill và thẻ)
-        // là lối đi bắt buộc khi rê chuột thẳng xuống — span cầu nối ngay
-        // dưới bật lại `pointer-events-auto` cho riêng dải đó để không bị
-        // rớt hover giữa chừng.
+        // `pointer-events-none` luôn: dải `px-5` chỉ để chứa shadow, rê chuột
+        // vào đó phải đóng menu chứ không giữ mở. Thẻ trắng bên trong và span
+        // cầu nối ở khe `pt-1` tự bật lại `pointer-events-auto`.
         style={{ width: size?.open }}
         className={`absolute top-full -right-5 box-content px-5 pt-1 z-50 pointer-events-none ${
           open
@@ -394,15 +316,10 @@ export function DesktopLanguageSelector({
           className="absolute inset-x-0 top-0 h-1 pointer-events-auto"
         />
 
-        {/* Chính thẻ này co giãn — không phải một lớp mask trượt qua nó. Nhờ
-            vậy bo góc dưới và shadow luôn hiện, chạy xuống theo thẻ, thay vì
-            đáy bị cắt phẳng suốt lúc animate. `overflow-hidden` để danh sách
-            bên trong bị thẻ cắt theo bo góc.
-
-            Delay âm −62ms (¼ của 250ms) là mẹo của FAQ accordion
-            (lib/expandTransition.ts, ở đó dùng ½): trình duyệt vào transition
-            ở trạng thái đã chạy sẵn ¼ đường cong, nên bỏ qua đoạn đầu và bớt
-            được chừng ấy lần tính lại layout — đỡ cảm giác ì lúc bắt đầu. */}
+        {/* Chính thẻ co giãn, không dùng mask trượt — nhờ vậy bo góc dưới và
+            shadow luôn chạy theo thẻ thay vì bị cắt phẳng lúc animate.
+            Delay âm −62ms (¼ của 250ms): vào transition ở trạng thái đã chạy
+            sẵn ¼ đường cong, bớt layout recalc — mẹo của lib/expandTransition. */}
         <div
           style={{ height: tall && size ? size.h : 0 }}
           className="pointer-events-auto overflow-hidden rounded-[20px] bg-white shadow-[0_0_24px_rgba(0,0,0,0.18)] [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
@@ -419,14 +336,8 @@ export function DesktopLanguageSelector({
                 } ${index !== options.length - 1 ? "border-b border-gray-100" : ""}`}
               >
                 {lang.label}
-                {/* Mọi dòng đều render icon (chỉ đổi opacity) — chứ không
-                    chỉ dòng đang active mới có. Trước đây chỉ dòng active
-                    có icon trong DOM, nên bề rộng "tự nhiên" của mỗi dòng
-                    khác nhau tuỳ ngôn ngữ nào đang active, khiến việc đo bề
-                    rộng cả danh sách (`measureListRef`) nhạy với đúng dòng
-                    nào có icon — sai một nhịp là icon bị hụt chỗ. Giờ icon
-                    luôn chiếm chỗ ở mọi dòng nên bề rộng đo được luôn ổn
-                    định, không phụ thuộc ngôn ngữ nào đang active. */}
+                {/* Mọi dòng đều render icon (chỉ đổi opacity) để bề rộng đo
+                    được không đổi theo ngôn ngữ nào đang active. */}
                 <CircledCheckIcon active={lang.code === locale} />
               </Link>
             ))}
@@ -434,11 +345,8 @@ export function DesktopLanguageSelector({
         </div>
       </div>
 
-      {/* Bản sao ẩn chỉ để đo — xem giải thích ở khai báo `measureListRef`.
-          `invisible` (không phải `hidden`) để vẫn tham gia layout/đo được,
-          `absolute` + `-z-10` để không chiếm chỗ hay chặn tương tác. Padding
-          ngang (`px-4`) và `gap-3` phải khớp y hệt danh sách thật ở trên,
-          nếu không số đo ra sẽ lệch. */}
+      {/* Bản sao ẩn để đo (xem `measureListRef`). `invisible` chứ không
+          `hidden` để vẫn đo được; `px-4`/`gap-3` phải khớp danh sách thật. */}
       <div
         aria-hidden
         className="absolute top-full right-0 invisible -z-10 pointer-events-none"
@@ -456,11 +364,8 @@ export function DesktopLanguageSelector({
         </div>
       </div>
 
-      {/* Bản sao ẩn chỉ để đo — xem giải thích ở khai báo `measureSelectLabelRef`.
-          Mỗi bản dịch một dòng riêng (`block`, không `whitespace-nowrap`
-          chung một hàng) để bề rộng đo ra là bản dịch DÀI NHẤT, không phải
-          tổng bề rộng của tất cả cộng lại. `px-1` khớp padding của chữ thật
-          trên pill. */}
+      {/* Bản sao ẩn để đo (xem `measureSelectLabelRef`). Mỗi bản dịch một
+          dòng riêng để đo ra bản DÀI NHẤT, không phải tổng bề rộng. */}
       <div
         aria-hidden
         className="absolute top-full right-0 invisible -z-10 pointer-events-none"

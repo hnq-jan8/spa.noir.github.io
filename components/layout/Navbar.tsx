@@ -166,12 +166,10 @@ export default function Navbar({
             <div className="relative self-center flex items-center flex-shrink-0 mr-2 py-1 h-7 md:h-9">
               <Link
                 href={`/${locale}`}
-                // transform-gpu: Safari repaints/re-hints an element's text or
-                // image on every opacity step unless it's promoted to its own
-                // compositing layer — with two overlapping layers crossfading
-                // this fast (100-200ms), that per-frame repaint shows up as a
-                // visible stutter. Forcing a GPU layer here (and on the label
-                // span below) makes Safari composite the fade instead.
+                // transform-gpu: Safari repaint lại chữ/ảnh ở mỗi bước opacity
+                // nếu phần tử chưa được đẩy lên layer riêng — hai lớp crossfade
+                // nhanh 100-200ms thì repaint đó lộ ra thành giật. Ép GPU layer
+                // để Safari composite thay vì vẽ lại (áp cho cả span nhãn dưới).
                 className={`group flex items-center transform-gpu transition-opacity ease-out ${
                   mobileLangView && menuOpen
                     ? "duration-100 opacity-0 pointer-events-none md:duration-300 md:opacity-100 md:pointer-events-auto"
@@ -185,7 +183,9 @@ export default function Navbar({
                 }}
               >
                 <Image
-                  src={logoBroken ? FALLBACK_LOGO : logoOnBlack || FALLBACK_LOGO}
+                  src={
+                    logoBroken ? FALLBACK_LOGO : logoOnBlack || FALLBACK_LOGO
+                  }
                   onError={() => setLogoBroken(true)}
                   alt="SUN PhuQuoc Airways"
                   width={185}
@@ -458,7 +458,11 @@ export default function Navbar({
                   aria-current="page"
                   className="inline-flex items-center min-h-[24px] text-gray-900 flex-shrink-0"
                 >
-                  <ArticleIcon className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden="true" />
+                  <ArticleIcon
+                    className="w-3.5 h-3.5"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  />
                   <span className="sr-only">
                     {openedArticle.title ?? activeItem.label}
                   </span>

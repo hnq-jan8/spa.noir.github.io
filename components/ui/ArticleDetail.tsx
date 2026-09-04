@@ -4,6 +4,11 @@ import { useEffect, useRef } from "react";
 import { ChevronLeft } from "lucide-react";
 import ArticleContent from "@/components/ui/ArticleContent";
 import Reveal from "@/components/ui/Reveal";
+import {
+  ArticleBackBarSkeleton,
+  ArticleBackSkeleton,
+  ArticleMetaSkeleton,
+} from "@/components/ui/skeletons/ArticleDetailSkeleton";
 import { titleOf } from "@/components/ui/ArticleCard";
 import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
@@ -15,6 +20,10 @@ const WORDS_PER_MINUTE = 200;
 /**
  * Full read view for one article. Rendered in place of the list on the same
  * route (see useArticleRoute) rather than as its own static page.
+ *
+ * `article` là `null` khi mở thẳng một link `?a=`: bài chưa về, nhưng khung
+ * và các <Reveal> vẫn dựng ngay để placeholder và bài thật đi chung một chỗ
+ * — bài về thì chỉ đổi ruột, hiệu ứng không chạy lại (xem Reveal.tsx).
  */
 export default function ArticleDetail({
   article,
@@ -22,7 +31,7 @@ export default function ArticleDetail({
   labels,
   onBack,
 }: {
-  article: ResolvedArticle;
+  article: ResolvedArticle | null;
   locale: string;
   labels: Record<string, string>;
   onBack: () => void;
@@ -30,7 +39,7 @@ export default function ArticleDetail({
   // Opening the detail view reads as a navigation, so start at the top.
   useEffect(() => {
     window.scrollTo({ top: 0 });
-  }, [article.key]);
+  }, [article?.key]);
 
   // Tab title follows the open article. Client-side only (no per-article
   // route to render a real <title>), so it reaches the tab/history/bookmark
@@ -38,6 +47,7 @@ export default function ArticleDetail({
   // swap `document.title` is already the article's.
   const originalTitleRef = useRef<string | null>(null);
   useEffect(() => {
+    if (!article) return;
     if (originalTitleRef.current === null) {
       originalTitleRef.current = document.title;
     }
@@ -53,14 +63,17 @@ export default function ArticleDetail({
     };
   }, [article]);
 
-  const minutes = Math.max(
-    1,
-    Math.round(article.body.trim().split(/\s+/).length / WORDS_PER_MINUTE),
-  );
+  const minutes = article
+    ? Math.max(
+        1,
+        Math.round(article.body.trim().split(/\s+/).length / WORDS_PER_MINUTE),
+      )
+    : 0;
 
   // Mirrors ArticleContent: a blank title opts the article out of the
   // default headline block.
-  const isFullBleed = !article.title || article.title.trim().length === 0;
+  const isFullBleed =
+    !!article && (!article.title || article.title.trim().length === 0);
 
   return (
     <div className="flex flex-col flex-1 md:block">
@@ -70,6 +83,7 @@ export default function ArticleDetail({
           mobile breadcrumb already covers it; md:px-1 is an optical offset
           against the card's rounded corners, which only exist at md+. */}
       <div className="print:hidden flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-4 mb-3 md:mb-4 md:px-1 text-xs">
+        {!article && <ArticleBackSkeleton />}
         {labels["back"] && (
           <button
             type="button"
@@ -87,12 +101,13 @@ export default function ArticleDetail({
           delay={100}
           className="flex items-center gap-3 text-gray-500 flex-wrap justify-start md:justify-end"
         >
-          {article.date && (
+          {!article && <ArticleMetaSkeleton />}
+          {article?.date && (
             <span className="whitespace-nowrap">
               {formatTimestamp(article.date, locale)}
             </span>
           )}
-          {labels["readingTime"] && (
+          {article && labels["readingTime"] && (
             <span className="whitespace-nowrap">
               {minutes} {labels["readingTime"]}
             </span>
@@ -102,7 +117,10 @@ export default function ArticleDetail({
       <div
         className={`press-article-card md:bg-white md:rounded-2xl md:p-8 md:card-shadow md:border md:border-white ${isFullBleed ? "full-bleed" : ""}`}
       >
-        <ArticleContent title={article.title} body={article.body} />
+        <ArticleContent
+          title={article?.title ?? null}
+          body={article?.body ?? null}
+        />
       </div>
       {/* Mobile-only equivalent of the desktop back button above, placed
           after the article body as a full-width, edge-to-edge action bar
@@ -114,6 +132,7 @@ export default function ArticleDetail({
           The divider below it matches Footer.tsx's own rule above its
           copyright bar (same color + inset), so bar and footer read as one
           continuous band. */}
+      {!article && <ArticleBackBarSkeleton />}
       {labels["back"] && (
         <div className="print:hidden md:hidden -mx-4 sm:-mx-6 pt-6 mt-auto">
           <button

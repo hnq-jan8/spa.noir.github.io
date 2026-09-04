@@ -1,11 +1,9 @@
-// Shared timing for the grid-template-rows 0fr/1fr expand/collapse and for any
-// JS-driven motion that has to land on the same curve (e.g. FaqAccordion's FLIP
-// transforms).
+// Timing dùng chung cho expand/collapse bằng grid-template-rows 0fr/1fr và cho
+// mọi animation JS phải khớp cùng đường cong (FLIP của FaqAccordion).
 //
-// The negative delay is the trick: -EXPAND_HALF_MS makes the browser start the
-// transition already half-elapsed, so only the decelerating half of the curve
-// is painted — half as many layout recalcs per toggle. (An honest full curve at
-// half the duration felt laggier.)
+// Mẹo nằm ở delay âm: -EXPAND_HALF_MS cho trình duyệt vào transition ở nửa sau
+// đường cong, chỉ vẽ phần giảm tốc — nửa số lần layout recalc mỗi lần toggle.
+// (Chạy trọn đường cong với nửa thời lượng thấy ì hơn.)
 export const EXPAND_DURATION_MS = 300;
 export const EXPAND_HALF_MS = EXPAND_DURATION_MS / 2;
 export const EXPAND_EASE = "ease-out";

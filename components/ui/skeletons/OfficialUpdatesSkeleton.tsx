@@ -1,4 +1,4 @@
-import Skeleton, { SkeletonScreen } from "@/components/ui/Skeleton";
+import Skeleton from "@/components/ui/Skeleton";
 
 /**
  * Mirrors TimelineCarousel: the rail (dot + connecting line) is real, only
@@ -26,7 +26,9 @@ function NodeSkeleton({
           />
         )}
       </div>
-      <div className={`flex-1 min-w-0 ${last ? "pb-1" : "pb-8 sm:pb-9"} pt-0.5`}>
+      <div
+        className={`flex-1 min-w-0 ${last ? "pb-1" : "pb-8 sm:pb-9"} pt-0.5`}
+      >
         <Skeleton className="h-3.5 w-32 mb-3" />
         {latest ? (
           <div className="flex gap-4 items-start">
@@ -52,15 +54,18 @@ function NodeSkeleton({
   );
 }
 
+/**
+ * Placeholder của TimelineCarousel. Không tự dựng khung trang: nó nằm chung
+ * <Reveal> với carousel thật trong OfficialUpdatesContent, khung là của
+ * trang — nhờ vậy lúc bàn giao chỉ phần ruột đổi, hiệu ứng không chạy lại.
+ */
 export default function OfficialUpdatesSkeleton() {
   return (
-    <SkeletonScreen className="container-page pt-4 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4">
-      <div className="mb-12">
-        <NodeSkeleton latest />
-        <NodeSkeleton />
-        <NodeSkeleton />
-        <NodeSkeleton last />
-      </div>
-    </SkeletonScreen>
+    <div className="mb-12">
+      <NodeSkeleton latest />
+      <NodeSkeleton />
+      <NodeSkeleton />
+      <NodeSkeleton last />
+    </div>
   );
 }

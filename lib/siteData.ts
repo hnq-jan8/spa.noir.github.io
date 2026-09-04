@@ -1,9 +1,7 @@
-// Ngày giờ luôn dựng từ các phần tử số của một locale cố định (`en-GB` chỉ
-// dùng để lấy chữ số Latin + 2 chữ số có padding), rồi tự ghép theo thứ tự
-// mong muốn — không giao cho Intl chọn thứ tự theo locale. Lý do: mã ngôn ngữ
-// trong CMS không phải BCP-47 (`cn`, `tw`, `hk`, `kr` không phải mã ngôn ngữ
-// hợp lệ), Intl không nhận ra nên rơi về mặc định kiểu Mỹ MM/dd/yyyy — thứ tự
-// ngày tháng khi đó là tai nạn chứ không phải lựa chọn.
+// Tự ghép ngày giờ từ các phần tử số của một locale cố định (`en-GB` chỉ để
+// lấy chữ số Latin có padding) thay vì để Intl chọn thứ tự: mã ngôn ngữ trong
+// CMS không phải BCP-47 (`cn`, `tw`, `hk`, `kr`) nên Intl rơi về mặc định Mỹ
+// MM/dd/yyyy — thứ tự lúc đó là tai nạn, không phải lựa chọn.
 const PART_SOURCE_LOCALE = "en-GB";
 const TIME_ZONE = "Asia/Ho_Chi_Minh";
 
@@ -11,17 +9,24 @@ const TIME_ZONE = "Asia/Ho_Chi_Minh";
 const DAY_FIRST_LOCALES = new Set(["vi"]);
 
 const MONTHS_SHORT = [
-  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
 ];
 
 /**
- * Ngày khai thác chuyến bay dạng ddMMM ("27AUG") — đủ ngắn cho một ô bảng.
- *
- * Giá trị CMS là date-only ("2026-08-27"), nên tách thẳng từ chuỗi thay vì qua
- * `new Date` + timezone: parse date-only ra UTC midnight rồi format theo múi
- * giờ khác là chỗ dễ lệch một ngày. Tên tháng giữ tiếng Anh ở mọi locale, cùng
- * quy ước với SRTD/ATD trong bảng này.
+ * Ngày bay dạng ddMMM ("27AUG"), đủ ngắn cho một ô bảng. Giá trị CMS là
+ * date-only nên tách thẳng từ chuỗi: qua `new Date` là ra UTC midnight rồi
+ * format theo múi giờ khác, lệch một ngày. Tên tháng giữ tiếng Anh mọi locale.
  */
 export function formatFlightDate(value: string | null) {
   const m = value ? /^(\d{4})-(\d{2})-(\d{2})/.exec(value) : null;

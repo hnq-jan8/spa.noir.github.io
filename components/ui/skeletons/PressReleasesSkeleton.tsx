@@ -1,4 +1,4 @@
-import Skeleton, { SkeletonScreen } from "@/components/ui/Skeleton";
+import Skeleton from "@/components/ui/Skeleton";
 
 /** One full-width list card: thumbnail beside date/title/excerpt. */
 function ListCardSkeleton() {
@@ -32,10 +32,13 @@ function GridTileSkeleton() {
 /**
  * Mirrors PressReleasesContent's list view: featured card, two list cards,
  * then a row of three tiles (stacked below md, 3-col grid from md up).
+ *
+ * Không tự dựng khung trang và cũng không tự bọc <Reveal>: nó nằm chung
+ * <Reveal> với danh sách thật, nên lúc bàn giao chỉ phần ruột đổi chỗ.
  */
 export default function PressReleasesSkeleton() {
   return (
-    <SkeletonScreen className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto">
+    <>
       <div className="bg-white rounded-2xl overflow-hidden card-shadow">
         <Skeleton className="skeleton-on-card w-full h-44 sm:h-56 rounded-none" />
         <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
@@ -66,6 +69,6 @@ export default function PressReleasesSkeleton() {
           <GridTileSkeleton />
         </div>
       </div>
-    </SkeletonScreen>
+    </>
   );
 }

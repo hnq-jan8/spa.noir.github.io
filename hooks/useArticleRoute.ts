@@ -6,15 +6,14 @@ import { useCallback, useEffect, useState } from "react";
 export const ARTICLE_PARAM = "a";
 
 /**
- * Which article the detail view is showing, kept in the URL query string.
+ * Bài nào đang mở, giữ trong query string.
  *
- * Per-article routes would freeze the route list at build time, so an article
- * published through the content-only deploy would 404. A query param keeps
- * every article reachable from the one prerendered page.
+ * Route riêng cho từng bài sẽ đóng băng danh sách route lúc build, nên bài
+ * đăng qua deploy content-only sẽ 404. Query param giữ mọi bài truy cập được
+ * từ đúng một trang prerender.
  *
- * Module-level, not component state: the language selector (carrying `?a=`
- * across a locale switch) and the nav (clearing it) both live outside the
- * article page.
+ * Để ở module chứ không phải state: language selector (mang `?a=` qua khi đổi
+ * locale) và nav (xoá nó) đều nằm ngoài trang bài viết.
  */
 let currentKey: string | null = null;
 let initialised = false;
@@ -37,9 +36,8 @@ function setKey(next: string | null) {
 }
 
 /**
- * Bound once from the first `useArticleKey` mount, and never unbound: back/
- * forward can return to an article from a tab that never mounted the article
- * page, so a listener scoped to that page's lifetime would already be gone.
+ * Bind một lần, không bao giờ gỡ: back/forward có thể quay lại một bài từ tab
+ * chưa từng mount trang bài viết, listener theo vòng đời trang sẽ mất trước đó.
  */
 function bindPopstate() {
   if (popstateBound || typeof window === "undefined") return;
@@ -48,9 +46,8 @@ function bindPopstate() {
 }
 
 /**
- * Drops the detail view without touching history, for when a next/link nav is
- * already changing the URL. Clearing on any nav click is what makes
- * re-clicking the current tab read as "back to list".
+ * Đóng trang chi tiết mà không đụng history, dùng khi next/link đã tự đổi URL.
+ * Xoá ở mọi cú bấm nav là thứ khiến bấm lại tab hiện tại = "về danh sách".
  */
 export function clearArticleRoute() {
   setKey(null);
