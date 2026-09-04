@@ -7,20 +7,23 @@ import Skeleton, {
 export default function HomeSkeleton() {
   return (
     <SkeletonScreen className="container-page pb-8 md:pt-3 md:pb-11 max-w-3xl mx-auto">
-      {/* As-of pill. Not sticky here — there is nothing yet to scroll under it. */}
+      {/* As-of pill. Not sticky here — there is nothing yet to scroll under
+          it. Full width, same as the official update card below — the pill
+          is a block element with no inline width constraint in the real
+          markup, so it stretches to the container. */}
       <div className="pt-4 mb-4 md:mb-6">
-        <Skeleton className="h-[26px] w-56 max-w-full rounded-full" />
+        <Skeleton className="h-[26px] w-full rounded-full" />
       </div>
 
       {/* Latest official update. Keeps the dark left rule at reduced weight:
           the card's identity is visible before its text is. */}
-      <div className="bg-white border-l-4 border-l-gray-900/30 rounded-2xl p-6 pb-4 card-shadow mb-4">
+      <div className="bg-white border-l-4 border-l-gray-900/30 rounded-2xl pt-5 pb-4 px-6 card-shadow mb-4">
         <Skeleton className="h-3.5 w-32 mb-3" />
         <Skeleton className="h-5 w-11/12 mb-2" />
-        <Skeleton className="h-5 w-2/3 mb-4" />
+        <Skeleton className="h-5 w-2/3 mb-2" />
         <Skeleton className="h-3.5 w-full mb-2" />
         <Skeleton className="h-3.5 w-4/5" />
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex items-center justify-between mt-5">
           <Skeleton className="h-3 w-28" />
           <Skeleton className="h-3 w-20" />
         </div>
@@ -67,9 +70,9 @@ export default function HomeSkeleton() {
       <div className="hidden min-[800px]:block">
         <div className="grid grid-cols-2 gap-4 mb-4">
           {[0, 1].map((i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 card-shadow">
+            <div key={i} className="bg-white rounded-2xl pt-6 pb-4 px-6 card-shadow">
               <Skeleton className="skeleton-on-card w-6 h-6 mb-3" />
-              <Skeleton className="skeleton-on-card h-5 w-2/5 mb-2" />
+              <Skeleton className="skeleton-on-card h-5 w-2/5 mb-1" />
               <Skeleton className="skeleton-on-card h-3.5 w-4/5" />
             </div>
           ))}
@@ -77,7 +80,7 @@ export default function HomeSkeleton() {
         <div className="bg-white rounded-2xl p-6 card-shadow flex items-center gap-4">
           <Skeleton className="skeleton-on-card w-6 h-6 flex-shrink-0" />
           <div className="flex-1">
-            <Skeleton className="skeleton-on-card h-5 w-1/4 mb-2" />
+            <Skeleton className="skeleton-on-card h-5 w-1/4 mb-1" />
             <Skeleton className="skeleton-on-card h-3.5 w-1/2" />
           </div>
         </div>

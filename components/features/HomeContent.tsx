@@ -88,9 +88,9 @@ export default function HomeContent() {
             // an accent, not an outline, on the one card that must win the first
             // glance. Plain white surface + default card hover, like every
             // other card — the rule alone carries the emphasis.
-            className="block border-l-4 border-l-gray-900 pb-4"
+            className="block border-l-4 border-l-gray-900 pt-5 pb-4"
           >
-            <p className="flex items-center gap-1.5 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-2">
+            <p className="flex items-center gap-1.5 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-3">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
               {home["officialUpdateBadge"]}
             </p>
@@ -224,7 +224,7 @@ export default function HomeContent() {
             <Reveal key={page.href} delay={100 + index * 50}>
               <CardLink
                 href={page.href}
-                className="flex items-center justify-between gap-4"
+                className="flex items-center justify-between gap-4 pb-4"
               >
                 <div className="flex flex-col items-start gap-0">
                   <page.Icon
@@ -232,7 +232,7 @@ export default function HomeContent() {
                     strokeWidth={2}
                   />
                   <div>
-                    <h2 className="font-semibold text-lg mb-1">
+                    <h2 className="font-semibold text-lg">
                       {page.label}
                     </h2>
                     <p className="text-sm text-gray-500">{page.desc}</p>
