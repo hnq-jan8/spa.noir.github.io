@@ -54,7 +54,7 @@ function i18nMap(translations, field) {
   );
 }
 
-/** Như i18nMap nhưng cho field rich-text (description/body): rewrite <img src>. */
+/** Như i18nMap nhưng cho field rich-text (description/body/flight_policy): rewrite <img src>. */
 function i18nRichText(translations, field, directusUrl) {
   return Object.fromEntries(
     translations.map((t) => [
@@ -136,7 +136,11 @@ export function assembleContentPayload({
         atd: formatTime(f.atd),
         note: f.note ?? "–",
       })),
-      flightPolicy: i18nMap(siteConfig.translations, "flight_policy"),
+      flightPolicy: i18nRichText(
+        siteConfig.translations,
+        "flight_policy",
+        directusUrl,
+      ),
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.flightInfo),
     },
     officialUpdates: {
