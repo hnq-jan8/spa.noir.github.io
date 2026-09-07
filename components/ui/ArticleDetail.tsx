@@ -75,6 +75,10 @@ export default function ArticleDetail({
   const isFullBleed =
     !!article && (!article.title || article.title.trim().length === 0);
 
+  // Bài rỗng ruột mới cần sàn chiều cao; bài có nội dung để cao đúng bằng nội
+  // dung, và lúc chờ thì skeleton đã tự lấp chỗ (xem .press-article-card).
+  const isEmptyBody = !!article && article.body.trim().length === 0;
+
   return (
     <div className="flex flex-col flex-1 md:block">
       {/* Meta sits outside the article card: a full-bleed article has no
@@ -115,7 +119,13 @@ export default function ArticleDetail({
         </Reveal>
       </div>
       <div
-        className={`press-article-card md:bg-white md:rounded-2xl md:p-8 md:card-shadow md:border md:border-white ${isFullBleed ? "full-bleed" : ""}`}
+        className={[
+          "press-article-card md:bg-white md:rounded-2xl md:p-8 md:card-shadow md:border md:border-white",
+          isFullBleed && "full-bleed",
+          isEmptyBody && "empty-body",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         <ArticleContent
           title={article?.title ?? null}
