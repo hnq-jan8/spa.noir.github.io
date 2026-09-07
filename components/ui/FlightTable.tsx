@@ -2,7 +2,7 @@
 
 import { ArrowRight, Plane } from "lucide-react";
 
-import { formatFlightDate } from "@/lib/siteData";
+import { formatFlightDate, TIME_ZONE_LABEL } from "@/lib/siteData";
 
 export interface FlightRow {
   no: number | string;
@@ -42,12 +42,58 @@ const defaultHeaders: FlightHeaders = {
   note: "Note",
 };
 
+/** Nhãn dài hơn ngưỡng này (vd "Scheduled Time of Departure") không vừa một
+ *  phần ba thẻ mobile: card đổi sang xếp dọc nhãn–giá trị. */
+const STACK_LABEL_MAX_LENGTH = 12;
+
+/** Giờ kèm múi giờ; `stack` đẩy múi giờ xuống dòng riêng để các giờ đậm
+ *  thẳng cột. */
+function TimeValue({
+  value,
+  stack,
+  align = "center",
+}: {
+  value: string;
+  stack?: boolean;
+  align?: "center" | "end";
+}) {
+  if (!stack) {
+    return (
+      <span className="inline-flex items-baseline gap-1">
+        <span className="font-medium text-gray-900">{value || "–"}</span>
+        {value ? (
+          <span className="text-[11px] font-normal text-gray-400">
+            {TIME_ZONE_LABEL}
+          </span>
+        ) : null}
+      </span>
+    );
+  }
+  return (
+    <span
+      className={`inline-flex flex-col ${
+        align === "end" ? "items-end" : "items-center"
+      }`}
+    >
+      <span className="font-medium text-gray-900">{value || "–"}</span>
+      <span
+        className={`text-[11px] font-normal text-gray-400${value ? "" : " invisible"}`}
+      >
+        {TIME_ZONE_LABEL}
+      </span>
+    </span>
+  );
+}
+
 export default function FlightTable({
   title = "Flight Information",
   rows,
   headers = defaultHeaders,
 }: FlightTableProps) {
   const h = headers;
+  const stackFields = [h.date, h.srtd, h.atd].some(
+    (label) => (label?.length ?? 0) > STACK_LABEL_MAX_LENGTH,
+  );
 
   return (
     <div>
@@ -90,25 +136,54 @@ export default function FlightTable({
                 </div>
               </div>
 
-              {/* Date joins the two times as even thirds — one date and two
-                  times balance in a way the old type/capacity pair needed its
-                  own row and second divider for. */}
-              <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center pt-4 pb-3">
-                <div className="flex flex-col justify-center">
-                  <p className="text-xs text-gray-500 mb-1">{h.date}</p>
-                  <p className="font-medium text-gray-900">
-                    {formatFlightDate(row.date) || "–"}
-                  </p>
+              {stackFields ? (
+                /* Nhãn dài: mỗi trường một dòng, nhãn trái – giá trị phải. */
+                <div className="divide-y divide-gray-100 border-t border-gray-100 mt-4 text-sm">
+                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
+                    <p className="text-xs text-gray-500">{h.date}</p>
+                    <p className="font-medium text-gray-900">
+                      {formatFlightDate(row.date) || "–"}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
+                    <p className="text-xs text-gray-500">{h.srtd}</p>
+                    <TimeValue value={row.srtd} stack align="end" />
+                  </div>
+                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
+                    <p className="text-xs text-gray-500">{h.atd}</p>
+                    <TimeValue value={row.atd} stack align="end" />
+                  </div>
                 </div>
-                <div className="flex flex-col justify-center">
-                  <p className="text-xs text-gray-500 mb-1">{h.srtd}</p>
-                  <p className="font-medium text-gray-900">{row.srtd}</p>
+              ) : (
+                /* Date joins the two times as even thirds — one date and two
+                    times balance in a way the old type/capacity pair needed its
+                    own row and second divider for. */
+                <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center pt-4 pb-3">
+                  {/* Nhãn ở trên cùng để ba nhãn thẳng hàng; giá trị chiếm
+                      phần còn lại và canh giữa. */}
+                  <div className="flex flex-col">
+                    <p className="text-xs text-gray-500 mb-1">{h.date}</p>
+                    {/* -3px: canh giữa hình học thì ngày trông trũng xuống. */}
+                    <div className="flex-1 flex items-center justify-center -translate-y-[3px]">
+                      <span className="font-medium text-gray-900">
+                        {formatFlightDate(row.date) || "–"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-xs text-gray-500 mb-1">{h.srtd}</p>
+                    <div className="flex-1 flex items-center justify-center">
+                      <TimeValue value={row.srtd} stack />
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-xs text-gray-500 mb-1">{h.atd}</p>
+                    <div className="flex-1 flex items-center justify-center">
+                      <TimeValue value={row.atd} stack />
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-col justify-center">
-                  <p className="text-xs text-gray-500 mb-1">{h.atd}</p>
-                  <p className="font-medium text-gray-900">{row.atd}</p>
-                </div>
-              </div>
+              )}
             </div>
           );
         })}
@@ -168,8 +243,8 @@ export default function FlightTable({
                 >
                   {h.srtd}
                 </th>
-                <td className="py-3 font-medium text-gray-900">
-                  {rows[0].srtd}
+                <td className="py-3">
+                  <TimeValue value={rows[0].srtd} />
                 </td>
               </tr>
               <tr>
@@ -179,8 +254,8 @@ export default function FlightTable({
                 >
                   {h.atd}
                 </th>
-                <td className="py-3 font-medium text-gray-900">
-                  {rows[0].atd}
+                <td className="py-3">
+                  <TimeValue value={rows[0].atd} />
                 </td>
               </tr>
               <tr>
@@ -206,7 +281,8 @@ export default function FlightTable({
               too-wide row still can't spill out of the card. */}
           <div className="overflow-x-clip px-6">
             {/* Tighter gaps below lg (pr-4) keep the natural width inside the
-                space available at 768px, so no scroll container is needed. */}
+                space available at 768px, so no scroll container is needed; hai
+                tiêu đề giờ được xuống dòng (whitespace-normal) cũng vì vậy. */}
             <table className="w-full text-sm text-left whitespace-nowrap">
               {/* Offset by the fixed navbar (h-14 from md up, and the table
                   only renders from md), since the scrollport here is the
@@ -228,10 +304,10 @@ export default function FlightTable({
                   <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5]">
                     {h.route}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5] text-center">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5] text-center whitespace-normal">
                     {h.srtd}
                   </th>
-                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5] text-center">
+                  <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5] text-center whitespace-normal">
                     {h.atd}
                   </th>
                   <th className="py-2 pr-4 lg:pr-8 font-bold text-gray-900 shadow-[inset_0_-1px_0_#e5e5e5]">
@@ -266,11 +342,11 @@ export default function FlightTable({
                         </span>
                       </span>
                     </td>
-                    <td className="py-3 pr-4 lg:pr-8 text-gray-600 text-center">
-                      {row.srtd}
+                    <td className="py-3 pr-4 lg:pr-8 text-center">
+                      <TimeValue value={row.srtd} />
                     </td>
-                    <td className="py-3 pr-4 lg:pr-8 text-gray-600 text-center">
-                      {row.atd}
+                    <td className="py-3 pr-4 lg:pr-8 text-center">
+                      <TimeValue value={row.atd} />
                     </td>
                     <td className="py-3 pr-4 lg:pr-8 text-gray-500">
                       <span className="text-xs bg-gray-100 px-2 py-1 rounded">

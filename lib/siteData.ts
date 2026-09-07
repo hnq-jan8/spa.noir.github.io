@@ -5,6 +5,9 @@
 const PART_SOURCE_LOCALE = "en-GB";
 const TIME_ZONE = "Asia/Ho_Chi_Minh";
 
+/** Hậu tố hiển thị của TIME_ZONE; không phải nhãn dịch được. */
+export const TIME_ZONE_LABEL = "GMT+7";
+
 /** Tiếng Việt giữ dd/MM/yyyy; các ngôn ngữ còn lại dùng yyyy/MM/dd. */
 const DAY_FIRST_LOCALES = new Set(["vi"]);
 
@@ -58,5 +61,5 @@ export function formatTimestamp(iso: string, locale: string) {
     minute: "2-digit",
     hour12: false,
   }).format(date);
-  return `${datePart} · ${timePart} GMT+7`;
+  return `${datePart} · ${timePart} ${TIME_ZONE_LABEL}`;
 }
