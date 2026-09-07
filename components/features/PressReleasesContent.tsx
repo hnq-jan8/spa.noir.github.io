@@ -90,8 +90,7 @@ export default function PressReleasesContent() {
   }
 
   // Releases arrive newest-first (sort=-published_at in the Directus query), so
-  // the lead card is simply the most recent one — there's no editor-picked
-  // ordering behind it any more.
+  // the lead card is simply the most recent one.
   const [latest, ...rest] = releases;
   // Vị trí 2–3 giữ kiểu list full-width; từ vị trí 4 gom thành hàng 3. Hàng lẻ
   // (dư 1 → full width, dư 2 → chia 2/1) đứng ngay sau top 3.

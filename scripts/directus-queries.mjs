@@ -19,9 +19,8 @@ export const FAQS_QUERY =
   "/items/faqs?fields=translations.languages_code,translations.question,translations.answer&sort=sort&filter[deleted_at][_null]=true";
 
 // sort=-published_at: bài mới nhất lên đầu, giống official_updates (sort=-date).
-// Collection không còn field `sort` để biên tập viên kéo thả thứ tự nữa.
 export const PRESS_RELEASES_QUERY =
-  "/items/press_releases?fields=id,slug,published_at,translations.languages_code,translations.title,translations.body,translations.preview_excerpt,translations.preview_image&sort=-published_at&filter[status][_eq]=published&filter[deleted_at][_null]=true";
+  "/items/press_releases?fields=id,published_at,translations.languages_code,translations.title,translations.body,translations.preview_excerpt,translations.preview_image&sort=-published_at&filter[status][_eq]=published&filter[deleted_at][_null]=true";
 
 export const SITE_CONFIG_QUERY =
   "/items/site_config/1?fields=passenger_hotline,family_hotline,support_email,media_contact,social_facebook,social_instagram,social_linkedin,social_youtube,social_tiktok,translations.languages_code,translations.flight_policy";

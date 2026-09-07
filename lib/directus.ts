@@ -89,7 +89,6 @@ export interface PressReleaseTranslation {
 }
 export interface PressRelease {
   id: number;
-  slug: string | null;
   published_at: string | null;
   translations: PressReleaseTranslation[];
 }

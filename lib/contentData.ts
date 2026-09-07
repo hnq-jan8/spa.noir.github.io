@@ -59,7 +59,6 @@ export interface ContentUpdateItem extends ContentUpdate {
 /** Một thông cáo báo chí trong danh sách. */
 export interface ContentReleaseItem {
   id: string;
-  slug: string;
   publishedAt: string | null;
   title: I18n<string | null>;
   /** Nullable: same as ContentUpdate.description. */
@@ -237,7 +236,7 @@ export function resolveLocale(
     },
     pressReleases: {
       releases: payload.pressReleases.releases.map((r) => ({
-        key: r.slug,
+        key: r.id,
         date: r.publishedAt,
         title: pick(r.title, locale) ?? null,
         body: pickText(r.body, locale),

@@ -158,7 +158,6 @@ export function assembleContentPayload({
       // Thứ tự do query lo (sort=-published_at); bài đầu là bài mới nhất.
       releases: pressReleases.map((r) => ({
         id: String(r.id),
-        slug: r.slug || String(r.id),
         publishedAt: r.published_at ?? null,
         title: i18nMap(r.translations, "title"),
         body: i18nRichText(r.translations, "body", directusUrl),
