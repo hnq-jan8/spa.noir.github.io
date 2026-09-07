@@ -43,10 +43,6 @@ export interface LanguageOption {
   label: string;
 }
 
-// Khớp tay với transition chậm nhất lúc mở (background-color, 200ms) — không
-// ghép được bằng biến vì Tailwind chỉ quét class tĩnh.
-const OPEN_ANIM_MS = 200;
-
 function ChevronDownIcon() {
   return (
     <svg
@@ -114,6 +110,9 @@ interface LanguageSelectorProps {
   languages?: LanguageOption[];
   /** aria-label cho nút mở dropdown (ui_labels: nav.selectLanguage). */
   selectLanguageLabel?: string;
+  /** Chung state với nút globe/langView bên mobile drawer (xem Navbar). */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function DesktopLanguageSelector({
@@ -121,46 +120,23 @@ export function DesktopLanguageSelector({
   pathWithoutLocale,
   languages: liveLanguages,
   selectLanguageLabel,
+  open,
+  onOpenChange,
 }: LanguageSelectorProps) {
   const options = liveLanguages ?? languages;
 
-  // Chỉ hover. Đóng thì biến mất ngay, không fade — trừ khi chuột rời đi
-  // giữa lúc animation mở còn đang chạy, `hide` sẽ đợi nốt `OPEN_ANIM_MS`
-  // rồi mới đóng, để không cắt animation giữa chừng.
-  const [open, setOpen] = useState(false);
-  const [tall, setTall] = useState(false);
+  // Hover khi đang đóng: chỉ đổi màu pill, không mở rộng / đổi chữ như lúc
+  // mở — xem cách dùng `pillActive` bên dưới.
+  const [hovering, setHovering] = useState(false);
   // Ngôn ngữ đang rê chuột tới: chữ trên pill đổi theo (xem `pillLabel`).
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
-  const openedAt = useRef<number | null>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const show = () => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
-    if (openedAt.current === null) openedAt.current = performance.now();
-    setOpen(true);
-    setTall(true);
-  };
-  const hide = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const close = () => {
     setHoveredCode(null);
-    const elapsed =
-      openedAt.current === null
-        ? OPEN_ANIM_MS
-        : performance.now() - openedAt.current;
-    const remaining = Math.max(0, OPEN_ANIM_MS - elapsed);
-    closeTimer.current = setTimeout(() => {
-      setOpen(false);
-      setTall(false);
-      openedAt.current = null;
-    }, remaining);
+    onOpenChange(false);
   };
-  useEffect(
-    () => () => {
-      if (closeTimer.current) clearTimeout(closeTimer.current);
-    },
-    [],
-  );
+  useDismissOnOutside(containerRef, open, close);
+  const pillActive = open || hovering;
 
   // Đo trên các phần tử không animate, để mọi animation chạy trên px cố định.
   const restRef = useRef<HTMLSpanElement>(null);
@@ -226,8 +202,9 @@ export function DesktopLanguageSelector({
   return (
     <div
       data-fallback-desktop-only
-      onMouseEnter={show}
-      onMouseLeave={hide}
+      ref={containerRef}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
       className="hidden md:flex relative items-stretch flex-shrink-0 ml-6 lg:ml-2 w-max"
     >
       <button
@@ -235,17 +212,20 @@ export function DesktopLanguageSelector({
         aria-label={selectLanguageLabel}
         aria-haspopup="menu"
         aria-expanded={open}
+        onClick={() => (open ? close() : onOpenChange(true))}
         // Chỉ `width` (px đo sẵn) và nền animate; chữ chỉ mờ vào/ra, không
         // dựng lại layout mỗi frame (Safari giật ở đúng chỗ đó).
         style={{ width: size ? (open ? size.open : size.rest) : undefined }}
         className={`relative self-center flex items-center justify-end h-9 rounded-full overflow-hidden text-xs font-medium [transition:width_200ms_cubic-bezier(0.32,0.72,0,1)_-100ms,background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
-          open ? "bg-gray-100" : "bg-transparent"
+          pillActive ? "bg-gray-100" : "bg-transparent"
         }`}
       >
         <span
           ref={restRef}
-          className={`flex items-center gap-1.5 px-3 whitespace-nowrap text-gray-200 transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-            open ? "opacity-0 -translate-x-3" : "opacity-100 translate-x-0"
+          className={`flex items-center gap-1.5 px-3 whitespace-nowrap transition-[opacity,transform,color] duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            open
+              ? "opacity-0 -translate-x-3 text-gray-200"
+              : `opacity-100 translate-x-0 ${hovering ? "text-black" : "text-gray-200"}`
           }`}
         >
           <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -288,7 +268,7 @@ export function DesktopLanguageSelector({
         // `pointer-events-none`: rê chuột vào dải đó vẫn đóng menu — thẻ
         // trắng bên trong tự bật lại `pointer-events-auto`.
         style={{ width: size?.open }}
-        className={`absolute top-full -right-5 box-content px-5 pt-1 z-50 pointer-events-none [transition:opacity_0s,visibility_0s] ${
+        className={`absolute top-full -right-5 box-content px-5 pt-3 z-50 pointer-events-none [transition:opacity_0s,visibility_0s] ${
           open ? "visible opacity-100" : "invisible opacity-0"
         }`}
       >
@@ -300,7 +280,7 @@ export function DesktopLanguageSelector({
         {/* Delay âm −62ms: vào transition ở trạng thái đã chạy sẵn ¼ đường
             cong, bớt layout recalc — mẹo của lib/expandTransition. */}
         <div
-          style={{ height: tall && size ? size.h : 0 }}
+          style={{ height: open && size ? size.h : 0 }}
           className="pointer-events-auto overflow-hidden rounded-[20px] bg-white shadow-[0_0_16px_rgba(0,0,0,0.12)] [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
         >
           <div ref={listRef}>

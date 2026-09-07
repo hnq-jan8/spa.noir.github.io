@@ -55,10 +55,9 @@ export default function Navbar({
     languageOptions.find((lang) => lang.code === locale) ?? languageOptions[0];
 
   const [menuOpen, setMenuOpen] = useState(false);
-  // Sub-view inside the mobile drawer: false = nav list, true = full-screen
-  // language list. Lives here (not in MobileMenu) because the header's
-  // globe/back trigger has to swap based on it too.
-  const [mobileLangView, setMobileLangView] = useState(false);
+  // Shared by the desktop dropdown and the mobile drawer's language
+  // sub-view, so a resize between breakpoints keeps the same open state.
+  const [langOpen, setLangOpen] = useState(false);
   const [iconAnimating, setIconAnimating] = useState(false);
   const {
     ref: navRef,
@@ -68,6 +67,10 @@ export default function Navbar({
   } = useHorizontalScroll<HTMLElement>();
   const headerRef = useRef<HTMLElement>(null);
   const iconAnimationTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  // True when the effect below auto-opened `menuOpen` for langOpen, not a
+  // real hamburger tap — closing langOpen should then close the drawer too,
+  // instead of just backing out to the nav list.
+  const menuOpenedByLangSync = useRef(false);
 
   const toggleMenu = () => {
     if (iconAnimating) return;
@@ -85,8 +88,34 @@ export default function Navbar({
   }, []);
 
   useEffect(() => {
-    if (!menuOpen) setMobileLangView(false);
+    if (!menuOpen) setLangOpen(false);
   }, [menuOpen]);
+
+  // Opening langOpen from desktop then resizing down to mobile should reveal
+  // the drawer already on the language screen. Gated on the mobile media
+  // query, not just langOpen, so opening the desktop dropdown doesn't also
+  // trigger the scroll lock below on desktop.
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)");
+    const sync = () => {
+      if (mql.matches && langOpen) {
+        setMenuOpen((prev) => {
+          if (!prev) menuOpenedByLangSync.current = true;
+          return true;
+        });
+      }
+    };
+    sync();
+    mql.addEventListener("change", sync);
+    return () => mql.removeEventListener("change", sync);
+  }, [langOpen]);
+
+  useEffect(() => {
+    if (!langOpen && menuOpenedByLangSync.current) {
+      menuOpenedByLangSync.current = false;
+      setMenuOpen(false);
+    }
+  }, [langOpen]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -159,10 +188,10 @@ export default function Navbar({
           <div className="flex items-stretch h-12 md:h-14">
             {/* Logo — crossfades with the "Select language" label on mobile
                 while the drawer's language sub-screen is open, same slot the
-                logo normally owns. Desktop has no langView state, so the
-                logo stays fully opaque there regardless of this flag. Both
-                layers stay mounted (never unmount) so they fade in sync with
-                the drawer instead of snapping. */}
+                logo normally owns. Gated on `menuOpen` too, so `langOpen`
+                being shared with the desktop dropdown doesn't crossfade the
+                logo there. Both layers stay mounted (never unmount) so they
+                fade in sync with the drawer instead of snapping. */}
             <div className="relative self-center flex items-center flex-shrink-0 mr-2 py-1 h-7 md:h-9">
               <Link
                 href={`/${locale}`}
@@ -171,7 +200,7 @@ export default function Navbar({
                 // nhanh 100-200ms thì repaint đó lộ ra thành giật. Ép GPU layer
                 // để Safari composite thay vì vẽ lại (áp cho cả span nhãn dưới).
                 className={`group flex items-center transform-gpu transition-opacity ease-out ${
-                  mobileLangView && menuOpen
+                  langOpen && menuOpen
                     ? "duration-100 opacity-0 pointer-events-none md:duration-300 md:opacity-100 md:pointer-events-auto"
                     : "duration-200 opacity-100"
                 }`}
@@ -197,7 +226,7 @@ export default function Navbar({
               {nav?.["selectLanguage"] && (
                 <span
                   className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-400 transform-gpu transition-opacity ease-out ${
-                    mobileLangView && menuOpen
+                    langOpen && menuOpen
                       ? "duration-200 opacity-100"
                       : "duration-100 opacity-0 pointer-events-none"
                   }`}
@@ -313,6 +342,8 @@ export default function Navbar({
               pathWithoutLocale={`${pathWithoutLocale}${localeSuffix}`}
               languages={languageOptions}
               selectLanguageLabel={nav?.["selectLanguage"]}
+              open={langOpen}
+              onOpenChange={setLangOpen}
             />
 
             <div className="flex md:hidden items-stretch gap-1">
@@ -327,18 +358,18 @@ export default function Navbar({
               {languageOptions.length > 1 && (
                 <button
                   type="button"
-                  onClick={() => setMobileLangView((v) => !v)}
+                  onClick={() => setLangOpen((v) => !v)}
                   tabIndex={menuOpen ? 0 : -1}
                   aria-hidden={!menuOpen}
                   className={`relative z-50 self-center h-9 min-w-[44px] pl-2.5 pr-3 flex items-center justify-center gap-1.5 rounded-full transition-[opacity,background-color,color] duration-300 ease-out ${
                     menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                   } ${
-                    mobileLangView
+                    langOpen
                       ? "bg-white text-black"
                       : "text-gray-300 hover:text-white active:text-white"
                   }`}
                   aria-label={nav?.["selectLanguage"]}
-                  aria-expanded={mobileLangView}
+                  aria-expanded={langOpen}
                 >
                   <GlobeIcon className="w-[18px] h-[18px] flex-shrink-0" />
                   <span className="text-sm font-medium">
@@ -395,7 +426,7 @@ export default function Navbar({
         {/* Mobile full-screen menu */}
         <MobileMenu
           open={menuOpen}
-          langView={mobileLangView}
+          langView={langOpen}
           navItems={navItems}
           normalizedPath={normalizedPath}
           languageOptions={languageOptions}
