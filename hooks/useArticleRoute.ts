@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { markForwardNavigation } from "@/lib/navigationDirection";
+
 /** Query param carrying the open article's key. */
 export const ARTICLE_PARAM = "a";
 
@@ -81,6 +83,7 @@ export function useArticleRoute() {
     const url = new URL(window.location.href);
     url.searchParams.set(ARTICLE_PARAM, next);
     window.history.pushState(null, "", url);
+    markForwardNavigation();
     setKey(next);
     window.scrollTo({ top: 0 });
   }, []);
@@ -89,6 +92,7 @@ export function useArticleRoute() {
     const url = new URL(window.location.href);
     url.searchParams.delete(ARTICLE_PARAM);
     window.history.pushState(null, "", url);
+    markForwardNavigation();
     setKey(null);
     // Mirrors `open`: the mobile back button sits at the bottom of the
     // article, and without this the list reappears scrolled to wherever

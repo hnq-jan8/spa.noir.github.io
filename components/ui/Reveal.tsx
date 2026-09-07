@@ -51,7 +51,7 @@ export default function Reveal({
   return (
     <div
       className={`transition-[opacity,transform] duration-200 ease-out will-change-[opacity,transform] ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       } ${className}`}
       style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
       onClick={onClick}
