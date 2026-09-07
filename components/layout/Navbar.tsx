@@ -192,14 +192,13 @@ export default function Navbar({
                 being shared with the desktop dropdown doesn't crossfade the
                 logo there. Both layers stay mounted (never unmount) so they
                 fade in sync with the drawer instead of snapping. */}
-            <div className="relative self-center flex items-center flex-shrink-0 mr-2 py-1 h-7 md:h-9">
+            <div className="relative self-stretch flex items-center flex-shrink-0 mr-2">
               <Link
                 href={`/${locale}`}
-                // transform-gpu: Safari repaint lại chữ/ảnh ở mỗi bước opacity
-                // nếu phần tử chưa được đẩy lên layer riêng — hai lớp crossfade
-                // nhanh 100-200ms thì repaint đó lộ ra thành giật. Ép GPU layer
-                // để Safari composite thay vì vẽ lại (áp cho cả span nhãn dưới).
-                className={`group flex items-center transform-gpu transition-opacity ease-out ${
+                // h-full: hit-area khớp chiều cao header, giống các tab bên
+                // cạnh, không chỉ khớp khung ảnh. transform-gpu: tránh Safari
+                // giật lúc crossfade nhanh với span nhãn bên dưới.
+                className={`group flex items-center h-full transform-gpu transition-opacity ease-out ${
                   langOpen && menuOpen
                     ? "duration-100 opacity-0 pointer-events-none md:duration-300 md:opacity-100 md:pointer-events-auto"
                     : "duration-200 opacity-100"

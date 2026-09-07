@@ -19,7 +19,12 @@ export function useDismissOnOutside(
   useEffect(() => {
     if (!open) return;
     const handlePointerDown = (e: PointerEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) onClose();
+      const el = containerRef.current;
+      // `open` có thể chung state với UI khác đang ẩn qua breakpoint — bỏ
+      // qua khi container này `display:none`, không thì tap ở UI kia luôn
+      // bị hiểu là "click ra ngoài".
+      if (!el || getComputedStyle(el).display === "none") return;
+      if (!el.contains(e.target as Node)) onClose();
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -213,53 +218,59 @@ export function DesktopLanguageSelector({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => (open ? close() : onOpenChange(true))}
-        // Chỉ `width` (px đo sẵn) và nền animate; chữ chỉ mờ vào/ra, không
-        // dựng lại layout mỗi frame (Safari giật ở đúng chỗ đó).
-        style={{ width: size ? (open ? size.open : size.rest) : undefined }}
-        className={`relative self-center flex items-center justify-end h-9 rounded-full overflow-hidden text-xs font-medium [transition:width_200ms_cubic-bezier(0.32,0.72,0,1)_-100ms,background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
-          pillActive ? "bg-gray-100" : "bg-transparent"
-        }`}
+        // self-stretch để hit-area khớp vùng hover (container ngoài) — viên
+        // pill bo tròn chuyển xuống span con, chỉ còn là lớp hiển thị.
+        className="relative self-stretch flex items-center text-xs font-medium"
       >
         <span
-          ref={restRef}
-          className={`flex items-center gap-1.5 px-3 whitespace-nowrap transition-[opacity,transform,color] duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-            open
-              ? "opacity-0 -translate-x-3 text-gray-200"
-              : `opacity-100 translate-x-0 ${hovering ? "text-black" : "text-gray-200"}`
+          // Chỉ `width` (px đo sẵn) và nền animate; chữ chỉ mờ vào/ra, không
+          // dựng lại layout mỗi frame (Safari giật ở đúng chỗ đó).
+          style={{ width: size ? (open ? size.open : size.rest) : undefined }}
+          className={`relative flex items-center justify-end h-9 rounded-full overflow-hidden [transition:width_200ms_cubic-bezier(0.32,0.72,0,1)_-100ms,background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
+            pillActive ? "bg-gray-100" : "bg-transparent"
           }`}
         >
-          <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
-          {locale.toUpperCase()}
-        </span>
+          <span
+            ref={restRef}
+            className={`flex items-center gap-1.5 px-3 whitespace-nowrap transition-[opacity,transform,color] duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              open
+                ? "opacity-0 -translate-x-3 text-gray-200"
+                : `opacity-100 translate-x-0 ${hovering ? "text-black" : "text-gray-200"}`
+            }`}
+          >
+            <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+            {locale.toUpperCase()}
+          </span>
 
-        {/* `left-1/2 -translate-x-1/2` chứ không `inset-0`, để offsetWidth đo
-            ra bề rộng chữ chứ không phải bề rộng nút. */}
-        <span
-          ref={openRef}
-          aria-hidden
-          className={`absolute left-1/2 -translate-x-1/2 inset-y-0 flex items-center px-1 whitespace-nowrap text-black transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
-            open ? "duration-150 opacity-100" : "duration-0 opacity-0"
-          }`}
-        >
-          {pillLabel}
-        </span>
+          {/* `left-1/2 -translate-x-1/2` chứ không `inset-0`, để offsetWidth đo
+              ra bề rộng chữ chứ không phải bề rộng nút. */}
+          <span
+            ref={openRef}
+            aria-hidden
+            className={`absolute left-1/2 -translate-x-1/2 inset-y-0 flex items-center px-1 whitespace-nowrap text-black transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              open ? "duration-150 opacity-100" : "duration-0 opacity-0"
+            }`}
+          >
+            {pillLabel}
+          </span>
 
-        <span
-          aria-hidden
-          className={`absolute inset-y-0 right-0 flex items-center pr-3 text-black transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
-            open ? "duration-150 opacity-100" : "duration-0 opacity-0"
-          }`}
-        >
-          <ChevronDownIcon />
-        </span>
+          <span
+            aria-hidden
+            className={`absolute inset-y-0 right-0 flex items-center pr-3 text-black transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              open ? "duration-150 opacity-100" : "duration-0 opacity-0"
+            }`}
+          >
+            <ChevronDownIcon />
+          </span>
 
-        <span
-          aria-hidden
-          className={`absolute inset-y-0 left-3 flex items-center transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
-            open ? "duration-150 opacity-100" : "duration-0 opacity-0"
-          }`}
-        >
-          <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0 text-black" />
+          <span
+            aria-hidden
+            className={`absolute inset-y-0 left-3 flex items-center transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              open ? "duration-150 opacity-100" : "duration-0 opacity-0"
+            }`}
+          >
+            <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0 text-black" />
+          </span>
         </span>
       </button>
 
