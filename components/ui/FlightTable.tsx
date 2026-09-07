@@ -145,12 +145,12 @@ export default function FlightTable({
                       {formatFlightDate(row.date) || "–"}
                     </p>
                   </div>
-                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-                    <p className="text-xs text-gray-500">{h.srtd}</p>
+                  <div className="flex items-start justify-between gap-4 px-4 pt-2 pb-1">
+                    <p className="text-xs text-gray-500 leading-5">{h.srtd}</p>
                     <TimeValue value={row.srtd} stack align="end" />
                   </div>
-                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-                    <p className="text-xs text-gray-500">{h.atd}</p>
+                  <div className="flex items-start justify-between gap-4 px-4 pt-2 pb-1">
+                    <p className="text-xs text-gray-500 leading-5">{h.atd}</p>
                     <TimeValue value={row.atd} stack align="end" />
                   </div>
                 </div>

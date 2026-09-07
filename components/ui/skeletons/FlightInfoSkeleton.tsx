@@ -26,23 +26,16 @@ function FlightCardSkeleton() {
         </div>
       </div>
 
-      <div className="mx-4 border-b pt-4 border-gray-200" />
-
-      <div className="grid grid-cols-3 divide-x divide-gray-200 py-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex flex-col items-center justify-center">
-            <Skeleton className="skeleton-on-card h-3 w-10 mb-2" />
-            <Skeleton className="skeleton-on-card h-5 w-14" />
-          </div>
-        ))}
+      {/* Real layout varies here (3-col grid vs. stacked rows, see
+          FlightTable) — one block just marks the area. */}
+      <div className="px-4 pb-4 pt-2">
+        <Skeleton className="skeleton-on-card h-10 w-full" />
       </div>
     </div>
   );
 }
 
-/**
- * Tiêu đề mục + bảng: cards xếp chồng dưới md, lưới 7 cột từ md trở lên.
- */
+/** Tiêu đề mục + bảng: cards xếp chồng dưới md, một khối placeholder từ md trở lên. */
 export function FlightTableSkeleton() {
   return (
     <>
@@ -53,30 +46,10 @@ export function FlightTableSkeleton() {
         <FlightCardSkeleton />
       </div>
 
-      {/* The md+ table: a header row of seven, then body rows. Widths follow
-          the real column proportions so nothing jumps on swap — index 3 is
-          the wider Route column. */}
-      <div className="hidden md:block -mx-6">
-        <div className="px-6">
-          <div className="grid grid-cols-[3rem_1fr_1fr_1.6fr_1fr_1fr_1fr] gap-x-4 lg:gap-x-8 items-center border-b border-gray-200 pb-2">
-            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-              <Skeleton key={i} className="skeleton-on-card h-4 w-full" />
-            ))}
-          </div>
-          {[0, 1, 2, 3, 4].map((row) => (
-            <div
-              key={row}
-              className="grid grid-cols-[3rem_1fr_1fr_1.6fr_1fr_1fr_1fr] gap-x-4 lg:gap-x-8 items-center border-b border-gray-100 py-3"
-            >
-              {[0, 1, 2, 3, 4, 5, 6].map((col) => (
-                <Skeleton
-                  key={col}
-                  className={`skeleton-on-card h-4 ${col === 3 ? "w-full" : "w-3/4"}`}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+      {/* Real layout varies here too (single-flight key/value table vs.
+          multi-row grid, see FlightTable) — one block marks the area. */}
+      <div className="hidden md:block">
+        <Skeleton className="h-64 w-full" />
       </div>
     </>
   );
