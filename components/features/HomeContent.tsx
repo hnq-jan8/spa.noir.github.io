@@ -116,7 +116,7 @@ export default function HomeContent() {
             // tiên. Nền trắng và hover vẫn y hệt mọi card khác.
             className="block border-l-4 border-l-gray-900 pt-5 pb-4"
           >
-            <p className="flex items-center gap-1.5 text-gray-600 text-xs font-semibold uppercase tracking-wide mb-3">
+            <p className="flex items-center gap-1.5 text-gray-600 text-xs font-semibold uppercase tracking-wide mb-4">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
               {home["officialUpdateBadge"]}
             </p>

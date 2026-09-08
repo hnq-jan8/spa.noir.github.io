@@ -175,6 +175,19 @@ export default function Navbar({
 
   const scrollNav = (dir: "left" | "right") => scrollNavBy(dir, 120);
 
+  // The desktop/tablet nav scrolls horizontally once labels overflow (see
+  // useHorizontalScroll above) -- without this, landing on a tab that's
+  // scrolled out of view (e.g. a deep link straight to Press Releases) never
+  // reveals which tab is active until the visitor happens to scroll there.
+  const activeLinkRef = useRef<HTMLAnchorElement>(null);
+  useEffect(() => {
+    activeLinkRef.current?.scrollIntoView({
+      inline: "center",
+      block: "nearest",
+      behavior: "smooth",
+    });
+  }, [normalizedPath, nav]);
+
   return (
     <>
       {/* `fixed` from md up only: below that, iOS Safari's URL-bar collapse
@@ -258,13 +271,14 @@ export default function Navbar({
                       <Link
                         key={item.href}
                         href={item.href}
+                        ref={isActive ? activeLinkRef : undefined}
                         onClick={() => {
                           // Re-clicking the active tab keeps the same pathname,
                           // so the detail view has to be dismissed explicitly.
                           clearArticleRoute();
                           if (isActive) invalidateContent();
                         }}
-                        className={`focus-ring-inset text-xs whitespace-nowrap px-4 flex items-center relative flex-shrink-0 ${
+                        className={`group text-xs whitespace-nowrap px-4 flex items-center relative flex-shrink-0 focus-visible:outline-none ${
                           isActive
                             ? "text-white font-medium bg-white/10"
                             : "text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium"
@@ -286,6 +300,14 @@ export default function Navbar({
                             {showDot && (
                               <span className="absolute -top-0.5 -right-2 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]" />
                             )}
+                            {/* Custom focus ring: the tab's hit-area is the
+                                full header height, so the default ring would
+                                hug that instead of the label -- draw it here,
+                                pill-shaped like the hotline links' ring. */}
+                            <span
+                              aria-hidden="true"
+                              className="pointer-events-none absolute -inset-x-2.5 -inset-y-1.5 rounded-full opacity-0 group-focus-visible:opacity-100 shadow-[0_0_0_2px_var(--focus-ring)]"
+                            />
                           </span>
                         </span>
                         {/* White on the gray chrome — the only accent left in a

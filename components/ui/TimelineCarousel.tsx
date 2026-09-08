@@ -103,7 +103,10 @@ export default function TimelineCarousel({
             key={item.key}
             type="button"
             onClick={() => onOpen(item.key)}
-            className="group flex gap-4 sm:gap-5 w-full text-left"
+            // Default :focus-visible ring (globals.css) hugs the button's
+            // full hit-area, which reaches past the trailing gap to the next
+            // item -- suppressed in favor of the custom ring below.
+            className="group flex gap-4 sm:gap-5 w-full text-left focus-visible:outline-none"
           >
             <div className="flex flex-col items-center flex-shrink-0">
               <div
@@ -129,68 +132,79 @@ export default function TimelineCarousel({
             <div
               className={`flex-1 min-w-0 ${isLast ? "pb-1" : "pb-8 sm:pb-9"} pt-0.5`}
             >
-              {isGroupStart && item.date && (
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span
-                    className={`text-xs sm:text-sm ${isPassed ? "text-gray-600 font-medium group-hover:text-gray-900 group-active:text-gray-900" : "text-gray-600 group-hover:text-gray-700 group-active:text-gray-700"}`}
-                  >
-                    {formatTimestamp(item.date, locale)}
-                  </span>
-                  {isPassed && latestLabel && (
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-white bg-gray-900 rounded px-1.5 py-0.5">
-                      {latestLabel}
+              <div className="relative">
+                {/* Custom focus ring, sized to just this wrapper's content
+                    (date row through excerpt) instead of the padded column
+                    around it, so it stops where the content visibly ends.
+                    Left is bled out much further than the other sides to
+                    clear the rail column (dot + connecting line) too. */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -top-1 -bottom-1.5 -right-3 -left-9 sm:-left-10 rounded-2xl opacity-0 group-focus-visible:opacity-100 shadow-[0_0_0_2px_var(--focus-ring)]"
+                />
+                {isGroupStart && item.date && (
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <span
+                      className={`text-xs sm:text-sm ${isPassed ? "text-gray-600 font-medium group-hover:text-gray-900 group-active:text-gray-900" : "text-gray-600 group-hover:text-gray-700 group-active:text-gray-700"}`}
+                    >
+                      {formatTimestamp(item.date, locale)}
                     </span>
-                  )}
-                </div>
-              )}
-              {isPassed ? (
-                <div className="flex gap-4 items-start">
-                  <div className="flex-1 min-w-0">
-                    {heading && (
-                      <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance">
-                        <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>
-                      </h3>
+                    {isPassed && latestLabel && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-white bg-gray-700 rounded px-1.5 py-0.5">
+                        {latestLabel}
+                      </span>
                     )}
-                    {excerpt && (
-                      <p className="text-sm text-gray-600 mb-2.5 group-hover:text-gray-700 group-active:text-gray-700">
-                        {excerpt}
-                      </p>
-                    )}
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600">
-                      {viewDetailsLabel}
-                      <ChevronRight
-                        className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
-                        strokeWidth={2}
-                      />
-                    </span>
                   </div>
-                  {item.previewImage && (
-                    <Thumb src={item.previewImage} size="lg" />
-                  )}
-                </div>
-              ) : (
-                <div className="flex gap-3 items-start">
-                  {item.previewImage && (
-                    <Thumb src={item.previewImage} size="md" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    {heading && (
-                      <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1">
-                        <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>{" "}
+                )}
+                {isPassed ? (
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-1 min-w-0">
+                      {heading && (
+                        <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance">
+                          <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>
+                        </h3>
+                      )}
+                      {excerpt && (
+                        <p className="text-sm text-gray-600 mb-2.5 group-hover:text-gray-700 group-active:text-gray-700">
+                          {excerpt}
+                        </p>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600">
+                        {viewDetailsLabel}
                         <ChevronRight
-                          className="inline-block w-3.5 h-4 align-[-3px] text-gray-300 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                          className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
                           strokeWidth={2}
                         />
-                      </h4>
-                    )}
-                    {excerpt && (
-                      <p className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-700 group-active:text-gray-700">
-                        {excerpt}
-                      </p>
+                      </span>
+                    </div>
+                    {item.previewImage && (
+                      <Thumb src={item.previewImage} size="lg" />
                     )}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="flex gap-3 items-start">
+                    {item.previewImage && (
+                      <Thumb src={item.previewImage} size="md" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      {heading && (
+                        <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1">
+                          <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>{" "}
+                          <ChevronRight
+                            className="inline-block w-3.5 h-4 align-[-3px] text-gray-300 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                            strokeWidth={2}
+                          />
+                        </h4>
+                      )}
+                      {excerpt && (
+                        <p className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-700 group-active:text-gray-700">
+                          {excerpt}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </button>
         );

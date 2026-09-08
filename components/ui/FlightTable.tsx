@@ -60,7 +60,7 @@ function TimeValue({
   if (!stack) {
     return (
       <span className="inline-flex items-baseline gap-1">
-        <span className="font-medium text-gray-900">{value || "–"}</span>
+        <span className="font-medium text-black">{value || "–"}</span>
         {value ? (
           <span className="text-[11px] font-normal text-gray-600">
             {TIME_ZONE_LABEL}
