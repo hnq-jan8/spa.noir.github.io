@@ -56,7 +56,7 @@ export default function EmptyState({
           <p className="text-base font-semibold text-gray-900">{t["title"]}</p>
         )}
         {t?.["description"] && (
-          <p className="mt-1 text-sm text-gray-500 max-w-sm">
+          <p className="mt-1 text-sm text-gray-600 max-w-sm">
             {t["description"]}
           </p>
         )}
@@ -64,7 +64,7 @@ export default function EmptyState({
           <button
             type="button"
             onClick={() => invalidateContent()}
-            className="inline-block mt-6 bg-black/5 text-sm text-gray-900 px-5 py-2 rounded-xl"
+            className="inline-block mt-6 btn-primary text-sm px-5 py-2 rounded-xl"
           >
             {t["retry"]}
           </button>

@@ -85,7 +85,7 @@ export default function HomeContent() {
       <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6">
         <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
         {data ? (
-          <div className="relative flex items-center gap-2 text-gray-500 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
+          <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
             {/* `aspect-square`, not `h-1.5` — with both width and height set
                 independently, fractional browser zoom can round them to
                 different physical pixel counts even though they're the same
@@ -116,11 +116,13 @@ export default function HomeContent() {
             // tiên. Nền trắng và hover vẫn y hệt mọi card khác.
             className="block border-l-4 border-l-gray-900 pt-5 pb-4"
           >
-            <p className="flex items-center gap-1.5 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-3">
+            <p className="flex items-center gap-1.5 text-gray-600 text-xs font-semibold uppercase tracking-wide mb-3">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
               {home["officialUpdateBadge"]}
             </p>
-            <h2 className="font-bold text-lg mb-2 text-balance">
+            {/* Cỡ chữ lớn nhất trang chủ: mọi thứ còn lại cố tình giữ giọng
+                trầm, nên tin mới nhất phải thắng cái nhìn đầu tiên. */}
+            <h2 className="font-bold text-xl sm:text-2xl mb-2 text-balance">
               {titleOf(latestUpdate)}
             </h2>
             {/* Shown whole: the editor already writes this short, so clipping
@@ -129,7 +131,7 @@ export default function HomeContent() {
               {excerptOf(latestUpdate)}
             </p>
             <div className="flex items-center justify-between text-xs mt-5">
-              <span className="text-gray-500">
+              <span className="text-gray-600">
                 {latestUpdate.date &&
                   formatTimestamp(latestUpdate.date, locale)}
               </span>
@@ -148,7 +150,7 @@ export default function HomeContent() {
             // Exception to the no-lines card rule: the dashed outline is what
             // reads as an empty slot. Silent on hover despite retrying on tap —
             // an affordance here would promise content that isn't there.
-            className="w-full flex items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-400 text-left"
+            className="w-full flex items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-600 text-left"
             onClick={() => invalidateContent()}
           >
             <Megaphone className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
@@ -162,7 +164,7 @@ export default function HomeContent() {
           the heading arriving first and reading as a separate element. */}
       <Reveal delay={50}>
         {data ? (
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+          <p className="text-xs text-gray-600 uppercase tracking-wide mb-2 mt-6 pl-1.5">
             {home["supportSection"]}
           </p>
         ) : (
@@ -172,7 +174,7 @@ export default function HomeContent() {
       <Reveal delay={50} className="relative mb-4">
         {data ? (
           <>
-            <div className="relative z-[2] bg-surface rounded-2xl p-6 card-shadow border border-gray-200">
+            <div className="relative z-[2] bg-surface rounded-2xl p-6 card-shadow">
               <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
                 {contacts.map(([key, value]) => {
                   const isEmail = value.includes("@");
@@ -181,12 +183,12 @@ export default function HomeContent() {
                     : `tel:${value.replace(/[^+\d]/g, "")}`;
                   return (
                     <div key={key}>
-                      <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
+                      <p className="text-xs text-gray-600 mb-1 uppercase tracking-wide">
                         {support[key]}
                       </p>
                       <a
                         href={href}
-                        className="text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
+                        className="focus-ring-gap text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
                       >
                         {value}
                       </a>
@@ -195,8 +197,10 @@ export default function HomeContent() {
                 })}
               </div>
             </div>
+            {/* Chìm hơn `surface` của card nằm trên một bậc rõ rệt, không thì
+                hai lớp dính vào nhau và dải này mất nghĩa "nằm dưới". */}
             {home["mediaNotice"] && (
-              <div className="relative z-[1] -mt-3.5 rounded-b-2xl bg-gray-200 px-6 pt-5 pb-2.5 flex gap-2.5 items-center">
+              <div className="relative z-[1] -mt-3.5 rounded-b-2xl bg-gray-300 px-6 pt-5 pb-2.5 flex gap-2.5 items-center">
                 <Info
                   className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5"
                   strokeWidth={2}
@@ -217,7 +221,7 @@ export default function HomeContent() {
           urgent update and the hotlines above. */}
       <Reveal delay={100}>
         {data ? (
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+          <p className="text-xs text-gray-600 uppercase tracking-wide mb-2 mt-6 pl-1.5">
             {home["browseSection"]}
           </p>
         ) : (
@@ -235,7 +239,7 @@ export default function HomeContent() {
               <Link
                 key={index}
                 href={item.href}
-                className="group flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-cardHover active:bg-cardHover"
+                className="group focus-ring-inset flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-cardHover active:bg-cardHover"
               >
                 <item.Icon
                   className="w-5 h-5 text-gray-400 flex-shrink-0 mr-1 sm:mr-2"
@@ -243,7 +247,7 @@ export default function HomeContent() {
                 />
                 <div className="flex-1 min-w-0">
                   <h2 className="font-semibold text-base">{item.label}</h2>
-                  <p className="text-sm text-gray-500">{item.desc}</p>
+                  <p className="text-sm text-gray-600">{item.desc}</p>
                 </div>
                 <ChevronRight
                   className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:translate-x-1 group-active:translate-x-1"
@@ -276,7 +280,7 @@ export default function HomeContent() {
                     />
                     <div>
                       <h2 className="font-semibold text-lg">{page.label}</h2>
-                      <p className="text-sm text-gray-500">{page.desc}</p>
+                      <p className="text-sm text-gray-600">{page.desc}</p>
                     </div>
                   </div>
                   <ChevronRight
@@ -306,7 +310,7 @@ export default function HomeContent() {
                   <h2 className="font-semibold text-lg">
                     {nav["pressReleases"]}
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-600">
                     {home["pressReleasesDesc"]}
                   </p>
                 </div>

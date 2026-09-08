@@ -11,7 +11,7 @@ import Reveal from "@/components/ui/Reveal";
  * a symmetric pill), since two conflicting utilities in one class string
  * race on stylesheet order rather than composing. */
 export const NOT_FOUND_ACTION_CLASS =
-  "mt-6 bg-black/5 hover:bg-black/10 active:bg-black/10 text-sm text-gray-900 py-2 rounded-xl";
+  "mt-6 btn-primary text-sm py-2 rounded-xl";
 
 export default function NotFoundLayout({
   title,
@@ -33,7 +33,7 @@ export default function NotFoundLayout({
           <p className="text-base font-semibold text-gray-900">{title}</p>
         )}
         {description && (
-          <p className="mt-1 text-sm text-gray-500 max-w-[300px] mx-auto">
+          <p className="mt-1 text-sm text-gray-600 max-w-[300px] mx-auto">
             {description}
           </p>
         )}

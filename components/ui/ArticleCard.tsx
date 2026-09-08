@@ -151,7 +151,7 @@ export default function ArticleCard({
           )}
           <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
             {badge && (
-              <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-3">
+              <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-3">
                 {badge}
               </p>
             )}
@@ -164,7 +164,7 @@ export default function ArticleCard({
               <p className="text-sm text-gray-600 line-clamp-3">{excerpt}</p>
             )}
             <div className="flex items-center justify-between gap-4 text-xs mt-4 -mr-1">
-              <span className="text-gray-500">
+              <span className="text-gray-600">
                 {article.date && formatTimestamp(article.date, locale)}
               </span>
               {readMoreLabel && (
@@ -199,7 +199,7 @@ export default function ArticleCard({
               {article.date && (
                 <div className="relative h-12 sm:h-14 flex flex-col justify-end px-3.5 pb-1 sm:px-4">
                   <div className="absolute inset-0 card-fade" />
-                  <p className="relative text-xs text-gray-500">
+                  <p className="relative text-xs text-gray-600">
                     {formatTimestamp(article.date, locale)}
                   </p>
                 </div>
@@ -225,7 +225,7 @@ export default function ArticleCard({
           // (ngày ghim sát trên, tiêu đề căn giữa phần còn lại), nền trắng.
           <div className="relative flex-1 pl-3.5 pr-3.5 sm:pl-4 sm:pr-4">
             {article.date && (
-              <p className="absolute top-2 sm:top-2.5 left-3.5 sm:left-4 text-xs text-gray-500">
+              <p className="absolute top-2 sm:top-2.5 left-3.5 sm:left-4 text-xs text-gray-600">
                 {formatTimestamp(article.date, locale)}
               </p>
             )}
@@ -269,7 +269,7 @@ export default function ArticleCard({
             >
               {article.date && (
                 <p
-                  className={`absolute text-xs text-gray-500 ${
+                  className={`absolute text-xs text-gray-600 ${
                     hasImage
                       ? "top-2 sm:top-2.5 left-3 sm:left-3.5"
                       : "top-3 sm:top-3.5 left-5 sm:left-6"
@@ -304,7 +304,7 @@ export default function ArticleCard({
             >
               {article.date && (
                 <p
-                  className={`text-xs text-gray-500 ${hideExcerpt ? "mb-1.5" : "mb-2.5"}`}
+                  className={`text-xs text-gray-600 ${hideExcerpt ? "mb-1.5" : "mb-2.5"}`}
                 >
                   {formatTimestamp(article.date, locale)}
                 </p>
@@ -317,7 +317,7 @@ export default function ArticleCard({
                 </h3>
               )}
               {excerpt && (
-                <p className="text-xs sm:text-sm text-gray-500">{excerpt}</p>
+                <p className="text-xs sm:text-sm text-gray-600">{excerpt}</p>
               )}
             </div>
           )}

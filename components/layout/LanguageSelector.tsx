@@ -219,8 +219,9 @@ export function DesktopLanguageSelector({
         aria-expanded={open}
         onClick={() => (open ? close() : onOpenChange(true))}
         // self-stretch để hit-area khớp vùng hover (container ngoài) — viên
-        // pill bo tròn chuyển xuống span con, chỉ còn là lớp hiển thị.
-        className="relative self-stretch flex items-center text-xs font-medium"
+        // pill bo tròn chuyển xuống span con, chỉ còn là lớp hiển thị, nên
+        // vòng focus cũng phải xuống theo nó (focus-ring-inner).
+        className="relative focus-ring-inner self-stretch flex items-center text-xs font-medium"
       >
         <span
           // Chỉ `width` (px đo sẵn) và nền animate; chữ chỉ mờ vào/ra, không
@@ -301,7 +302,7 @@ export function DesktopLanguageSelector({
                 href={`/${lang.code}${pathWithoutLocale}`}
                 onMouseEnter={() => setHoveredCode(lang.code)}
                 onMouseLeave={() => setHoveredCode(null)}
-                className={`flex items-center justify-between gap-3 h-11 px-4 text-sm whitespace-nowrap hover:bg-cardHover active:bg-cardHover ${
+                className={`focus-ring-inset flex items-center justify-between gap-3 h-11 px-4 text-sm whitespace-nowrap hover:bg-cardHover active:bg-cardHover ${
                   lang.code === locale ? "text-black" : "text-gray-700"
                 } ${index !== options.length - 1 ? "border-b border-gray-100" : ""}`}
               >

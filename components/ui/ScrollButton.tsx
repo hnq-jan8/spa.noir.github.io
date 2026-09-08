@@ -33,7 +33,9 @@ export default function ScrollButton({
       aria-label={label}
       aria-hidden={!active}
       tabIndex={active ? 0 : -1}
-      className={`transition-opacity duration-200 ${
+      // focus-ring-inner: vùng bấm rộng hơn hẳn mũi tên nên vòng focus phải
+      // ôm cái icon, không ôm cả vùng bấm.
+      className={`focus-ring-inner transition-opacity duration-200 ${
         active ? "opacity-100" : "opacity-0 pointer-events-none"
       } ${className}`}
     >

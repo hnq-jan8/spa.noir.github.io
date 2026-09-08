@@ -62,7 +62,7 @@ function TimeValue({
       <span className="inline-flex items-baseline gap-1">
         <span className="font-medium text-gray-900">{value || "–"}</span>
         {value ? (
-          <span className="text-[11px] font-normal text-gray-400">
+          <span className="text-[11px] font-normal text-gray-600">
             {TIME_ZONE_LABEL}
           </span>
         ) : null}
@@ -77,7 +77,7 @@ function TimeValue({
     >
       <span className="font-medium text-gray-900">{value || "–"}</span>
       <span
-        className={`text-[11px] font-normal text-gray-400${value ? "" : " invisible"}`}
+        className={`text-[11px] font-normal text-gray-600${value ? "" : " invisible"}`}
       >
         {TIME_ZONE_LABEL}
       </span>
@@ -113,7 +113,7 @@ export default function FlightTable({
                     <Plane className="w-4 h-4 text-gray-400" strokeWidth={2} />
                     {row.flightNo}
                   </span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                  <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
                     {row.note}
                   </span>
                 </div>
@@ -140,17 +140,17 @@ export default function FlightTable({
                 /* Nhãn dài: mỗi trường một dòng, nhãn trái – giá trị phải. */
                 <div className="divide-y divide-gray-100 border-t border-gray-100 mt-4 text-sm">
                   <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-                    <p className="text-xs text-gray-500">{h.date}</p>
+                    <p className="text-xs text-gray-600">{h.date}</p>
                     <p className="font-medium text-gray-900">
                       {formatFlightDate(row.date) || "–"}
                     </p>
                   </div>
                   <div className="flex items-start justify-between gap-4 px-4 pt-2 pb-1">
-                    <p className="text-xs text-gray-500 leading-5">{h.srtd}</p>
+                    <p className="text-xs text-gray-600 leading-5">{h.srtd}</p>
                     <TimeValue value={row.srtd} stack align="end" />
                   </div>
                   <div className="flex items-start justify-between gap-4 px-4 pt-2 pb-1">
-                    <p className="text-xs text-gray-500 leading-5">{h.atd}</p>
+                    <p className="text-xs text-gray-600 leading-5">{h.atd}</p>
                     <TimeValue value={row.atd} stack align="end" />
                   </div>
                 </div>
@@ -162,7 +162,7 @@ export default function FlightTable({
                   {/* Nhãn ở trên cùng để ba nhãn thẳng hàng; giá trị chiếm
                       phần còn lại và canh giữa. */}
                   <div className="flex flex-col">
-                    <p className="text-xs text-gray-500 mb-1">{h.date}</p>
+                    <p className="text-xs text-gray-600 mb-1">{h.date}</p>
                     {/* -3px: canh giữa hình học thì ngày trông trũng xuống. */}
                     <div className="flex-1 flex items-center justify-center -translate-y-[3px]">
                       <span className="font-medium text-gray-900">
@@ -171,13 +171,13 @@ export default function FlightTable({
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-xs text-gray-500 mb-1">{h.srtd}</p>
+                    <p className="text-xs text-gray-600 mb-1">{h.srtd}</p>
                     <div className="flex-1 flex items-center justify-center">
                       <TimeValue value={row.srtd} stack />
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-xs text-gray-500 mb-1">{h.atd}</p>
+                    <p className="text-xs text-gray-600 mb-1">{h.atd}</p>
                     <div className="flex-1 flex items-center justify-center">
                       <TimeValue value={row.atd} stack />
                     </div>
@@ -199,7 +199,7 @@ export default function FlightTable({
               <tr>
                 <th
                   scope="row"
-                  className="py-3 pr-8 font-medium text-gray-500 align-top whitespace-nowrap"
+                  className="py-3 pr-8 font-medium text-gray-600 align-top whitespace-nowrap"
                 >
                   {h.flightNo}
                 </th>
@@ -228,7 +228,7 @@ export default function FlightTable({
               <tr>
                 <th
                   scope="row"
-                  className="py-3 pr-8 font-medium text-gray-500 align-top whitespace-nowrap"
+                  className="py-3 pr-8 font-medium text-gray-600 align-top whitespace-nowrap"
                 >
                   {h.date}
                 </th>
@@ -239,7 +239,7 @@ export default function FlightTable({
               <tr>
                 <th
                   scope="row"
-                  className="py-3 pr-8 font-medium text-gray-500 align-top whitespace-nowrap"
+                  className="py-3 pr-8 font-medium text-gray-600 align-top whitespace-nowrap"
                 >
                   {h.srtd}
                 </th>
@@ -250,7 +250,7 @@ export default function FlightTable({
               <tr>
                 <th
                   scope="row"
-                  className="py-3 pr-8 font-medium text-gray-500 align-top whitespace-nowrap"
+                  className="py-3 pr-8 font-medium text-gray-600 align-top whitespace-nowrap"
                 >
                   {h.atd}
                 </th>
@@ -261,7 +261,7 @@ export default function FlightTable({
               <tr>
                 <th
                   scope="row"
-                  className="py-3 pr-8 font-medium text-gray-500 align-top whitespace-nowrap"
+                  className="py-3 pr-8 font-medium text-gray-600 align-top whitespace-nowrap"
                 >
                   {h.note}
                 </th>
@@ -348,7 +348,7 @@ export default function FlightTable({
                     <td className="py-3 pr-4 lg:pr-8 text-center">
                       <TimeValue value={row.atd} />
                     </td>
-                    <td className="py-3 pr-4 lg:pr-8 text-gray-500">
+                    <td className="py-3 pr-4 lg:pr-8 text-gray-600">
                       <span className="text-xs bg-gray-100 px-2 py-1 rounded">
                         {row.note}
                       </span>

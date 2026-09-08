@@ -91,7 +91,7 @@ export default function MobileMenu({
                   transitionDelay:
                     open && !langView ? `${100 + index * 50}ms` : "0ms",
                 }}
-                className={`flex items-center px-6 py-4 text-xl transition-[opacity,transform] duration-300 ease-out ${
+                className={`focus-ring-inset flex items-center px-6 py-4 text-xl transition-[opacity,transform] duration-300 ease-out ${
                   open && !langView
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-3"
@@ -136,7 +136,7 @@ export default function MobileMenu({
                   style={{
                     transitionDelay: langView ? `${100 + index * 50}ms` : "0ms",
                   }}
-                  className={`flex items-center justify-between px-6 py-4 text-xl transition-[opacity,transform] duration-300 ease-out ${
+                  className={`focus-ring-inset flex items-center justify-between px-6 py-4 text-xl transition-[opacity,transform] duration-300 ease-out ${
                     langView
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 translate-y-3"

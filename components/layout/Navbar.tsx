@@ -196,9 +196,11 @@ export default function Navbar({
               <Link
                 href={`/${locale}`}
                 // h-full: hit-area khớp chiều cao header, giống các tab bên
-                // cạnh, không chỉ khớp khung ảnh. transform-gpu: tránh Safari
-                // giật lúc crossfade nhanh với span nhãn bên dưới.
-                className={`group flex items-center h-full transform-gpu transition-opacity ease-out ${
+                // cạnh, không chỉ khớp khung ảnh — nên ring focus phải vẽ
+                // quanh cái logo, không quanh hit-area (focus-ring-inner).
+                // transform-gpu: tránh Safari giật lúc crossfade nhanh với
+                // span nhãn bên dưới.
+                className={`group focus-ring-inner flex items-center h-full transform-gpu transition-opacity ease-out ${
                   langOpen && menuOpen
                     ? "duration-100 opacity-0 pointer-events-none md:duration-300 md:opacity-100 md:pointer-events-auto"
                     : "duration-200 opacity-100"
@@ -218,13 +220,15 @@ export default function Navbar({
                   alt="SUN PhuQuoc Airways"
                   width={185}
                   height={43}
-                  className="h-7 md:h-9 w-auto transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)]"
+                  // `rounded-lg` không đổi gì về hình (logo nền trong suốt) —
+                  // nó ở đây để vòng focus bám theo được bo góc.
+                  className="h-7 md:h-9 w-auto rounded-lg transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)]"
                   priority
                 />
               </Link>
               {nav?.["selectLanguage"] && (
                 <span
-                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-400 transform-gpu transition-opacity ease-out ${
+                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-300 transform-gpu transition-opacity ease-out ${
                     langOpen && menuOpen
                       ? "duration-200 opacity-100"
                       : "duration-100 opacity-0 pointer-events-none"
@@ -260,7 +264,7 @@ export default function Navbar({
                           clearArticleRoute();
                           if (isActive) invalidateContent();
                         }}
-                        className={`text-xs whitespace-nowrap px-4 flex items-center relative flex-shrink-0 ${
+                        className={`focus-ring-inset text-xs whitespace-nowrap px-4 flex items-center relative flex-shrink-0 ${
                           isActive
                             ? "text-white font-medium bg-white/10"
                             : "text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium"
@@ -379,7 +383,7 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={toggleMenu}
-                className="relative h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white active:text-white"
+                className="relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white active:text-white"
                 aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
@@ -450,7 +454,7 @@ export default function Navbar({
             <Link
               href={`/${locale}`}
               onClick={() => clearArticleRoute()}
-              className="inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-900 active:text-gray-900"
+              className="focus-ring-gap inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-900 active:text-gray-900"
             >
               {nav?.["home"]}
             </Link>
@@ -468,7 +472,7 @@ export default function Navbar({
               }}
               // With an article open, "you are here" moves to the icon crumb and
               // this one drops back to a plain link.
-              className={`inline-flex items-center min-h-[24px] truncate hover:text-gray-600 active:text-gray-600 ${
+              className={`focus-ring-gap inline-flex items-center min-h-[24px] truncate hover:text-gray-600 active:text-gray-600 ${
                 openedArticle
                   ? "text-gray-700 hover:text-gray-900 active:text-gray-900"
                   : "font-medium"

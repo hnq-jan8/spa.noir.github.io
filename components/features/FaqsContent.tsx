@@ -57,7 +57,11 @@ function SearchField({
         placeholder={placeholder}
         aria-label={placeholder}
         // Gray, not amber — same fill a card gets on hover, not the accent.
-        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-500 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-400"
+        // `outline-none` chỉ dành cho ô nhập: trình duyệt tính ô text là
+        // `:focus-visible` kể cả khi bấm chuột, nên vòng focus chung sẽ hiện
+        // mọi lần bấm — thừa, vì con trỏ nháy đã là chỉ báo rõ nhất. Thay bằng
+        // viền đậm lên một nấc, cùng tông xám với vòng focus chung.
+        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-600 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-500"
       />
       {query && (
         <button
@@ -196,7 +200,11 @@ export default function FaqsContent() {
         }`}
       />
       <div
-        className={`md:hidden fixed top-16 right-4 z-20 h-[34px] rounded-full bg-white/75 backdrop-blur-md border border-gray-200 shadow-[0_0_5px_rgba(0,0,0,0.05)] overflow-hidden transition-[width] ${CAPSULE_TRANSITION} ${
+        // Trạng thái focus vẽ trên viên nang chứ không trên ô nhập: ô nhập chỉ
+        // là lớp chữ trong suốt nằm giữa viên, chỉ báo bám vào nó sẽ ra một
+        // khung chữ nhật lửng lơ. Lúc thu gọn thì nút mở nằm đè (input
+        // tabIndex -1) và tự vẽ ring của nó.
+        className={`md:hidden fixed top-16 right-4 z-20 h-[34px] rounded-full bg-white/75 backdrop-blur-md border border-gray-200 shadow-[0_0_5px_rgba(0,0,0,0.05)] overflow-hidden transition-[width] focus-within:border-gray-500 ${CAPSULE_TRANSITION} ${
           mobileSearchOpen ? "w-[calc(100vw-2rem)]" : "w-[34px]"
         }`}
       >
@@ -238,7 +246,7 @@ export default function FaqsContent() {
           tabIndex={mobileSearchOpen ? 0 : -1}
           // text-base (16px), not text-sm: iOS Safari auto-zooms the viewport on
           // focus for anything smaller, fighting the capsule's expand.
-          className={`absolute inset-y-0 left-9 right-9 bg-transparent text-base text-gray-900 placeholder:text-gray-500 focus:outline-none transition-opacity duration-150 ${
+          className={`absolute inset-y-0 left-9 right-9 bg-transparent text-base text-gray-900 placeholder:text-gray-600 focus:outline-none transition-opacity duration-150 ${
             mobileSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         />
@@ -322,7 +330,7 @@ export default function FaqsContent() {
               </p>
             )}
             {labels["noResultsHint"] && (
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-600">
                 {labels["noResultsHint"]}
               </p>
             )}

@@ -132,7 +132,7 @@ export default function TimelineCarousel({
               {isGroupStart && item.date && (
                 <div className="flex items-center gap-2 mb-2.5">
                   <span
-                    className={`text-xs sm:text-sm ${isPassed ? "text-gray-600 font-medium group-hover:text-gray-900 group-active:text-gray-900" : "text-gray-500 group-hover:text-gray-700 group-active:text-gray-700"}`}
+                    className={`text-xs sm:text-sm ${isPassed ? "text-gray-600 font-medium group-hover:text-gray-900 group-active:text-gray-900" : "text-gray-600 group-hover:text-gray-700 group-active:text-gray-700"}`}
                   >
                     {formatTimestamp(item.date, locale)}
                   </span>
@@ -184,7 +184,7 @@ export default function TimelineCarousel({
                       </h4>
                     )}
                     {excerpt && (
-                      <p className="text-xs sm:text-sm text-gray-500 group-hover:text-gray-700 group-active:text-gray-700">
+                      <p className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-700 group-active:text-gray-700">
                         {excerpt}
                       </p>
                     )}

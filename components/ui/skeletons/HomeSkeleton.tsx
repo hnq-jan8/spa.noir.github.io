@@ -35,12 +35,13 @@ export function LatestUpdateSkeleton() {
   return (
     <div className="bg-white border-l-4 border-l-gray-900/30 rounded-2xl pt-5 pb-4 px-6 card-shadow">
       {/* Từng khối lấy đúng line box của chữ nó thay: nhãn text-xs = 16,
-          tiêu đề text-lg = 28, mỗi dòng excerpt text-sm = 20, hàng cuối
-          text-xs = 16. Đặt bar mảnh vào giữa hộp đó, chứ không để bar tự
-          quyết chiều cao — lệch vài px mỗi khối là trang placeholder ngắn
-          hơn trang thật, và người đang cuộn dở bị kéo giật lên lúc bàn giao. */}
+          tiêu đề text-xl = 28 và sm:text-2xl = 32, mỗi dòng excerpt
+          text-sm = 20, hàng cuối text-xs = 16. Đặt bar mảnh vào giữa hộp đó,
+          chứ không để bar tự quyết chiều cao — lệch vài px mỗi khối là trang
+          placeholder ngắn hơn trang thật, và người đang cuộn dở bị kéo giật
+          lên lúc bàn giao. */}
       <SkeletonText box="h-4 mb-3" bar="h-3.5 w-32" />
-      <SkeletonText box="h-7 mb-2" bar="h-5 w-11/12" />
+      <SkeletonText box="h-7 sm:h-8 mb-2" bar="h-5 sm:h-6 w-11/12" />
       {/* Excerpt: 3 dòng dưới md, 2 dòng từ md trở lên — đúng cách câu tóm
           tắt ngắt dòng ở mỗi khổ màn hình. */}
       <div className="mb-2">
@@ -60,7 +61,7 @@ export function LatestUpdateSkeleton() {
 export function HotlinesSkeleton({ hasNotice }: { hasNotice: boolean }) {
   return (
     <>
-      <div className="relative z-[2] bg-surface rounded-2xl p-6 card-shadow border border-gray-200">
+      <div className="relative z-[2] bg-surface rounded-2xl p-6 card-shadow">
         <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
           {[0, 1, 2, 3].map((i) => (
             <div key={i}>
@@ -79,8 +80,8 @@ export function HotlinesSkeleton({ hasNotice }: { hasNotice: boolean }) {
         </div>
       </div>
       {hasNotice && (
-        <div className="relative z-[1] -mt-3.5 rounded-b-2xl bg-gray-200 px-6 pt-5 pb-2.5 flex gap-2.5 items-center">
-          <Skeleton className="w-4 h-4 flex-shrink-0 rounded-full skeleton-on-surface" />
+        <div className="relative z-[1] -mt-3.5 rounded-b-2xl bg-gray-300 px-6 pt-5 pb-2.5 flex gap-2.5 items-center">
+          <Skeleton className="w-4 h-4 flex-shrink-0 rounded-full skeleton-on-notice" />
           {/* text-xs + leading-relaxed = 19.5px/dòng. Dưới md câu lưu ý
               xuống 3 dòng, từ md trở lên vừa đúng một dòng — placeholder
               theo đúng cách chữ thật ngắt dòng ở mỗi khổ màn hình. */}
@@ -88,17 +89,17 @@ export function HotlinesSkeleton({ hasNotice }: { hasNotice: boolean }) {
             <SkeletonText
               box="h-[19.5px]"
               bar="h-3 w-full"
-              fill="skeleton-on-surface"
+              fill="skeleton-on-notice"
             />
             <SkeletonText
               box="h-[19.5px] md:hidden"
               bar="h-3 w-full"
-              fill="skeleton-on-surface"
+              fill="skeleton-on-notice"
             />
             <SkeletonText
               box="h-[19.5px] md:hidden"
               bar="h-3 w-2/3"
-              fill="skeleton-on-surface"
+              fill="skeleton-on-notice"
             />
           </div>
         </div>

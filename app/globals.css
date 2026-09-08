@@ -25,6 +25,35 @@
     @apply bg-surface text-gray-900 min-h-[100dvh];
   }
 
+  /* Vòng focus bàn phím dùng chung, thay cho ring xanh mặc định của trình
+     duyệt — màu duy nhất phá vỡ bảng trắng-đen. Màu đi theo NỀN gần nhất qua
+     biến kế thừa, nên panel trắng nằm trong header tối (dropdown ngôn ngữ) tự
+     lấy lại ring xám. `gray-400` là hết mức nhạt: dưới nữa tụt khỏi ngưỡng
+     tương phản 3:1 của chỉ báo giao diện. */
+  :root {
+    --focus-ring: theme(colors.gray.500);
+  }
+  .bg-chrome {
+    --focus-ring: theme(colors.gray.300);
+  }
+  .bg-white,
+  .bg-page,
+  .bg-surface {
+    --focus-ring: theme(colors.gray.500);
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    /* Ôm sát hình sẵn có: trên card/pill ring chạy đúng đường bo của chúng,
+       có khoảng hở là thành một đường bao thứ hai lửng lơ. */
+    outline-offset: 0;
+    /* Outline đi theo `border-radius` của phần tử, mà phần lớn thứ bấm được ở
+       đây không bo góc nên ring ra góc vuông — đây là bo góc cho các trường
+       hợp đó. Phải nằm ở layer `base`: `rounded-*` ở layer `utilities` đứng
+       sau, cùng độ đặc hiệu nên thắng, giữ nguyên bo góc thật của card/nút.
+       Nâng lên `components` là đè mất. */
+    border-radius: 8px;
+  }
+
   /* Bleed guard for CMS content (a wide table shouldn't pan the page).
      On `main`, not html/body — overflow on the root propagates to the
      viewport itself. `clip`, not `hidden`, so no scroll container is
@@ -51,7 +80,10 @@
   /* Shared card shadow: a very faint 0-offset glow to separate a card from
      the page background, no border (see components/ui/Card.tsx). A manual
      `md:` variant is defined alongside since Tailwind only auto-generates
-     responsive variants for its own utilities, not custom component classes. */
+     responsive variants for its own utilities, not custom component classes.
+     Đừng tăng số này lên cho card dễ thấy hơn — card ở đây không mang đường bao
+     nào, kể cả bóng. Muốn thẻ nổi hơn thì hạ độ sáng của nền quanh nó
+     (lib/theme-colors.js). */
   .card-shadow {
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.01);
   }
@@ -81,10 +113,10 @@
   .group:active .card-fade {
     background-image: linear-gradient(
       to top,
-      rgba(250, 250, 250, 1) 0%,
-      rgba(250, 250, 250, 0.85) 30%,
-      rgba(250, 250, 250, 0.45) 65%,
-      rgba(250, 250, 250, 0) 100%
+      rgba(235, 235, 235, 1) 0%,
+      rgba(235, 235, 235, 0.85) 30%,
+      rgba(235, 235, 235, 0.45) 65%,
+      rgba(235, 235, 235, 0) 100%
     );
   }
 
@@ -188,6 +220,47 @@
   }
   .skeleton-on-surface {
     @apply bg-gray-300/70;
+  }
+  /* Dải lưu ý báo chí dưới card hotline là bậc nền chìm nhất (bg-gray-300),
+     nên fill của hai bậc trên chìm mất ở đây. */
+  .skeleton-on-notice {
+    @apply bg-gray-400/70;
+  }
+
+  /* Cho phần tử trong khối `overflow-hidden`: outline luôn vẽ ra ngoài mép kể
+     cả khi offset bằng 0, nên vẫn bị cha cắt cụt — bản này kéo hẳn vào trong. */
+  .focus-ring-inset:focus-visible {
+    outline-offset: -2px;
+  }
+
+  /* Cho nút có vùng bấm cố ý rộng hơn hình nhìn thấy (logo, nút chọn ngôn ngữ
+     desktop, nút mũi tên cuộn, hamburger): ring vẽ trên chính nút sẽ ra khung
+     to lệch hẳn khỏi hình, nên chuyển sang phần tử con.
+     `:last-child` chứ không phải `*` vì vài nút còn chứa chấm báo chưa đọc
+     đứng trước. Không khai `border-radius` ở đây — con nào bo góc riêng thì
+     outline tự bám theo, khai vào là đè mất (selector này đặc hiệu hơn). */
+  .focus-ring-inner:focus-visible {
+    outline: none;
+  }
+  .focus-ring-inner:focus-visible > :last-child {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Cho link chữ trần: không có hình khối để ôm, ring bám sát chân chữ thì
+     chật. Nới bằng `outline-offset` chứ không phải padding — padding xê dịch
+     layout của cả cụm. */
+  .focus-ring-gap:focus-visible {
+    outline-offset: 3px;
+  }
+
+  /* Nấc nhấn mạnh cao nhất, và là nấc duy nhất trên mỗi trang: chỉ dùng cho
+     hành động chính khi trang không còn gì khác để làm (404, lỗi tải nội
+     dung); rải thêm là mất ý nghĩa. Nút phụ giữ dạng pill `bg-black/5`.
+     Không gói padding vào đây: nút có icon cần padding lệch (xem
+     NotFoundLayout). */
+  .btn-primary {
+    @apply bg-gray-900 text-white hover:bg-gray-700 active:bg-gray-700;
   }
 
   .pill-badge {

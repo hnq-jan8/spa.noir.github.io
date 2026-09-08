@@ -100,12 +100,12 @@ export default function Footer({
                   : `tel:${value.replace(/[^+\d]/g, "")}`;
                 return (
                   <div key={key}>
-                    <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
+                    <p className="text-xs text-gray-600 mb-1 uppercase tracking-wide">
                       {support[key]}
                     </p>
                     <a
                       href={href}
-                      className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
+                      className="focus-ring-gap inline-flex items-center text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
                     >
                       {value}
                     </a>
@@ -119,7 +119,7 @@ export default function Footer({
         {!data && !failed && <FooterSocialSkeleton />}
         {socialLinks.length > 0 && (
           <div className="mt-8">
-            <p className="text-xs text-gray-500 mb-3 uppercase tracking-wide">
+            <p className="text-xs text-gray-600 mb-3 uppercase tracking-wide">
               {footer?.["connectWithUs"]}
             </p>
             <div className="flex items-center gap-3 -ml-1">
@@ -148,7 +148,7 @@ export default function Footer({
         )}
 
         <div className="mt-8 pt-6 border-t border-black/10 flex flex-col items-start min-[400px]:flex-row min-[400px]:items-center justify-between gap-4">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-600">
             © {new Date().getFullYear()} Sun PhuQuoc Airways
           </p>
           <a

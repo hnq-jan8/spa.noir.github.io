@@ -28,7 +28,7 @@ export default function ArticleContent({ title, body }: ArticleContentProps) {
             <ArticleTitleSkeleton />
           ) : (
             <>
-              <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-4 text-balance">
+              <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-balance">
                 {title}
               </h1>
               <hr className="border-gray-300 mb-6" />

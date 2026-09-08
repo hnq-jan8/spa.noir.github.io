@@ -25,8 +25,8 @@ export function ArticleMetaSkeleton() {
 export function ArticleTitleSkeleton() {
   return (
     <>
-      <Skeleton className="skeleton-on-card h-8 md:h-9 w-11/12 mb-3" />
-      <Skeleton className="skeleton-on-card h-8 md:h-9 w-2/3 mb-4" />
+      <Skeleton className="skeleton-on-card h-9 md:h-11 w-11/12 mb-3" />
+      <Skeleton className="skeleton-on-card h-9 md:h-11 w-2/3 mb-4" />
       <hr className="border-gray-300 mb-6" />
     </>
   );
