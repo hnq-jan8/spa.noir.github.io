@@ -68,7 +68,7 @@ export async function downloadCmsAssets({ base, token, ids, destDir }) {
  */
 export function resolveBasePath() {
   const siteUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL || "https://hnq-jan8.github.io/spa.noir.github.io"
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ).replace(/\/$/, "");
   return new URL(siteUrl).pathname.replace(/\/$/, "");
 }
