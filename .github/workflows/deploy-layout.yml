@@ -48,9 +48,10 @@ jobs:
         env:
           DIRECTUS_URL: ${{ vars.DIRECTUS_URL }}
           DIRECTUS_STATIC_TOKEN: ${{ secrets.DIRECTUS_STATIC_TOKEN }}
-          # Bỏ trống -> domain GitHub Pages demo. Lên Azure: set repo var
-          # SITE_URL = URL công khai đầy đủ (vd https://emergency.sunphuquocairways.com)
-          NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL }}
+          # Bỏ trống -> fallback localhost trong next.config.mjs (basePath vỡ
+          # trên GitHub Pages project page). Set repo var NEXT_PUBLIC_SITE_URL
+          # = URL công khai đầy đủ, vd https://hnq-jan8.github.io/spa.noir.github.io
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
 
       - name: Save built site for content updates
         uses: actions/upload-artifact@v4
