@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronRight, ImageOff } from "lucide-react";
 import type { ResolvedArticle } from "@/lib/contentData";
+import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import { formatTimestamp } from "@/lib/siteData";
 
 /**
@@ -45,23 +46,17 @@ function PreviewImage({
   );
 }
 
-/**
- * Strips markdown *and* raw HTML (authors paste `<img>`/`<br>` into CMS
- * bodies) so an auto-generated excerpt reads as plain prose.
- */
+// body/description is WYSIWYG HTML (older rows: markdown) — strip both, then decode entities.
 function toPlainText(markdown: string) {
-  return markdown
+  const stripped = markdown
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/<[^>]*>/g, " ")
     .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
     .replace(/^\s{0,3}>\s?/gm, " ")
     .replace(/^\s{0,3}#{1,6}\s+/gm, " ")
-    .replace(/[*_`~]/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/[*_`~]/g, "");
+  return decodeHtmlEntities(stripped).replace(/\s+/g, " ").trim();
 }
 
 /**
@@ -82,7 +77,7 @@ export function titleOf(article: ResolvedArticle): string | null {
 
 export function excerptOf(article: ResolvedArticle, max = 180) {
   const explicit = article.previewExcerpt?.trim();
-  if (explicit) return explicit;
+  if (explicit) return decodeHtmlEntities(explicit);
   // No hand-written excerpt — fall back to the body.
   const plain = toPlainText(article.body);
   return plain.length > max ? `${plain.slice(0, max).trimEnd()}…` : plain;
