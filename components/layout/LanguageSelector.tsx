@@ -367,11 +367,7 @@ export function DesktopLanguageSelector({
             <div
               ref={highlightRef}
               aria-hidden
-              // `cardHover`: màu hover dùng chung toàn site. Ảnh nền tối xuyên
-              // qua lớp blur của container có thể làm nó chìm, nên thêm quầng
-              // sáng trắng (`shadow`) đỡ lưng — `overflow-hidden` ở container
-              // cha tự cắt quầng này theo bo góc, không tràn ra ngoài dropdown.
-              className={`absolute inset-x-2 top-2 h-10 rounded-2xl bg-cardHover shadow-[0_0_24px_10px_rgba(255,255,255,0.8)] transition-[transform,opacity] duration-150 ease-out ${
+              className={`absolute inset-x-2 top-2 h-10 rounded-2xl bg-cardHover shadow-[0_0_0.5px_1.5px_rgba(255,255,255,0.6)] transition-[transform,opacity] duration-150 ease-out ${
                 hoveredIndex >= 0 ? "opacity-100" : "opacity-0"
               }`}
               style={{
