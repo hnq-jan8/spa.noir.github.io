@@ -283,6 +283,16 @@
   }
 }
 
+/* Header dùng `fixed` từ md: trở lên (xem Navbar.tsx) — khi in, trình duyệt
+   tính lại vị trí `fixed` theo khổ giấy thay vì viewport, cắt header vỡ vụn ở
+   hai mép trang. Trang in không cần thanh điều hướng nên ẩn hẳn, đỡ phải vá
+   riêng vị trí fixed cho từng trình duyệt. */
+@media print {
+  header {
+    display: none !important;
+  }
+}
+
 @keyframes skeleton-sweep {
   100% {
     transform: translateX(100%);

@@ -108,6 +108,12 @@ function CircledCheckIcon({ active }: { active: boolean }) {
   );
 }
 
+// h-10 trên từng item dropdown — dùng để tính vị trí trượt của highlight.
+const ITEM_HEIGHT = 40;
+// Phải khớp với `duration-150` trên className của highlight bên dưới — dùng
+// để hẹn giờ đánh dấu "đã tắt hẳn" đúng lúc fade xong (xem `handleItemLeave`).
+const HIGHLIGHT_FADE_MS = 150;
+
 interface LanguageSelectorProps {
   locale: string;
   pathWithoutLocale: string;
@@ -136,8 +142,55 @@ export function DesktopLanguageSelector({
   // Ngôn ngữ đang rê chuột tới: chữ trên pill đổi theo (xem `pillLabel`).
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Vị trí highlight lúc rời hẳn khỏi danh sách (hoveredCode -> null): giữ
+  // nguyên đây thay vì tụt về 0, để nó mờ dần đúng tại chỗ thay vì nhảy lên
+  // đầu danh sách rồi mới biến mất.
+  const lastHoveredIndexRef = useRef(0);
+  // Highlight trong dropdown: đổi chỗ có trượt hay không tuỳ đã tắt hẳn
+  // (hết fade) hay chưa — xem `handleItemEnter`/`handleItemLeave`.
+  const highlightRef = useRef<HTMLDivElement>(null);
+  const highlightFullyHiddenRef = useRef(true);
+  const highlightHideTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => () => clearTimeout(highlightHideTimeoutRef.current), []);
+  const handleItemEnter = (code: string) => {
+    clearTimeout(highlightHideTimeoutRef.current);
+    if (highlightFullyHiddenRef.current && highlightRef.current) {
+      // Đã tắt hẳn từ trước — tắt riêng transition của `transform` một nhịp
+      // để nó xuất hiện thẳng tại ô mới, không trượt từ vị trí cũ nữa. Phải
+      // đợi ĐỦ HAI rAF: React commit `transform` mới qua microtask (trước
+      // rAF), nhưng rAF đầu vẫn chạy trước khi trình duyệt kịp SƠN khung
+      // hình đã tắt transition đó — bật lại transition ngay ở rAF đầu coi
+      // như chưa từng tắt, vẫn trượt như thường. rAF thứ hai (lồng bên
+      // trong) mới chắc chắn chạy sau khi khung hình "nhảy tại chỗ" đã vẽ.
+      highlightRef.current.style.transition = `opacity ${HIGHLIGHT_FADE_MS}ms ease-out`;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (highlightRef.current) highlightRef.current.style.transition = "";
+        });
+      });
+    }
+    highlightFullyHiddenRef.current = false;
+    setHoveredCode(code);
+  };
+  const handleItemLeave = () => {
+    setHoveredCode(null);
+    // Hết `HIGHLIGHT_FADE_MS` (khớp transition opacity của highlight) coi như
+    // đã tắt hẳn. Bị huỷ ngay nếu rê sang ô khác kịp lúc (xem `handleItemEnter`),
+    // nên chỉ thực sự đánh dấu khi rời hẳn dropdown.
+    highlightHideTimeoutRef.current = setTimeout(() => {
+      highlightFullyHiddenRef.current = true;
+    }, HIGHLIGHT_FADE_MS);
+  };
   const close = () => {
     setHoveredCode(null);
+    // Vuốt scroll (không phải tap) không phát `mouseleave` bù cho
+    // `mouseenter` giả lập lúc chạm mở dropdown — reset thủ công, không thì
+    // pill kẹt sáng như đang hover dù dropdown đã đóng.
+    setHovering(false);
+    // Cả dropdown vừa biến mất — lần mở lại sau luôn phải snap, không trượt
+    // từ vị trí hover dở dang trước khi đóng.
+    clearTimeout(highlightHideTimeoutRef.current);
+    highlightFullyHiddenRef.current = true;
     onOpenChange(false);
   };
   useDismissOnOutside(containerRef, open, close);
@@ -198,6 +251,11 @@ export function DesktopLanguageSelector({
       ? (bundledLabels(hoveredCode, "nav")["selectLanguage"] ??
         selectLanguageLabel)
       : selectLanguageLabel;
+
+  const hoveredIndex = options.findIndex((lang) => lang.code === hoveredCode);
+  if (hoveredIndex >= 0) lastHoveredIndexRef.current = hoveredIndex;
+  const highlightIndex =
+    hoveredIndex >= 0 ? hoveredIndex : lastHoveredIndexRef.current;
 
   const allSelectLanguageLabels = [
     selectLanguageLabel,
@@ -280,7 +338,10 @@ export function DesktopLanguageSelector({
         // `pointer-events-none`: rê chuột vào dải đó vẫn đóng menu — thẻ
         // trắng bên trong tự bật lại `pointer-events-auto`.
         style={{ width: size?.open }}
-        className={`absolute top-full -right-5 box-content px-5 pt-3 z-50 pointer-events-none [transition:opacity_0s,visibility_0s] ${
+        // pt-2.5 (10px) = khoảng cách từ pill (h-9, giữa container cao h-14)
+        // xuống cạnh dưới navbar, để dropdown cách cạnh dưới navbar đúng
+        // bằng khoảng pill cách cạnh dưới đó.
+        className={`absolute top-full -right-5 box-content px-5 pt-2.5 z-50 pointer-events-none [transition:opacity_0s,visibility_0s] ${
           open ? "visible opacity-100" : "invisible opacity-0"
         }`}
       >
@@ -293,18 +354,37 @@ export function DesktopLanguageSelector({
             cong, bớt layout recalc — mẹo của lib/expandTransition. */}
         <div
           style={{ height: open && size ? size.h : 0 }}
-          className="pointer-events-auto overflow-hidden rounded-[20px] bg-white shadow-[0_0_16px_rgba(0,0,0,0.12)] [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
+          className="pointer-events-auto overflow-hidden rounded-[24px] bg-white/80 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.14)] [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
         >
-          <div ref={listRef}>
-            {options.map((lang, index) => (
+          {/* p-2 (8px) quanh danh sách: margin 2 bên và trên/dưới (item
+              đầu/cuối) đều bằng nhau, không có gap giữa các item. rounded-2xl
+              (16px) trên khối hover = bo góc khối trắng (24px) − margin (8px). */}
+          <div ref={listRef} className="relative flex flex-col p-2">
+            {/* Một khối nền duy nhất trượt theo `hoveredIndex`, thay vì mỗi
+                dòng tự tô hover riêng — mượt hơn khi rê chuột qua các dòng
+                liên tiếp. `z-10` trên Link để chữ/icon luôn nổi trên khối
+                này (absolute mặc định vẽ sau nội dung tĩnh cùng cấp). */}
+            <div
+              ref={highlightRef}
+              aria-hidden
+              // `cardHover`: màu hover dùng chung toàn site. Ảnh nền tối xuyên
+              // qua lớp blur của container có thể làm nó chìm, nên thêm quầng
+              // sáng trắng (`shadow`) đỡ lưng — `overflow-hidden` ở container
+              // cha tự cắt quầng này theo bo góc, không tràn ra ngoài dropdown.
+              className={`absolute inset-x-2 top-2 h-10 rounded-2xl bg-cardHover shadow-[0_0_24px_10px_rgba(255,255,255,0.8)] transition-[transform,opacity] duration-150 ease-out ${
+                hoveredIndex >= 0 ? "opacity-100" : "opacity-0"
+              }`}
+              style={{
+                transform: `translateY(${highlightIndex * ITEM_HEIGHT}px)`,
+              }}
+            />
+            {options.map((lang) => (
               <Link
                 key={lang.code}
                 href={`/${lang.code}${pathWithoutLocale}`}
-                onMouseEnter={() => setHoveredCode(lang.code)}
-                onMouseLeave={() => setHoveredCode(null)}
-                className={`focus-ring-inset flex items-center justify-between gap-3 h-11 px-4 text-sm whitespace-nowrap hover:bg-cardHover active:bg-cardHover ${
-                  lang.code === locale ? "text-black" : "text-gray-700"
-                } ${index !== options.length - 1 ? "border-b border-gray-100" : ""}`}
+                onMouseEnter={() => handleItemEnter(lang.code)}
+                onMouseLeave={handleItemLeave}
+                className="focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 rounded-2xl text-sm text-black whitespace-nowrap"
               >
                 {lang.label}
                 <CircledCheckIcon active={lang.code === locale} />
@@ -319,11 +399,11 @@ export function DesktopLanguageSelector({
         aria-hidden
         className="absolute top-full right-0 invisible -z-10 pointer-events-none"
       >
-        <div ref={measureListRef}>
+        <div ref={measureListRef} className="flex flex-col p-2">
           {options.map((lang) => (
             <div
               key={lang.code}
-              className="flex items-center justify-between gap-3 h-11 px-4 text-sm whitespace-nowrap"
+              className="flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 text-sm whitespace-nowrap"
             >
               {lang.label}
               <CircledCheckIcon active={lang.code === locale} />
