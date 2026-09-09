@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node scripts/generate-i18n.mjs && next dev",
     "build": "node scripts/generate-i18n.mjs && node scripts/fetch-cms-assets.mjs && rm -rf .next/cache/fetch-cache && BUILD_TIMESTAMP=$(node -e \"console.log(new Date().toISOString())\") next build",
-    "preview": "rm -rf .preview && mkdir .preview && cp -R out .preview/spa.noir.github.io && python3 -m http.server ${PORT:-4173} -d .preview",
+    "preview": "python3 -m http.server ${PORT:-4173} -d out",
     "start": "next start"
   },
   "dependencies": {

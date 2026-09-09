@@ -380,7 +380,7 @@ export function DesktopLanguageSelector({
                 href={`/${lang.code}${pathWithoutLocale}`}
                 onMouseEnter={() => handleItemEnter(lang.code)}
                 onMouseLeave={handleItemLeave}
-                className="focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 rounded-2xl text-sm text-black whitespace-nowrap"
+                className="focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 rounded-2xl text-sm text-black whitespace-nowrap active:bg-cardHover"
               >
                 {lang.label}
                 <CircledCheckIcon active={lang.code === locale} />
