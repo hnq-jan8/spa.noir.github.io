@@ -44,6 +44,19 @@ function resolveCmsAsset(id: string | null): string | null {
   return assetUrl(id);
 }
 
+// Chỉ dùng khi CMS chết mà cũng chưa có bản chụp nào — lượt build đầu tiên sau
+// khi thêm cơ chế chụp. Để trống chứ không bịa: trang ra không <title>/<meta
+// description>, logo rơi về public/logo.svg, nội dung không ảnh hưởng. Một
+// lượt build lành là có bản chụp, hố này đóng vĩnh viễn. `official_site_url`
+// rỗng vô hại vì nhánh này chỉ chạy khi active=true.
+const BLANK_METADATA: SiteMetadata = {
+  official_site_url: "",
+  favicon: null,
+  logo_on_black: null,
+  logo_on_white: null,
+  translations: [],
+};
+
 // `active` quyết định lúc build: 0 thì toàn bộ site chỉ render redirect về
 // official_site_url, không build nội dung Dark Site thật.
 export async function getBuildMode(): Promise<BuildMode> {
@@ -59,17 +72,26 @@ export async function getBuildMode(): Promise<BuildMode> {
     active = Boolean(setting.active);
     meta = fresh;
   } catch (err) {
-    // Cần CẢ HAI: bản chụp site_metadata do prebuild ghi, và `active` của site
-    // đang live. Thiếu một thì thà hỏng còn hơn đoán — đoán sai `active` là
-    // biến cả site thành trang redirect, hoặc dựng lại site khẩn cấp lẽ ra đã
-    // phải tắt.
+    // `active` thì tuyệt đối không đoán: đoán sai là biến cả site thành trang
+    // redirect, hoặc dựng lại site khẩn cấp lẽ ra đã phải tắt. status.json của
+    // bản live nói đúng site đang làm gì, không có nó thì thà hỏng.
+    const status = await fetchLiveStatus();
+    if (!status) throw err;
+
+    // Bản chụp site_metadata thì được phép thiếu. Nó do prebuild ghi nên lượt
+    // build ĐẦU TIÊN gặp lúc CMS chết sẽ chưa có bản nào — bắt buộc phải có nó
+    // là tự trói mình vào thứ chỉ tồn tại khi không cần tới.
     const snapshot = readMetadataSnapshot(resolve(process.cwd(), "public"));
-    const status = snapshot ? await fetchLiveStatus() : null;
-    if (!snapshot || !status) throw err;
+
+    // Ngoại lệ duy nhất: site đang tắt thì cả trang chỉ là cú redirect sang
+    // official_site_url, mà địa chỉ đó nằm trong site_metadata. Không biết đích
+    // thì deploy ra một trang redirect đi đâu không rõ — thà hỏng.
+    if (!snapshot && !status.active) throw err;
+
     active = status.active;
-    meta = snapshot;
+    meta = snapshot ?? BLANK_METADATA;
     console.warn(
-      `⚠ Directus site_metadata fetch failed during build (${err instanceof Error ? err.message : err}) — dùng bản chụp của lượt prebuild gần nhất, active=${active} lấy từ status.json của site live.`,
+      `⚠ Directus site_metadata fetch failed during build (${err instanceof Error ? err.message : err}) — active=${active} lấy từ status.json của site live, metadata ${snapshot ? "dùng bản chụp của lượt prebuild gần nhất" : "để trống (chưa có bản chụp nào): SEO/logo rơi về mặc định, nội dung không ảnh hưởng"}.`,
     );
   }
 

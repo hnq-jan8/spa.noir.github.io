@@ -1,7 +1,3 @@
-import { readFileSync, writeFileSync, unlinkSync } from "fs";
-import { tmpdir } from "os";
-import { join } from "path";
-
 /**
  * fetch() tới Directus dùng chung cho ba script prebuild và lib/directus.ts.
  * Thêm những thứ fetch trần không có: hạn giờ mỗi lần gọi, thử lại lỗi tự hết,
@@ -29,44 +25,13 @@ function isRetryable(status) {
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Cầu dao. Một lượt build gọi Directus hàng trăm lượt (đo được 139 lượt khi CMS
-// chết); để lượt nào cũng đi hết 3 lần × 30s thì riêng phần ngồi chờ đã kéo
-// build dài hàng chục phút, mà kết cục vẫn là rơi về fallback. Hỏng hết lượt
-// một lần = coi như CMS chết, từ đó chỉ thử một phát với hạn ngắn — vẫn thử,
-// phòng khi nó sống lại giữa chừng.
-//
-// Dấu ghi ra FILE chứ không để trong RAM, vì `pnpm build` là ba tiến trình Node
-// tách biệt và next build còn tự đẻ worker riêng; không chia dấu thì mỗi tiến
-// trình lại trả giá 98s để khám phá lại đúng một sự thật.
+// Cầu dao trong tiến trình. Một lượt build gọi Directus hàng trăm lượt (đo được
+// 139 lượt khi CMS chết); để lượt nào cũng đi hết 3 lần × 30s thì riêng phần
+// ngồi chờ đã kéo build dài hàng chục phút, mà kết cục vẫn là rơi về fallback.
+// Hỏng hết lượt một lần = coi như CMS chết, từ đó chỉ thử một phát với hạn ngắn
+// — vẫn thử, phòng khi nó sống lại giữa chừng.
 const TRIPPED_TIMEOUT_MS = 5_000;
-// Đủ dài cho một lượt build, đủ ngắn để dấu không đè sang lượt sau.
-const MARKER_TTL_MS = 10 * 60_000;
-const DOWN_MARKER = join(tmpdir(), "darksite-directus-down");
-
 let circuitOpen = false;
-
-function isCircuitOpen() {
-  if (circuitOpen) return true;
-  try {
-    const at = Number(readFileSync(DOWN_MARKER, "utf-8"));
-    if (Date.now() - at < MARKER_TTL_MS) return true;
-  } catch {}
-  return false;
-}
-
-function tripCircuit() {
-  circuitOpen = true;
-  try {
-    writeFileSync(DOWN_MARKER, String(Date.now()));
-  } catch {}
-}
-
-function resetCircuit() {
-  circuitOpen = false;
-  try {
-    unlinkSync(DOWN_MARKER);
-  } catch {}
-}
 
 // Dò `/server/ping` (public, không cần token) một lần mỗi tiến trình, trước khi
 // tốn 30s×3 cho query thật. Phép dò chỉ được MỞ cầu dao, không bao giờ đóng:
@@ -78,14 +43,14 @@ let probe = null;
 
 function ensureProbed(origin) {
   probe ??= (async () => {
-    if (isCircuitOpen()) return; // đã biết nó chết rồi, khỏi dò
+    if (circuitOpen) return; // đã biết nó chết rồi, khỏi dò
     try {
       const res = await fetch(`${origin}/server/ping`, {
         signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
       });
-      if (!res.ok) tripCircuit();
+      if (!res.ok) circuitOpen = true;
     } catch {
-      tripCircuit();
+      circuitOpen = true;
     }
   })();
   return probe;
@@ -100,7 +65,7 @@ function ensureProbed(origin) {
  * @returns {Promise<Response>}
  */
 export async function directusFetch(url, opts = {}) {
-  // Phải đứng trước phần đọc `isCircuitOpen()` bên dưới — phép dò có thể vừa
+  // Phải đứng trước phần đọc `circuitOpen` bên dưới — phép dò có thể vừa
   // mở cầu dao, và ngân sách chờ chốt theo trạng thái sau đó.
   await ensureProbed(new URL(url).origin);
 
@@ -108,8 +73,8 @@ export async function directusFetch(url, opts = {}) {
     token = "",
     init = {},
     label = url,
-    timeoutMs = isCircuitOpen() ? TRIPPED_TIMEOUT_MS : DEFAULT_TIMEOUT_MS,
-    attempts = isCircuitOpen() ? 1 : DEFAULT_ATTEMPTS,
+    timeoutMs = circuitOpen ? TRIPPED_TIMEOUT_MS : DEFAULT_TIMEOUT_MS,
+    attempts = circuitOpen ? 1 : DEFAULT_ATTEMPTS,
   } = opts;
 
   for (let attempt = 1; ; attempt++) {
@@ -134,7 +99,7 @@ export async function directusFetch(url, opts = {}) {
       const reason =
         err?.name === "TimeoutError" ? `quá ${timeoutMs}ms` : err?.message;
       if (isLast) {
-        tripCircuit();
+        circuitOpen = true;
         throw new Error(`Directus ${label} → ${reason}`, { cause: err });
       }
       console.warn(
@@ -145,13 +110,13 @@ export async function directusFetch(url, opts = {}) {
     }
 
     if (res.ok) {
-      resetCircuit(); // CMS trả lời được = sống lại, mở lại full retry
+      circuitOpen = false; // CMS trả lời được = sống lại, mở lại full retry
       return res;
     }
     if (isLast || !isRetryable(res.status)) {
       // Chỉ hết lượt vì 5xx/timeout mới là CMS chết — 401/403/404 ném ngay từ
       // lần đầu và không nói gì về việc nó còn sống hay không.
-      if (isLast && isRetryable(res.status)) tripCircuit();
+      if (isLast && isRetryable(res.status)) circuitOpen = true;
       throw new Error(`Directus ${label} → ${res.status}`);
     }
     console.warn(
