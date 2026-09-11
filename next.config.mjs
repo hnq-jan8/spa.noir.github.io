@@ -13,6 +13,11 @@ const nextConfig = {
   output: "export",
   trailingSlash: true,
   basePath,
+  // Mặc định 60s, ngắn hơn chuỗi retry của scripts/directus-fetch.mjs: lúc CMS
+  // treo, Next bắn SIGTERM giữa chừng nên trang không bao giờ tới được bước rơi
+  // về fallback, worker mới lại đếm từ đầu, ba vòng rồi fail cả build. Nới cho
+  // chuỗi đó chạy trọn; trang lành vẫn render trong vài trăm ms.
+  staticPageGenerationTimeout: 180,
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_SITE_URL: siteUrl,
