@@ -19,8 +19,10 @@ function PreviewImage({
   alt: string;
   className: string;
 }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "failed">(
+    "loading",
+  );
+  if (status === "failed") {
     return (
       <div
         className={`${className} bg-gray-200 flex items-center justify-center overflow-hidden`}
@@ -33,14 +35,19 @@ function PreviewImage({
   // The hover zoom needs this fixed, overflow-hidden box to crop against —
   // on the <img> alone it grows into the text column instead of zooming.
   return (
-    <div className={`${className} overflow-hidden bg-gray-100`}>
+    <div className={`${className} overflow-hidden bg-gray-200`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
         loading="lazy"
-        onError={() => setFailed(true)}
-        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        onLoad={() => setStatus("loaded")}
+        onError={() => setStatus("failed")}
+        // Trước khi tải xong ẩn <img> đi (opacity-0) thay vì để trình duyệt tự
+        // vẽ icon "ảnh vỡ" mặc định đè lên nền xám — chỉ hiện khi đã load xong.
+        className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+          status === "loading" ? "opacity-0" : ""
+        }`}
       />
     </div>
   );
