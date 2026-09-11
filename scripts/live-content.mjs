@@ -32,6 +32,28 @@ export async function fetchLiveContent() {
 }
 
 /**
+ * status.json của site live. Khi CMS chết thì đây là nguồn duy nhất còn lại cho
+ * `active` (giữ nguyên hiện trạng thay vì đoán) và cho `since` — mốc nội dung
+ * của bản đang chạy.
+ *
+ * @returns {Promise<{active: boolean, since?: string}|null>}
+ */
+export async function fetchLiveStatus() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) return null;
+  try {
+    const res = await fetch(`${siteUrl.replace(/\/$/, "")}/status.json`, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) return null;
+    const status = await res.json();
+    return typeof status?.active === "boolean" ? status : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Đảo content.json về lại dạng row của ui_labels. Label trong đó nằm rải theo
  * từng section (`common.labels`, `faqs.labels`, ...) dưới dạng
  * namespace -> key -> locale -> value; xem scripts/content-payload.mjs.

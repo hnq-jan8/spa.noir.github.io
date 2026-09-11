@@ -84,7 +84,11 @@ export default function HomeContent() {
           either element, the pill sits too close to the card below it. */}
       <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6">
         <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
-        {data ? (
+        {/* Ba trạng thái chứ không hai: có mốc -> pill; chưa có data ->
+            skeleton; có data mà không mốc -> giấu hẳn, vì nhãn cụt kèm chấm
+            "đang sống" là sai, mà skeleton quay mãi cũng sai. Trường hợp cuối
+            đến từ emptyContentPayload() trong lib/buildContentPayload.ts. */}
+        {data && asOf ? (
           <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
             {/* `aspect-square`, not `h-1.5` — with both width and height set
                 independently, fractional browser zoom can round them to
@@ -99,7 +103,7 @@ export default function HomeContent() {
               <span className="whitespace-nowrap">{asOf}</span>
             </p>
           </div>
-        ) : (
+        ) : data ? null : (
           <AsOfPillSkeleton />
         )}
       </div>

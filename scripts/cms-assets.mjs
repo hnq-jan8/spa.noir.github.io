@@ -59,6 +59,31 @@ export async function downloadCmsAssets({ base, token, ids, destDir }) {
 }
 
 /**
+ * Bản chụp site_metadata của lượt prebuild gần nhất, để `next build` còn cái mà
+ * dùng khi CMS chết (xem lib/buildMode.ts). Để cạnh manifest.json vì cùng vòng
+ * đời: cùng do prebuild ghi, cùng sống qua các lượt chạy, cùng mất nếu ai đó
+ * dọn sạch public/cms-assets/.
+ */
+const METADATA_SNAPSHOT = "site-metadata.json";
+
+export function saveMetadataSnapshot(destDir, metadata) {
+  const dir = resolve(destDir, "cms-assets");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(resolve(dir, METADATA_SNAPSHOT), JSON.stringify(metadata));
+}
+
+/** @returns {any|null} null nếu chưa có bản chụp nào. */
+export function readMetadataSnapshot(destDir) {
+  try {
+    return JSON.parse(
+      readFileSync(resolve(destDir, "cms-assets", METADATA_SNAPSHOT), "utf-8"),
+    );
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Suy ra basePath giống hệt logic trong next.config.mjs, để đường dẫn
  * /cms-assets/... khớp với site deploy dưới subpath (GitHub Pages project page).
  */

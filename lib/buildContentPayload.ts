@@ -11,7 +11,7 @@ import {
 } from "@/lib/directus";
 import type { ContentPayload } from "@/lib/contentData";
 import { assembleContentPayload } from "../scripts/content-payload.mjs";
-import { fetchLiveContent } from "../scripts/live-content.mjs";
+import { fetchLiveContent, fetchLiveStatus } from "../scripts/live-content.mjs";
 
 // Cache trong tiến trình build — phòng buildContentPayload() bị gọi nhiều
 // lần trong cùng một route/worker (tránh gọi lại Directus không cần thiết).
@@ -31,9 +31,15 @@ function fallbackLanguages(): { code: string; name: string }[] {
   }
 }
 
-function emptyContentPayload(): ContentPayload {
+/**
+ * @param since Mốc nội dung của bản đang live, "" nếu không moi ra được (khi
+ *   đó trang chủ giấu pill). Tuyệt đối đừng đóng dấu giờ build vào đây: payload
+ *   rỗng mang mốc mới là client đang giữ cache TỐT sẽ tưởng có nội dung mới
+ *   (useContentData so `generatedAt` với `since`) rồi tự thay bằng bản rỗng.
+ */
+function emptyContentPayload(since: string): ContentPayload {
   return {
-    generatedAt: process.env.BUILD_TIMESTAMP ?? new Date().toISOString(),
+    generatedAt: since,
     common: {
       contacts: {
         passengerHotline: "",
@@ -97,11 +103,16 @@ export async function buildContentPayload(): Promise<ContentPayload> {
     // content.json/status.json là JSON tĩnh, refresh lại được sau (xem
     // scripts/fetch-json.mjs, deploy-content.yml) — Directus sập giữa lúc
     // build không nên làm fail cả layout.
+    //
+    // `stale` mang sẵn `generatedAt` của nó nên mốc nội dung đứng yên đúng như
+    // bản đang live, chỉ `buildId` là mới (xem status.json/route.ts). Không lấy
+    // được content.json thì `since` trong status.json cũng chính là mốc đó.
     const stale = await fetchLiveContent();
+    const since = stale?.generatedAt ?? (await fetchLiveStatus())?.since ?? "";
     console.warn(
       `⚠ Directus content fetch failed during build (${err instanceof Error ? err.message : err}) — ${stale ? "reusing the live site's last content.json" : "deploying layout with an empty content.json"}; a later content update will refill it.`,
     );
-    cached = stale ?? emptyContentPayload();
+    cached = stale ?? emptyContentPayload(since);
   }
   return cached;
 }

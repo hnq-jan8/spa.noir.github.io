@@ -9,8 +9,9 @@
  */
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { downloadCmsAssets } from "./cms-assets.mjs";
+import { downloadCmsAssets, saveMetadataSnapshot } from "./cms-assets.mjs";
 import { directusGet } from "./directus-fetch.mjs";
+import { SITE_METADATA_QUERY } from "./directus-queries.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -23,17 +24,44 @@ try {
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
 
-const metadata = await directusGet(
-  BASE,
-  "/items/site_metadata/1?fields=favicon,logo_on_black,logo_on_white",
-  { token: TOKEN },
-);
-const manifest = await downloadCmsAssets({
-  base: BASE,
-  token: TOKEN,
-  ids: [metadata.logo_on_black, metadata.logo_on_white, metadata.favicon],
-  destDir: resolve(root, "public"),
-});
+// CMS hỏng KHÔNG được làm chết bước này: logo/favicon là trang trí, thiếu thì
+// buildMode rơi về URL Directus rồi Navbar/Footer rơi tiếp về public/logo.svg.
+// Hỏng cả deploy vì cái logo là lỗ vốn — nội dung và i18n mới đáng, và hai bước
+// đó đã có lưới riêng.
+const publicDir = resolve(root, "public");
+
+let manifest = {};
+try {
+  // Query đầy đủ chứ không riêng 3 field ảnh: chụp lại cho `next build` dùng
+  // khi CMS chết (xem lib/buildMode.ts).
+  const metadata = await directusGet(BASE, SITE_METADATA_QUERY, {
+    token: TOKEN,
+  });
+  saveMetadataSnapshot(publicDir, metadata);
+  manifest = await downloadCmsAssets({
+    base: BASE,
+    token: TOKEN,
+    ids: [metadata.logo_on_black, metadata.logo_on_white, metadata.favicon],
+    destDir: publicDir,
+  });
+} catch (err) {
+  // `ids` rỗng = chỉ đọc lại manifest.json trên đĩa, không gọi mạng nữa. Trên
+  // agent self-hosted, public/cms-assets/ sống qua các lượt chạy (nằm trong
+  // .gitignore, ngoài bước Clean) nên ảnh lượt trước vẫn dùng lại nguyên vẹn.
+  manifest = await downloadCmsAssets({
+    base: BASE,
+    token: TOKEN,
+    ids: [],
+    destDir: publicDir,
+  });
+  console.warn(
+    `⚠ cms-assets fetch failed (${err instanceof Error ? err.message : err}) — ${
+      Object.keys(manifest).length > 0
+        ? "dùng lại ảnh đã tải ở lượt build trước"
+        : "không có ảnh cũ để dùng, site rơi về fallback trong public/"
+    }.`,
+  );
+}
 
 console.log(
   Object.keys(manifest).length > 0

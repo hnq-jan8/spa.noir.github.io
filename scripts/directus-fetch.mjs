@@ -25,6 +25,14 @@ function isRetryable(status) {
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Cầu dao. Một lượt build gọi Directus rất nhiều lượt (đo được 139 lượt khi
+// CMS chết); để lượt nào cũng đi hết 3 lần × 30s thì riêng phần ngồi chờ đã
+// kéo build dài hàng chục phút, mà kết cục vẫn là rơi về fallback. Hỏng hết
+// lượt một lần = coi như CMS chết, từ đó trong cùng tiến trình chỉ thử một
+// phát với hạn ngắn. Vẫn thử, phòng khi nó sống lại giữa chừng.
+const TRIPPED_TIMEOUT_MS = 5_000;
+let circuitOpen = false;
+
 /**
  * @param {string} url
  * @param {{ token?: string, init?: RequestInit, label?: string,
@@ -38,8 +46,8 @@ export async function directusFetch(url, opts = {}) {
     token = "",
     init = {},
     label = url,
-    timeoutMs = DEFAULT_TIMEOUT_MS,
-    attempts = DEFAULT_ATTEMPTS,
+    timeoutMs = circuitOpen ? TRIPPED_TIMEOUT_MS : DEFAULT_TIMEOUT_MS,
+    attempts = circuitOpen ? 1 : DEFAULT_ATTEMPTS,
   } = opts;
 
   for (let attempt = 1; ; attempt++) {
@@ -63,8 +71,10 @@ export async function directusFetch(url, opts = {}) {
     } catch (err) {
       const reason =
         err?.name === "TimeoutError" ? `quá ${timeoutMs}ms` : err?.message;
-      if (isLast)
+      if (isLast) {
+        circuitOpen = true;
         throw new Error(`Directus ${label} → ${reason}`, { cause: err });
+      }
       console.warn(
         `⚠ Directus ${label} → ${reason}; thử lại sau ${retryIn}ms (${attempt}/${attempts})`,
       );
@@ -72,8 +82,14 @@ export async function directusFetch(url, opts = {}) {
       continue;
     }
 
-    if (res.ok) return res;
+    if (res.ok) {
+      circuitOpen = false; // CMS trả lời được = sống lại, mở lại full retry
+      return res;
+    }
     if (isLast || !isRetryable(res.status)) {
+      // Chỉ hết lượt vì 5xx/timeout mới là CMS chết — 401/403/404 ném ngay từ
+      // lần đầu và không nói gì về việc nó còn sống hay không.
+      if (isLast && isRetryable(res.status)) circuitOpen = true;
       throw new Error(`Directus ${label} → ${res.status}`);
     }
     console.warn(
