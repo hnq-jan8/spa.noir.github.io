@@ -9,9 +9,9 @@
  */
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { downloadCmsAssets, saveMetadataSnapshot } from "./cms-assets.mjs";
+import { downloadCmsAssets } from "./cms-assets.mjs";
 import { directusGet } from "./directus-fetch.mjs";
-import { SITE_METADATA_QUERY } from "./directus-queries.mjs";
+import { SITE_ASSETS_QUERY } from "./directus-queries.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -32,16 +32,13 @@ const publicDir = resolve(root, "public");
 
 let manifest = {};
 try {
-  // Query đầy đủ chứ không riêng 3 field ảnh: chụp lại cho `next build` dùng
-  // khi CMS chết (xem lib/buildMode.ts).
-  const metadata = await directusGet(BASE, SITE_METADATA_QUERY, {
+  const assets = await directusGet(BASE, SITE_ASSETS_QUERY, {
     token: TOKEN,
   });
-  saveMetadataSnapshot(publicDir, metadata);
   manifest = await downloadCmsAssets({
     base: BASE,
     token: TOKEN,
-    ids: [metadata.logo_on_black, metadata.logo_on_white, metadata.favicon],
+    ids: [assets.logo_on_black, assets.logo_on_white, assets.favicon],
     destDir: publicDir,
   });
 } catch (err) {

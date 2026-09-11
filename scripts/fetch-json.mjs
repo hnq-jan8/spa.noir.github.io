@@ -18,6 +18,7 @@ import {
   FAQS_QUERY,
   PRESS_RELEASES_QUERY,
   SITE_CONFIG_QUERY,
+  SITE_METADATA_QUERY,
   APP_SETTING_QUERY,
 } from "./directus-queries.mjs";
 import { directusFetch, directusGet } from "./directus-fetch.mjs";
@@ -55,6 +56,7 @@ const [
   faqs,
   releases,
   config,
+  metadata,
   active,
   languageRows,
   labelRows,
@@ -64,6 +66,7 @@ const [
   get(FAQS_QUERY),
   get(PRESS_RELEASES_QUERY),
   get(SITE_CONFIG_QUERY),
+  get(SITE_METADATA_QUERY),
   getActive(),
   get(LANGUAGES_QUERY),
   get(UI_LABELS_QUERY),
@@ -78,6 +81,7 @@ const contentPayload = assembleContentPayload({
   faqs,
   pressReleases: releases,
   siteConfig: config,
+  siteMetadata: metadata,
   languages: languageRows,
   labelRows,
   directusUrl: BASE,

@@ -28,4 +28,9 @@ export const SITE_CONFIG_QUERY =
 export const SITE_METADATA_QUERY =
   "/items/site_metadata/1?fields=official_site_url,favicon,logo_on_black,logo_on_white,translations.languages_code,translations.seo_title,translations.seo_description";
 
+// Chỉ 3 field ảnh — scripts/fetch-cms-assets.mjs cần đúng id để tải, không cần
+// text (title/description/url đã đi kèm content.json, xem content-payload.mjs).
+export const SITE_ASSETS_QUERY =
+  "/items/site_metadata/1?fields=favicon,logo_on_black,logo_on_white";
+
 export const APP_SETTING_QUERY = "/items/app_setting?fields=active";

@@ -123,6 +123,19 @@ export interface ContentPayload {
     languages: ContentLanguage[];
     labels: LabelMap;
   };
+  /**
+   * Không phục vụ trang nào cả — đi kèm content.json chỉ để lib/buildMode.ts
+   * còn cái mà dùng khi Directus chết lúc build (title/description/logo tab),
+   * vì content.json của site live là nguồn dự phòng duy nhất đã có sẵn.
+   */
+  siteMetadata: {
+    officialSiteUrl: string;
+    favicon: string | null;
+    logoOnBlack: string | null;
+    logoOnWhite: string | null;
+    seoTitle: I18n<string>;
+    seoDescription: I18n<string>;
+  };
   /** Trang chủ "/" */
   home: {
     labels: LabelMap;

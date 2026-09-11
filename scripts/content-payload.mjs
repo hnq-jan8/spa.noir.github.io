@@ -86,6 +86,7 @@ export function assembleContentPayload({
   faqs,
   pressReleases,
   siteConfig,
+  siteMetadata,
   languages,
   labelRows,
   directusUrl = "",
@@ -95,6 +96,16 @@ export function assembleContentPayload({
 
   return {
     generatedAt,
+    // Không phục vụ trang nào — chỉ để lib/buildMode.ts đọc lại khi CMS chết
+    // lúc build, xem lib/contentData.ts.
+    siteMetadata: {
+      officialSiteUrl: siteMetadata.official_site_url,
+      favicon: siteMetadata.favicon,
+      logoOnBlack: siteMetadata.logo_on_black,
+      logoOnWhite: siteMetadata.logo_on_white,
+      seoTitle: i18nMap(siteMetadata.translations, "seo_title"),
+      seoDescription: i18nMap(siteMetadata.translations, "seo_description"),
+    },
     common: {
       contacts: {
         passengerHotline: siteConfig.passenger_hotline,

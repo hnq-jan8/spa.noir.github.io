@@ -5,6 +5,7 @@ import type {
   Faq,
   PressRelease,
   SiteConfig,
+  SiteMetadata,
   Language,
   UiLabel,
 } from "../lib/directus";
@@ -37,6 +38,7 @@ export declare function assembleContentPayload(input: {
   faqs: Faq[];
   pressReleases: PressRelease[];
   siteConfig: SiteConfig;
+  siteMetadata: SiteMetadata;
   languages: Language[];
   labelRows: UiLabel[];
   /** Origin của Directus, dùng dựng URL đầy đủ cho preview_image. */

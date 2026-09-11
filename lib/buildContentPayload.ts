@@ -6,6 +6,7 @@ import {
   getFaqs,
   getPressReleases,
   getSiteConfig,
+  getSiteMetadata,
   getLanguages,
   getUiLabels,
 } from "@/lib/directus";
@@ -57,6 +58,14 @@ function emptyContentPayload(since: string): ContentPayload {
       languages: fallbackLanguages(),
       labels: {},
     },
+    siteMetadata: {
+      officialSiteUrl: "",
+      favicon: null,
+      logoOnBlack: null,
+      logoOnWhite: null,
+      seoTitle: {},
+      seoDescription: {},
+    },
     home: { labels: {} },
     faqs: { faqs: [], labels: {} },
     flightInfo: { flights: [], flightPolicy: {}, labels: {} },
@@ -77,16 +86,25 @@ export async function buildContentPayload(): Promise<ContentPayload> {
   if (cached) return cached;
 
   try {
-    const [rawUpdates, flights, faqs, releases, config, languages, labelRows] =
-      await Promise.all([
-        getOfficialUpdates(),
-        getFlights(),
-        getFaqs(),
-        getPressReleases(),
-        getSiteConfig(),
-        getLanguages(),
-        getUiLabels(),
-      ]);
+    const [
+      rawUpdates,
+      flights,
+      faqs,
+      releases,
+      config,
+      metadata,
+      languages,
+      labelRows,
+    ] = await Promise.all([
+      getOfficialUpdates(),
+      getFlights(),
+      getFaqs(),
+      getPressReleases(),
+      getSiteConfig(),
+      getSiteMetadata(),
+      getLanguages(),
+      getUiLabels(),
+    ]);
 
     cached = assembleContentPayload({
       generatedAt,
@@ -95,6 +113,7 @@ export async function buildContentPayload(): Promise<ContentPayload> {
       faqs,
       pressReleases: releases,
       siteConfig: config,
+      siteMetadata: metadata,
       languages,
       labelRows,
       directusUrl: process.env.DIRECTUS_URL ?? "http://localhost:8055",
