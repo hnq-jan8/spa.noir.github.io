@@ -14,9 +14,16 @@ interface LanguageOption {
 }
 
 /**
+ * Thời lượng hạ rèm, Navbar chờ theo mốc này lúc đóng. Phải sửa tay cho khớp
+ * `500ms` trong class `[transition:clip-path_...]` bên dưới — Tailwind chỉ sinh
+ * class từ chuỗi tĩnh, không nội suy hằng số vào được.
+ */
+export const MOBILE_MENU_ANIM_MS = 500;
+
+/**
  * Drawer toàn màn hình cho mobile (< md): danh sách route, hoặc danh sách ngôn
  * ngữ khi `langView` bật (nút globe/back ở Navbar). Luôn mount, ẩn/hiện bằng
- * fade opacity 300ms — cùng nhịp với header đảo màu (Navbar.tsx).
+ * hiệu ứng hạ rèm: `clip-path` mở dần từ mép trên xuống.
  */
 export default function MobileMenu({
   open,
@@ -47,17 +54,19 @@ export default function MobileMenu({
       // Mirrors the closed-state classes below so the drawer stays hidden even
       // if the stylesheet fails to load.
       style={open ? undefined : { visibility: "hidden", pointerEvents: "none" }}
-      // top-12 = đúng chiều cao header. Không chồm lên nó: drawer cố định
-      // `bg-page` còn header đảo màu theo `menuOpen`, nên mọi phần giao nhau
-      // đều lộ thành vệt lệch màu giữa lúc header đang transition.
+      // top-12 = đúng chiều cao header, không chồm lên nó.
+      //
+      // Hạ rèm bằng `clip-path` chứ không phải translate/height: hộp đứng yên
+      // đúng chỗ, chỉ phần lộ ra lớn dần, nên nội dung không trượt theo và
+      // không reflow ở từng frame.
       //
       // overflow-x-hidden: hai panel xếp chồng bên dưới nằm ngoài khung bằng
       // translate-x lúc ẩn, mà con đã transform vẫn nới overflow của cha —
       // không clip thì cả drawer cuộn ngang được đúng bằng khoảng đó.
       className={`md:hidden fixed inset-x-0 top-12 h-[calc(100dvh-3rem)] z-40 bg-page text-gray-900 overflow-y-auto overflow-x-hidden overscroll-contain ${
         open
-          ? "opacity-100 visible pointer-events-auto [transition:opacity_300ms_ease-out,visibility_0s_linear_0s]"
-          : "opacity-0 invisible pointer-events-none [transition:opacity_300ms_ease-out,visibility_0s_linear_300ms]"
+          ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
+          : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
       }`}
       role="dialog"
       aria-modal="true"
@@ -86,7 +95,7 @@ export default function MobileMenu({
                   if (isActive) invalidateContent();
                 }}
                 // Staggered reveal on open only — delay collapses to 0 on close
-                // so the drawer's own opacity fade handles the exit.
+                // so the curtain closing over them handles the exit.
                 style={{
                   transitionDelay:
                     open && !langView ? `${100 + index * 50}ms` : "0ms",

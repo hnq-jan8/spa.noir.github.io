@@ -10,7 +10,9 @@ import {
   GlobeIcon,
   useDismissOnOutside,
 } from "@/components/layout/LanguageSelector";
-import MobileMenu from "@/components/layout/MobileMenu";
+import MobileMenu, {
+  MOBILE_MENU_ANIM_MS,
+} from "@/components/layout/MobileMenu";
 import ScrollButton from "@/components/ui/ScrollButton";
 import {
   ARTICLE_PARAM,
@@ -25,6 +27,7 @@ import { useUnreadUpdate } from "@/hooks/useUnreadUpdate";
 import { bundledLabels } from "@/i18n/labels";
 import { normalizePath, stripLocale } from "@/i18n/paths";
 import { languages as routingLanguages } from "@/i18n/routing";
+import { COLORS } from "@/lib/theme-colors";
 
 const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 
@@ -58,6 +61,12 @@ export default function Navbar({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  // Drawer mở = header đảo sang nền sáng. Kèm `isMobile` vì `menuOpen` không tự
+  // tắt khi kéo cửa sổ rộng ra desktop — CSS `md:hidden` chỉ ẩn drawer đi.
+  const drawerLight = menuOpen && isMobile;
+  // Bản trễ của `drawerLight` (xem effect bên dưới), và là bản mà mọi thứ bám
+  // nền header dùng: nền header, logo, nút hamburger, thẻ theme-color.
+  const [lightHeader, setLightHeader] = useState(false);
   // Shared by the desktop dropdown and the mobile drawer's language
   // sub-view, so a resize between breakpoints keeps the same open state.
   const [langOpen, setLangOpen] = useState(false);
@@ -101,6 +110,38 @@ export default function Navbar({
   useEffect(() => {
     if (!menuOpen) setLangOpen(false);
   }, [menuOpen]);
+
+  // Mở thì header sáng ngay cùng lúc rèm bắt đầu hạ; đóng thì giữ sáng tới khi
+  // rèm kéo hết mới trả về nền tối — rèm còn che nửa màn mà header đã tối thì
+  // thành hai mảng màu đá nhau. Vẫn phải đổi dứt khoát, không transition: xem
+  // ghi chú Safari iOS ở thẻ <header>.
+  useEffect(() => {
+    if (drawerLight) {
+      setLightHeader(true);
+      return;
+    }
+    // Sang desktop thì `md:hidden` giấu drawer ngay, không có rèm để chờ — trả
+    // về tối luôn, đừng để logo kẹt bản nền-sáng nửa giây.
+    if (!isMobile) {
+      setLightHeader(false);
+      return;
+    }
+    const timeout = setTimeout(
+      () => setLightHeader(false),
+      MOBILE_MENU_ANIM_MS,
+    );
+    return () => clearTimeout(timeout);
+  }, [drawerLight, isMobile]);
+
+  // Thẻ `theme-color` do `viewport` export dựng ra là tĩnh, trong khi header
+  // đảo màu lúc drawer mở — đồng bộ lại cho Chrome/Android, bên đó status bar
+  // ăn theo màu này. (Safari iOS bỏ qua thẻ này, nó đọc thẳng
+  // `background-color` của <header> — xem ghi chú ở thẻ <header> bên dưới.)
+  useEffect(() => {
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", lightHeader ? COLORS.page : COLORS.chrome);
+  }, [lightHeader]);
 
   // Opening langOpen from desktop then resizing down to mobile should reveal
   // the drawer already on the language screen. Gated on `isMobile`, not just
@@ -160,10 +201,6 @@ export default function Navbar({
 
   const scrollNav = (dir: "left" | "right") => scrollNavBy(dir, 120);
 
-  // Drawer mở = header đảo sang nền sáng. Phải kèm `isMobile`: `menuOpen`
-  // không tự tắt khi kéo cửa sổ rộng ra desktop (CSS `md:hidden` chỉ ẩn drawer
-  // đi), mà logo thì đổi `src` bằng JS nên sẽ kẹt ở bản nền-sáng.
-  const lightHeader = menuOpen && isMobile;
   const activeLogo = lightHeader ? logoOnWhite : logoOnBlack;
   const logoSrc = logoBroken ? FALLBACK_LOGO : activeLogo || FALLBACK_LOGO;
   // FALLBACK_LOGO (public/logo.svg) là logo trắng, hợp nền tối — rơi về nó
@@ -191,10 +228,17 @@ export default function Navbar({
 
           `md:` override ở nhánh sáng: `isMobile` đi qua matchMedia -> state nên
           trễ một frame lúc kéo resize, CSS chốt sẵn nền tối ở desktop để không
-          kịp loé màu sai. */}
+          kịp loé màu sai.
+
+          KHÔNG transition màu nền: Safari iOS tô dải status bar trên và vùng
+          quanh thanh công cụ dưới đáy bằng `background-color` của chính
+          <header>, nhưng chỉ đọc lại khi style đổi hẳn — đang transition thì
+          dải dưới kẹt ở một frame giữa chừng và ở nguyên đó (đo trên simulator:
+          #4f4f4f giữa #404040 và #f5f5f5). Đổi tức thì thì cả hai dải bám đúng;
+          muốn lệch nhịp với rèm thì trễ ở state, xem `lightHeader`. */}
       <header
         ref={headerRef}
-        className={`sticky md:fixed top-0 inset-x-0 z-50 w-full transition-colors duration-300 ${
+        className={`sticky md:fixed top-0 inset-x-0 z-50 w-full ${
           lightHeader
             ? "bg-page text-gray-900 md:bg-chrome md:text-white"
             : "bg-chrome text-white"
@@ -206,8 +250,8 @@ export default function Navbar({
                 while the drawer's language sub-screen is open, same slot the
                 logo normally owns. Gated on `menuOpen` too, so `langOpen`
                 being shared with the desktop dropdown doesn't crossfade the
-                logo there. Both layers stay mounted (never unmount) so they
-                fade in sync with the drawer instead of snapping. */}
+                logo there. Both layers stay mounted (never unmount) so the
+                swap is a crossfade instead of a snap. */}
             <div className="relative self-stretch flex items-center flex-shrink-0 mr-2">
               <Link
                 href={`/${locale}`}
@@ -376,13 +420,12 @@ export default function Navbar({
 
             <div className="flex md:hidden items-stretch gap-1">
               {/* Cùng vị trí với DesktopLanguageSelector ở size lớn hơn —
-                  luôn mounted (không chỉ khi drawer mở) để fade theo cùng
-                  nhịp với drawer thay vì bật/tắt đột ngột; pointer-events tắt
-                  lúc ẩn nên không bấm/tab vào được. Bấm để chuyển sang màn
-                  hình chọn ngôn ngữ full-screen bên trong drawer; bấm lại để
-                  quay về danh sách nav. Không đổi icon — chỉ sáng lên khi
-                  đang ở màn ngôn ngữ, giống cách tab active sáng hơn tab
-                  thường trong menu mobile. */}
+                  luôn mounted (không chỉ khi drawer mở) để fade vào/ra chứ
+                  không bật/tắt đột ngột; pointer-events tắt lúc ẩn nên không
+                  bấm/tab vào được. Bấm để chuyển sang màn hình chọn ngôn ngữ
+                  full-screen bên trong drawer; bấm lại để quay về danh sách
+                  nav. Không đổi icon — chỉ sáng lên khi đang ở màn ngôn ngữ,
+                  giống cách tab active sáng hơn tab thường trong menu mobile. */}
               {languageOptions.length > 1 && (
                 <button
                   type="button"
@@ -408,7 +451,7 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={toggleMenu}
-                className={`relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center transition-colors duration-300 ${
+                className={`relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center ${
                   lightHeader
                     ? "text-gray-700 hover:text-gray-900 active:text-gray-900"
                     : "text-gray-200 hover:text-white active:text-white"
