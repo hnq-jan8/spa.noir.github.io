@@ -8,12 +8,15 @@
  * read the generated output instead of hardcoding locales/labels.
  *
  * Usage: node scripts/generate-i18n.mjs
- * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN
+ * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN,
+ *        NEXT_PUBLIC_SITE_URL (chỉ dùng cho fallback khi CMS lỗi, xem bên dưới)
  */
 import { writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { LANGUAGES_QUERY, UI_LABELS_QUERY } from "./directus-queries.mjs";
+import { directusGet } from "./directus-fetch.mjs";
+import { fetchLiveContent, labelRowsFromContent } from "./live-content.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -27,23 +30,39 @@ try {
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
 
-async function get(path) {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "ngrok-skip-browser-warning": "true",
-    },
-  });
-  if (!res.ok) throw new Error(`Directus ${path} → ${res.status}`);
-  return (await res.json()).data;
-}
+const get = (path) => directusGet(BASE, path, { token: TOKEN });
 
-const [languageRows, labelRows] = await Promise.all([
-  get(LANGUAGES_QUERY),
-  get(UI_LABELS_QUERY),
-]);
-if (!languageRows.length)
-  throw new Error("Directus languages collection has no active language");
+// ─── Fallback: content.json của site đang live ───────────────────────────────
+// Cùng lưới an toàn lib/buildContentPayload.ts dùng (scripts/live-content.mjs).
+// Ở đây cần hơn ở đó: bước này quyết định build ra những locale nào, nuốt lỗi
+// rồi đi tiếp là export ra site không có route nào. Trên CI cũng không có bản
+// sinh lần trước để xài lại — layout-pipeline.yml xoá i18n/*.generated và
+// messages/ mỗi lượt (cố ý, để locale vừa tắt không tồn dư).
+//
+// Đánh đổi: locale/label lấy về là của lần deploy gần nhất. Vừa tắt một ngôn
+// ngữ mà CMS lại sập đúng lúc thì nó sống lại một lượt — vẫn hơn là hỏng cả
+// deploy, và lượt build sau CMS tỉnh là đúng ngay.
+
+let languageRows;
+let labelRows;
+try {
+  [languageRows, labelRows] = await Promise.all([
+    get(LANGUAGES_QUERY),
+    get(UI_LABELS_QUERY),
+  ]);
+  if (!languageRows.length)
+    throw new Error("Directus languages collection has no active language");
+} catch (err) {
+  const live = await fetchLiveContent();
+  // Không có locale nào thì fallback vô dụng — trả lại lỗi gốc của CMS, vì đó
+  // mới là thứ đáng đọc trong log.
+  if (!live?.common.languages?.length) throw err;
+  languageRows = live.common.languages;
+  labelRows = labelRowsFromContent(live);
+  console.warn(
+    `⚠ Directus i18n fetch failed (${err instanceof Error ? err.message : err}) — dùng lại content.json của ${process.env.NEXT_PUBLIC_SITE_URL}; locale/label là của lần deploy gần nhất.`,
+  );
+}
 
 const languages = languageRows.map((r) => ({
   code: r.code,

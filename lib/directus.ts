@@ -10,6 +10,7 @@ import {
   APP_SETTING_QUERY,
 } from "../scripts/directus-queries.mjs";
 import { buildAssetUrl } from "../scripts/asset-url.mjs";
+import { directusFetch } from "../scripts/directus-fetch.mjs";
 
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
@@ -26,14 +27,13 @@ async function get<T>(
   const url = opts?.bustCache
     ? `${BASE}${path}${path.includes("?") ? "&" : "?"}_=${BUILD_NONCE}`
     : `${BASE}${path}`;
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "ngrok-skip-browser-warning": "true",
+  const res = await directusFetch(url, {
+    token: TOKEN,
+    label: path,
+    init: {
+      cache: process.env.NODE_ENV === "production" ? "force-cache" : "no-store",
     },
-    cache: process.env.NODE_ENV === "production" ? "force-cache" : "no-store",
   });
-  if (!res.ok) throw new Error(`Directus ${path} → ${res.status}`);
   const json = await res.json();
   return json.data as T;
 }

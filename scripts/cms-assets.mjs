@@ -8,6 +8,7 @@
  */
 import { writeFileSync, mkdirSync, readFileSync } from "fs";
 import { resolve } from "path";
+import { directusFetch } from "./directus-fetch.mjs";
 
 const EXT_BY_CONTENT_TYPE = {
   "image/svg+xml": "svg",
@@ -36,15 +37,10 @@ export async function downloadCmsAssets({ base, token, ids, destDir }) {
 
   await Promise.all(
     uniqueIds.map(async (id) => {
-      const res = await fetch(`${base}/assets/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true",
-        },
+      const res = await directusFetch(`${base}/assets/${id}`, {
+        token,
+        label: `asset ${id}`,
       });
-      if (!res.ok) {
-        throw new Error(`Directus asset ${id} → ${res.status}`);
-      }
       const contentType = res.headers.get("content-type")?.split(";")[0]?.trim();
       const ext = EXT_BY_CONTENT_TYPE[contentType] ?? "bin";
       const filename = `${id}.${ext}`;

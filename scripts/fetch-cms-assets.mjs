@@ -10,6 +10,7 @@
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { downloadCmsAssets } from "./cms-assets.mjs";
+import { directusGet } from "./directus-fetch.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -22,19 +23,10 @@ try {
 const BASE = process.env.DIRECTUS_URL ?? "http://localhost:8055";
 const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
 
-async function get(path) {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "ngrok-skip-browser-warning": "true",
-    },
-  });
-  if (!res.ok) throw new Error(`Directus ${path} → ${res.status}`);
-  return (await res.json()).data;
-}
-
-const metadata = await get(
+const metadata = await directusGet(
+  BASE,
   "/items/site_metadata/1?fields=favicon,logo_on_black,logo_on_white",
+  { token: TOKEN },
 );
 const manifest = await downloadCmsAssets({
   base: BASE,

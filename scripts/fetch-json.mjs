@@ -20,6 +20,7 @@ import {
   SITE_CONFIG_QUERY,
   APP_SETTING_QUERY,
 } from "./directus-queries.mjs";
+import { directusFetch, directusGet } from "./directus-fetch.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -34,29 +35,15 @@ const TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? "";
 
 // ─── Directus helpers ────────────────────────────────────────────────────────
 
-async function get(path) {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "ngrok-skip-browser-warning": "true",
-    },
-  });
-  if (!res.ok) throw new Error(`Directus ${path} → ${res.status}`);
-  return (await res.json()).data;
-}
+const get = (path) => directusGet(BASE, path, { token: TOKEN });
 
 async function getActive() {
   const nonce = Date.now().toString();
-  const res = await fetch(
-    `${BASE}${APP_SETTING_QUERY}&_=${nonce}`,
-    {
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-        "ngrok-skip-browser-warning": "true",
-      },
-    },
-  );
-  if (!res.ok) throw new Error(`Directus app_setting → ${res.status}`);
+  const res = await directusFetch(`${BASE}${APP_SETTING_QUERY}&_=${nonce}`, {
+    token: TOKEN,
+    // Không để nonce lọt vào thông báo lỗi, mỗi lần chạy lại ra một chuỗi khác.
+    label: "app_setting",
+  });
   return Boolean((await res.json()).data.active);
 }
 

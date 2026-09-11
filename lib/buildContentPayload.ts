@@ -11,6 +11,7 @@ import {
 } from "@/lib/directus";
 import type { ContentPayload } from "@/lib/contentData";
 import { assembleContentPayload } from "../scripts/content-payload.mjs";
+import { fetchLiveContent } from "../scripts/live-content.mjs";
 
 // Cache trong tiến trình build — phòng buildContentPayload() bị gọi nhiều
 // lần trong cùng một route/worker (tránh gọi lại Directus không cần thiết).
@@ -27,21 +28,6 @@ function fallbackLanguages(): { code: string; name: string }[] {
     return generated.languages ?? [];
   } catch {
     return [];
-  }
-}
-
-// Site đang live vẫn đang phục vụ content.json của lần build trước — thử lấy
-// cái đó trước khi rơi về rỗng hẳn.
-async function fetchLiveContentPayload(): Promise<ContentPayload | null> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!siteUrl) return null;
-  try {
-    const res = await fetch(`${siteUrl.replace(/\/$/, "")}/content.json`);
-    if (!res.ok) return null;
-    const payload = await res.json();
-    return payload?.common ? (payload as ContentPayload) : null;
-  } catch {
-    return null;
   }
 }
 
@@ -111,7 +97,7 @@ export async function buildContentPayload(): Promise<ContentPayload> {
     // content.json/status.json là JSON tĩnh, refresh lại được sau (xem
     // scripts/fetch-json.mjs, deploy-content.yml) — Directus sập giữa lúc
     // build không nên làm fail cả layout.
-    const stale = await fetchLiveContentPayload();
+    const stale = await fetchLiveContent();
     console.warn(
       `⚠ Directus content fetch failed during build (${err instanceof Error ? err.message : err}) — ${stale ? "reusing the live site's last content.json" : "deploying layout with an empty content.json"}; a later content update will refill it.`,
     );
