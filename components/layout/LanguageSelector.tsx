@@ -10,6 +10,7 @@ import {
 } from "react";
 import { languages as configuredLanguages } from "@/i18n/routing";
 import { bundledLabels } from "@/i18n/labels";
+import { invalidateContent } from "@/hooks/useContentData";
 
 export function useDismissOnOutside(
   containerRef: RefObject<HTMLElement | null>,
@@ -380,6 +381,15 @@ export function DesktopLanguageSelector({
                 href={`/${lang.code}${pathWithoutLocale}`}
                 onMouseEnter={() => handleItemEnter(lang.code)}
                 onMouseLeave={handleItemLeave}
+                onClick={() => {
+                  // Cùng locale thì Link không điều hướng, không remount nào
+                  // tự đóng dropdown hay refetch. Giữ nguyên bài đang mở —
+                  // đổi sang ngôn ngữ khác cũng giữ (href mang theo `?a=`).
+                  if (lang.code === locale) {
+                    invalidateContent();
+                    close();
+                  }
+                }}
                 className="focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 rounded-2xl text-sm text-black whitespace-nowrap active:bg-cardHover"
               >
                 {lang.label}

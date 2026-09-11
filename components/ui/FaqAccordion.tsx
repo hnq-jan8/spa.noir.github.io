@@ -161,13 +161,13 @@ export default function FaqAccordion({
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
-          // Rounded on the button itself: the focus outline follows the
-          // button's own radius, not the card's. Top/bottom as separate
-          // longhands so the bottom pair can transition when the panel opens
-          // -- except while focus-visible, where the outline would otherwise
-          // visibly warp along with it; a keyboard user toggling the panel
-          // just gets an instant corner snap instead of the smooth version.
-          className={`focus-ring-inset focus-visible:transition-none w-full rounded-t-2xl ${isOpen ? "rounded-b-none" : "rounded-b-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left transition-[border-radius] duration-300 ease-out hover:bg-cardHover active:bg-cardHover`}
+          // Bo góc đặt trên chính nút vì outline focus bám radius của nút chứ
+          // không phải của card. Mép dưới vuông cố định (lúc đóng thì
+          // `overflow-hidden` của card đã cắt tròn hộ), trừ khi đóng + focus
+          // bàn phím: góc vuông nằm ngoài cung bo của card nên ring bị cắt cụt
+          // hai đầu, bo lại cho khớp. `rounded-b-none` phải viết ra, không thì
+          // `:focus-visible` ở layer base (globals.css) lọt vào bo đáy 8px.
+          className={`focus-ring-inset w-full rounded-t-2xl rounded-b-none ${isOpen ? "" : "focus-visible:rounded-b-2xl"} flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left hover:bg-cardHover active:bg-cardHover`}
           onClick={() => toggle(i)}
         >
           <span className="pr-4 text-gray-900 font-medium">

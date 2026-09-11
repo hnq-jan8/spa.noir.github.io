@@ -60,8 +60,9 @@ function SearchField({
         // `outline-none` chỉ dành cho ô nhập: trình duyệt tính ô text là
         // `:focus-visible` kể cả khi bấm chuột, nên vòng focus chung sẽ hiện
         // mọi lần bấm — thừa, vì con trỏ nháy đã là chỉ báo rõ nhất. Thay bằng
-        // viền đậm lên một nấc, cùng tông xám với vòng focus chung.
-        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-600 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-500"
+        // viền đậm lên một nấc, cùng tông xám với vòng focus chung. `ring-inset`
+        // 1px chồng lên viền cho dày thành 2px mà không đội layout như border-2.
+        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-600 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
       />
       {query && (
         <button
@@ -204,7 +205,7 @@ export default function FaqsContent() {
         // là lớp chữ trong suốt nằm giữa viên, chỉ báo bám vào nó sẽ ra một
         // khung chữ nhật lửng lơ. Lúc thu gọn thì nút mở nằm đè (input
         // tabIndex -1) và tự vẽ ring của nó.
-        className={`md:hidden fixed top-16 right-4 z-20 h-[34px] rounded-full bg-white/75 backdrop-blur-md border border-gray-200 shadow-[0_0_5px_rgba(0,0,0,0.05)] overflow-hidden transition-[width] focus-within:border-gray-500 ${CAPSULE_TRANSITION} ${
+        className={`md:hidden fixed top-16 right-4 z-20 h-[34px] rounded-full bg-white/75 backdrop-blur-md border border-gray-200 shadow-[0_0_5px_rgba(0,0,0,0.05)] overflow-hidden transition-[width] focus-within:border-gray-500 focus-within:ring-1 focus-within:ring-inset focus-within:ring-gray-500 ${CAPSULE_TRANSITION} ${
           mobileSearchOpen ? "w-[calc(100vw-2rem)]" : "w-[34px]"
         }`}
       >

@@ -35,13 +35,16 @@ function FlightCardSkeleton() {
   );
 }
 
-/** Tiêu đề mục + bảng: cards xếp chồng dưới md, một khối placeholder từ md trở lên. */
+/** Tiêu đề mục bảng — nằm ngoài thẻ trắng nên giữ fill của nền trang. */
+export function FlightTitleSkeleton() {
+  return <SkeletonText box="h-9 mb-4" bar="h-7 w-52" />;
+}
+
+/** Ruột thẻ trắng: cards xếp chồng dưới md, một khối placeholder từ md trở lên. */
 export function FlightTableSkeleton() {
   return (
     <>
-      <SkeletonText box="h-9 mb-4" bar="h-7 w-52 md:skeleton-on-card" />
-
-      <div className="md:hidden grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+      <div className="md:hidden grid grid-cols-1 min-[570px]:grid-cols-2 gap-3">
         <FlightCardSkeleton />
         <FlightCardSkeleton />
       </div>
@@ -49,22 +52,23 @@ export function FlightTableSkeleton() {
       {/* Real layout varies here too (single-flight key/value table vs.
           multi-row grid, see FlightTable) — one block marks the area. */}
       <div className="hidden md:block">
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="skeleton-on-card h-64 w-full" />
       </div>
     </>
   );
 }
 
-/** Tiêu đề "chính sách đổi/hoàn vé" + đoạn markdown bên dưới. */
+/** Tiêu đề "chính sách đổi/hoàn vé" + đoạn markdown bên dưới. Cả mục nằm ngoài
+ *  thẻ trắng ở mọi khổ màn hình nên dùng fill của nền trang. */
 export function FlightPolicySkeleton() {
   return (
     <>
-      <SkeletonText box="h-9 mb-4" bar="h-7 w-40 md:skeleton-on-card" />
+      <SkeletonText box="h-9 mb-4" bar="h-7 w-40" />
       <div className="max-w-3xl">
-        <Skeleton className="h-3.5 w-full mb-2 md:skeleton-on-card" />
-        <Skeleton className="h-3.5 w-full mb-2 md:skeleton-on-card" />
-        <Skeleton className="h-3.5 w-11/12 mb-2 md:skeleton-on-card" />
-        <Skeleton className="h-3.5 w-3/5 md:skeleton-on-card" />
+        <Skeleton className="h-3.5 w-full mb-2" />
+        <Skeleton className="h-3.5 w-full mb-2" />
+        <Skeleton className="h-3.5 w-11/12 mb-2" />
+        <Skeleton className="h-3.5 w-3/5" />
       </div>
     </>
   );

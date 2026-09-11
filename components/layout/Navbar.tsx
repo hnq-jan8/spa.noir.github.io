@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, FileText, Megaphone } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   DesktopLanguageSelector,
   GlobeIcon,
@@ -17,10 +17,10 @@ import {
   clearArticleRoute,
   useArticleKey,
 } from "@/hooks/useArticleRoute";
-import { useBreadcrumbHidden } from "@/hooks/useBreadcrumbVisibility";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useLocale } from "@/hooks/useLocale";
+import { useNavItems } from "@/hooks/useNavItems";
 import { useUnreadUpdate } from "@/hooks/useUnreadUpdate";
 import { bundledLabels } from "@/i18n/labels";
 import { normalizePath, stripLocale } from "@/i18n/paths";
@@ -33,8 +33,10 @@ const MENU_ICON_ANIM_MS = 370;
 
 export default function Navbar({
   logoOnBlack,
+  logoOnWhite,
 }: {
   logoOnBlack: string | null;
+  logoOnWhite: string | null;
 }) {
   const locale = useLocale();
   const pathname = usePathname();
@@ -55,6 +57,7 @@ export default function Navbar({
     languageOptions.find((lang) => lang.code === locale) ?? languageOptions[0];
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   // Shared by the desktop dropdown and the mobile drawer's language
   // sub-view, so a resize between breakpoints keeps the same open state.
   const [langOpen, setLangOpen] = useState(false);
@@ -88,27 +91,28 @@ export default function Navbar({
   }, []);
 
   useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsMobile(mql.matches);
+    sync();
+    mql.addEventListener("change", sync);
+    return () => mql.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
     if (!menuOpen) setLangOpen(false);
   }, [menuOpen]);
 
   // Opening langOpen from desktop then resizing down to mobile should reveal
-  // the drawer already on the language screen. Gated on the mobile media
-  // query, not just langOpen, so opening the desktop dropdown doesn't also
-  // trigger the scroll lock below on desktop.
+  // the drawer already on the language screen. Gated on `isMobile`, not just
+  // langOpen, so opening the desktop dropdown doesn't also trigger the scroll
+  // lock below on desktop.
   useEffect(() => {
-    const mql = window.matchMedia("(max-width: 767px)");
-    const sync = () => {
-      if (mql.matches && langOpen) {
-        setMenuOpen((prev) => {
-          if (!prev) menuOpenedByLangSync.current = true;
-          return true;
-        });
-      }
-    };
-    sync();
-    mql.addEventListener("change", sync);
-    return () => mql.removeEventListener("change", sync);
-  }, [langOpen]);
+    if (!isMobile || !langOpen) return;
+    setMenuOpen((prev) => {
+      if (!prev) menuOpenedByLangSync.current = true;
+      return true;
+    });
+  }, [isMobile, langOpen]);
 
   useEffect(() => {
     if (!langOpen && menuOpenedByLangSync.current) {
@@ -117,8 +121,11 @@ export default function Navbar({
     }
   }, [langOpen]);
 
+  // `isMobile` chứ không chỉ `menuOpen`: kéo cửa sổ rộng ra desktop thì
+  // `md:hidden` giấu drawer đi nhưng state vẫn mở, khoá cuộn mà treo lại là
+  // trang không cuộn được nữa và cũng chẳng còn nút nào để đóng.
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen || !isMobile) return;
     const html = document.documentElement;
     const prev = html.style.cssText;
     html.style.setProperty("overflow", "hidden", "important");
@@ -126,18 +133,11 @@ export default function Navbar({
     return () => {
       html.style.cssText = prev;
     };
-  }, [menuOpen]);
+  }, [menuOpen, isMobile]);
 
   useDismissOnOutside(headerRef, menuOpen, () => setMenuOpen(false));
 
-  const navItems = nav
-    ? [
-        { label: nav["officialUpdates"], href: `/${locale}/official-updates` },
-        { label: nav["flightInfo"], href: `/${locale}/flight-info` },
-        { label: nav["faqs"], href: `/${locale}/faqs` },
-        { label: nav["pressReleases"], href: `/${locale}/press-releases` },
-      ]
-    : [];
+  const navItems = useNavItems();
 
   // Switching language mid-article has to land on the same article, so the key
   // rides along. A suffix, not the whole query string, so nothing else leaks.
@@ -148,9 +148,7 @@ export default function Navbar({
 
   const pathWithoutLocale = stripLocale(pathname);
   const normalizedPath = normalizePath(pathname);
-  const activeItem = navItems.find((item) => item.href === normalizedPath);
   const isHomeActive = normalizedPath === `/${locale}`;
-  const breadcrumbHidden = useBreadcrumbHidden();
 
   // official_updates arrives sorted `-date`, so [0] is newest. The badge keys
   // off that date, not a count, so unrelated content edits don't trigger it.
@@ -160,20 +158,17 @@ export default function Navbar({
     normalizedPath === updatesHref,
   );
 
-  // Third crumb: only the two listing pages open a detail view, and only while
-  // active — articleKey lingers briefly during a cross-tab nav.
-  const pressReleasesHref = `/${locale}/press-releases`;
-  const openedArticle =
-    articleKey &&
-    (normalizedPath === updatesHref || normalizedPath === pressReleasesHref)
-      ? (data?.officialUpdates.updates.find((u) => u.key === articleKey) ??
-        data?.pressReleases.releases.find((r) => r.key === articleKey) ??
-        null)
-      : null;
-  // Same glyphs the home cards use for these two sections.
-  const ArticleIcon = normalizedPath === updatesHref ? Megaphone : FileText;
-
   const scrollNav = (dir: "left" | "right") => scrollNavBy(dir, 120);
+
+  // Drawer mở = header đảo sang nền sáng. Phải kèm `isMobile`: `menuOpen`
+  // không tự tắt khi kéo cửa sổ rộng ra desktop (CSS `md:hidden` chỉ ẩn drawer
+  // đi), mà logo thì đổi `src` bằng JS nên sẽ kẹt ở bản nền-sáng.
+  const lightHeader = menuOpen && isMobile;
+  const activeLogo = lightHeader ? logoOnWhite : logoOnBlack;
+  const logoSrc = logoBroken ? FALLBACK_LOGO : activeLogo || FALLBACK_LOGO;
+  // FALLBACK_LOGO (public/logo.svg) là logo trắng, hợp nền tối — rơi về nó
+  // trên nền sáng thì phải `invert`, giống cách Footer.tsx xử lý fallback.
+  const logoNeedsInvert = lightHeader && (logoBroken || !activeLogo);
 
   // The desktop/tablet nav scrolls horizontally once labels overflow (see
   // useHorizontalScroll above) -- without this, landing on a tab that's
@@ -192,10 +187,18 @@ export default function Navbar({
     <>
       {/* `fixed` from md up only: below that, iOS Safari's URL-bar collapse
           leaves a fixed header painted at a stale offset it never recovers
-          from. `sticky` rides the scroller instead. */}
+          from. `sticky` rides the scroller instead.
+
+          `md:` override ở nhánh sáng: `isMobile` đi qua matchMedia -> state nên
+          trễ một frame lúc kéo resize, CSS chốt sẵn nền tối ở desktop để không
+          kịp loé màu sai. */}
       <header
         ref={headerRef}
-        className="sticky md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
+        className={`sticky md:fixed top-0 inset-x-0 z-50 w-full transition-colors duration-300 ${
+          lightHeader
+            ? "bg-page text-gray-900 md:bg-chrome md:text-white"
+            : "bg-chrome text-white"
+        }`}
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">
@@ -226,22 +229,22 @@ export default function Navbar({
                 }}
               >
                 <Image
-                  src={
-                    logoBroken ? FALLBACK_LOGO : logoOnBlack || FALLBACK_LOGO
-                  }
+                  src={logoSrc}
                   onError={() => setLogoBroken(true)}
                   alt="SUN PhuQuoc Airways"
                   width={185}
                   height={43}
                   // `rounded-lg` không đổi gì về hình (logo nền trong suốt) —
                   // nó ở đây để vòng focus bám theo được bo góc.
-                  className="h-7 md:h-9 w-auto rounded-lg transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)]"
+                  className={`h-7 md:h-9 w-auto rounded-lg transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)] ${
+                    logoNeedsInvert ? "invert" : ""
+                  }`}
                   priority
                 />
               </Link>
               {nav?.["selectLanguage"] && (
                 <span
-                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-300 transform-gpu transition-opacity ease-out ${
+                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-600 transform-gpu transition-opacity ease-out ${
                     langOpen && menuOpen
                       ? "duration-200 opacity-100"
                       : "duration-100 opacity-0 pointer-events-none"
@@ -390,8 +393,8 @@ export default function Navbar({
                     menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                   } ${
                     langOpen
-                      ? "bg-white text-black"
-                      : "text-gray-300 hover:text-white active:text-white"
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-600 hover:text-gray-900 active:text-gray-900"
                   }`}
                   aria-label={nav?.["selectLanguage"]}
                   aria-expanded={langOpen}
@@ -405,7 +408,11 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={toggleMenu}
-                className="relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white active:text-white"
+                className={`relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center transition-colors duration-300 ${
+                  lightHeader
+                    ? "text-gray-700 hover:text-gray-900 active:text-gray-900"
+                    : "text-gray-200 hover:text-white active:text-white"
+                }`}
                 aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
@@ -461,73 +468,6 @@ export default function Navbar({
           unreadHref={hasUnreadUpdate ? updatesHref : null}
         />
       </header>
-
-      {/* `invisible`, not unmounted, when a page needs this row for something
-          else (FAQs search capsule) — keeps its layout space and is more
-          reliable than masking it (hooks/useBreadcrumbVisibility.ts). */}
-      {activeItem && (
-        <div
-          className={`md:hidden sticky top-12 z-10 px-4 pt-4 pb-6 ${breadcrumbHidden ? "invisible" : ""}`}
-        >
-          <div
-            className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full overflow-hidden whitespace-nowrap
-                    bg-white/75 backdrop-blur-md border border-gray-200 text-xs text-black max-w-full"
-          >
-            <Link
-              href={`/${locale}`}
-              onClick={() => clearArticleRoute()}
-              className="focus-ring-gap inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-900 active:text-gray-900"
-            >
-              {nav?.["home"]}
-            </Link>
-            <ChevronRight
-              className="w-3 h-3 text-gray-400 flex-shrink-0"
-              strokeWidth={2}
-            />
-            <Link
-              href={activeItem.href}
-              onClick={() => {
-                // Same as the tab bar: close the detail view (its query param is
-                // invisible to Next's router) and refresh the list.
-                clearArticleRoute();
-                invalidateContent();
-              }}
-              // With an article open, "you are here" moves to the icon crumb and
-              // this one drops back to a plain link.
-              className={`focus-ring-gap inline-flex items-center min-h-[24px] truncate hover:text-gray-600 active:text-gray-600 ${
-                openedArticle
-                  ? "text-gray-700 hover:text-gray-900 active:text-gray-900"
-                  : "font-medium"
-              }`}
-            >
-              {activeItem.label}
-            </Link>
-            {openedArticle && (
-              <>
-                <ChevronRight
-                  className="w-3 h-3 text-gray-400 flex-shrink-0"
-                  strokeWidth={2}
-                />
-                {/* Icon-only: a headline would blow out the pill's width or
-                    truncate to nothing. The title still reaches screen readers. */}
-                <span
-                  aria-current="page"
-                  className="inline-flex items-center min-h-[24px] text-gray-900 flex-shrink-0"
-                >
-                  <ArticleIcon
-                    className="w-3.5 h-3.5"
-                    strokeWidth={2.5}
-                    aria-hidden="true"
-                  />
-                  <span className="sr-only">
-                    {openedArticle.title ?? activeItem.label}
-                  </span>
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 }

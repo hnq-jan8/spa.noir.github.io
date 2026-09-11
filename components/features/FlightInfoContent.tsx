@@ -7,6 +7,7 @@ import Reveal from "@/components/ui/Reveal";
 import {
   FlightPolicySkeleton,
   FlightTableSkeleton,
+  FlightTitleSkeleton,
 } from "@/components/ui/skeletons/FlightInfoSkeleton";
 import { loadingProps } from "@/components/ui/Skeleton";
 import { useContentState } from "@/hooks/useContentData";
@@ -32,13 +33,19 @@ export default function FlightInfoContent() {
       className="container-page pt-4 pb-8 md:py-8 md:max-w-6xl md:mx-auto"
       {...loadingProps(!data)}
     >
-      <div className="md:bg-white md:rounded-2xl md:p-6 md:card-shadow">
-        {/* Placeholder nằm chung <Reveal> với bảng thật: đổi ruột giữa chừng,
-            hiệu ứng vào trang không chạy lại (xem Reveal.tsx). */}
-        <Reveal>
+      {/* Placeholder nằm chung <Reveal> với bảng thật: đổi ruột giữa chừng,
+          hiệu ứng vào trang không chạy lại (xem Reveal.tsx). */}
+      <Reveal>
+        {data ? (
+          <h2 className="text-xl md:text-2xl font-bold mb-4">{fi["title"]}</h2>
+        ) : (
+          <FlightTitleSkeleton />
+        )}
+        {/* Thẻ trắng khai báo ngoài hai nhánh: placeholder và bảng thật dùng
+            chung đúng một cái hộp nên không lệch lúc bàn giao. */}
+        <div className="md:bg-white md:rounded-2xl md:p-6 md:card-shadow">
           {data ? (
             <FlightTable
-              title={fi["title"]}
               rows={flights}
               headers={{
                 no: fi["no"],
@@ -53,21 +60,21 @@ export default function FlightInfoContent() {
           ) : (
             <FlightTableSkeleton />
           )}
-        </Reveal>
-        <Reveal delay={50} className="mt-10">
-          {data ? (
-            <>
-              <h2 className="section-title">{fi["policy"]}</h2>
-              <MarkdownContent
-                content={data.flightInfo.flightPolicy}
-                className="text-sm text-gray-700 max-w-3xl"
-              />
-            </>
-          ) : (
-            <FlightPolicySkeleton />
-          )}
-        </Reveal>
-      </div>
+        </div>
+      </Reveal>
+      <Reveal delay={50} className="mt-10">
+        {data ? (
+          <>
+            <h2 className="section-title">{fi["policy"]}</h2>
+            <MarkdownContent
+              content={data.flightInfo.flightPolicy}
+              className="text-sm text-gray-700 max-w-3xl"
+            />
+          </>
+        ) : (
+          <FlightPolicySkeleton />
+        )}
+      </Reveal>
     </div>
   );
 }

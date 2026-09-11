@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Navbar from "@/components/layout/Navbar";
+import Breadcrumb from "@/components/layout/Breadcrumb";
 import Footer from "@/components/layout/Footer";
 import RememberLocale from "@/components/sys/RememberLocale";
 import ActivePoller from "@/components/sys/ActivePoller";
@@ -66,7 +67,10 @@ export default async function LocaleLayout({
       <RememberLocale />
       <ActivePoller officialSiteUrl={officialSiteUrl} buildId={buildId} />
       <div className="flex flex-col min-h-[100dvh] bg-page">
-        <Navbar logoOnBlack={logoOnBlack} />
+        <Navbar logoOnBlack={logoOnBlack} logoOnWhite={logoOnWhite} />
+        {/* Dải crumb của trang, chỉ có ở mobile — đứng ngay sau header vì nó
+            sticky theo `top-12` của header đó. */}
+        <Breadcrumb />
         {/* Navbar's header is `sticky` on mobile (stays in flow, no spacer
             needed) but `fixed` from `md:` up, where it drops out of flow —
             this spacer reserves its md:h-14 there so content below (and

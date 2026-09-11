@@ -27,7 +27,6 @@ interface FlightHeaders {
 }
 
 interface FlightTableProps {
-  title?: string;
   rows: FlightRow[];
   headers?: FlightHeaders;
 }
@@ -85,8 +84,9 @@ function TimeValue({
   );
 }
 
+/** Chỉ phần bảng: tiêu đề mục nằm ngoài thẻ trắng bọc bảng này nên do
+ *  FlightInfoContent dựng. */
 export default function FlightTable({
-  title = "Flight Information",
   rows,
   headers = defaultHeaders,
 }: FlightTableProps) {
@@ -96,9 +96,7 @@ export default function FlightTable({
   );
 
   return (
-    <div>
-      <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
-
+    <>
       {/* Mobile: stacked cards, one card per flight; 2 cards per row when wide enough */}
       <div className="md:hidden grid grid-cols-1 min-[570px]:grid-cols-2 gap-3">
         {rows.map((row, idx) => {
@@ -360,6 +358,6 @@ export default function FlightTable({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

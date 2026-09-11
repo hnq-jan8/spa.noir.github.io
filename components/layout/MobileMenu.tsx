@@ -16,7 +16,7 @@ interface LanguageOption {
 /**
  * Drawer toàn màn hình cho mobile (< md): danh sách route, hoặc danh sách ngôn
  * ngữ khi `langView` bật (nút globe/back ở Navbar). Luôn mount, ẩn/hiện bằng
- * clip-path để animate mượt.
+ * fade opacity 300ms — cùng nhịp với header đảo màu (Navbar.tsx).
  */
 export default function MobileMenu({
   open,
@@ -47,17 +47,17 @@ export default function MobileMenu({
       // Mirrors the closed-state classes below so the drawer stays hidden even
       // if the stylesheet fails to load.
       style={open ? undefined : { visibility: "hidden", pointerEvents: "none" }}
-      // Chồm 8px vào header để nuốt khe hở sub-pixel giữa sticky (header) và
-      // fixed (drawer) ở mức zoom lẻ — an toàn vì header nằm trên (z-50 > z-40)
-      // và có nền đục; pt-2 bù lại phía nội dung.
+      // top-12 = đúng chiều cao header. Không chồm lên nó: drawer cố định
+      // `bg-page` còn header đảo màu theo `menuOpen`, nên mọi phần giao nhau
+      // đều lộ thành vệt lệch màu giữa lúc header đang transition.
       //
       // overflow-x-hidden: hai panel xếp chồng bên dưới nằm ngoài khung bằng
       // translate-x lúc ẩn, mà con đã transform vẫn nới overflow của cha —
       // không clip thì cả drawer cuộn ngang được đúng bằng khoảng đó.
-      className={`md:hidden fixed inset-x-0 top-[calc(3rem-8px)] h-[calc(100dvh-3rem+8px)] pt-2 z-40 bg-chrome text-white overflow-y-auto overflow-x-hidden overscroll-contain ${
+      className={`md:hidden fixed inset-x-0 top-12 h-[calc(100dvh-3rem)] z-40 bg-page text-gray-900 overflow-y-auto overflow-x-hidden overscroll-contain ${
         open
-          ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
-          : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
+          ? "opacity-100 visible pointer-events-auto [transition:opacity_300ms_ease-out,visibility_0s_linear_0s]"
+          : "opacity-0 invisible pointer-events-none [transition:opacity_300ms_ease-out,visibility_0s_linear_300ms]"
       }`}
       role="dialog"
       aria-modal="true"
@@ -86,7 +86,7 @@ export default function MobileMenu({
                   if (isActive) invalidateContent();
                 }}
                 // Staggered reveal on open only — delay collapses to 0 on close
-                // so the drawer's own clip-path handles the exit.
+                // so the drawer's own opacity fade handles the exit.
                 style={{
                   transitionDelay:
                     open && !langView ? `${100 + index * 50}ms` : "0ms",
@@ -97,8 +97,8 @@ export default function MobileMenu({
                     : "opacity-0 translate-y-3"
                 } ${
                   isActive
-                    ? "text-white font-semibold"
-                    : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
+                    ? "text-gray-900 font-semibold"
+                    : "text-gray-600 font-normal hover:text-gray-900 hover:font-medium active:text-gray-900 active:font-medium"
                 }`}
               >
                 {/* Anchors the unread dot to the text, not the row, so it sits on
@@ -110,7 +110,7 @@ export default function MobileMenu({
                       aria-hidden="true"
                       // Steady, not pulsing: it marks a state, and a pulse would
                       // compete with the homepage's live "as of" dot.
-                      className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]"
+                      className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-gray-900 shadow-[0_0_3px_1px_rgba(0,0,0,0.35)]"
                     />
                   )}
                 </span>
@@ -132,7 +132,13 @@ export default function MobileMenu({
                 <Link
                   key={lang.code}
                   href={`/${lang.code}${pathWithoutLocale}`}
-                  onClick={onNavigate}
+                  onClick={() => {
+                    onNavigate();
+                    // Cùng locale thì Link không điều hướng, không gì tự
+                    // refetch. Giữ nguyên bài đang mở — đổi sang ngôn ngữ
+                    // khác cũng giữ (href mang theo `?a=`).
+                    if (isActive) invalidateContent();
+                  }}
                   style={{
                     transitionDelay: langView ? `${100 + index * 50}ms` : "0ms",
                   }}
@@ -142,8 +148,8 @@ export default function MobileMenu({
                       : "opacity-0 translate-y-3"
                   } ${
                     isActive
-                      ? "text-white font-semibold"
-                      : "text-gray-300 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
+                      ? "text-gray-900 font-semibold"
+                      : "text-gray-600 font-normal hover:text-gray-900 hover:font-medium active:text-gray-900 active:font-medium"
                   }`}
                 >
                   <span>{lang.label}</span>
