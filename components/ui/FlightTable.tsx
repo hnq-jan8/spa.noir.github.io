@@ -112,12 +112,18 @@ export default function FlightTable({
               className="bg-white rounded-2xl overflow-hidden card-shadow"
             >
               <div className="px-4 pt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="flex items-center gap-1.5 font-semibold text-gray-900">
-                    <Plane className="w-4 h-4 text-gray-400" strokeWidth={2} />
-                    {row.flightNo}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  {/* min-w-0 lets the truncate below win over the flex item's
+                      content-based minimum width — otherwise a garbage-length
+                      flightNo just pushes the card wider instead of clipping. */}
+                  <span className="flex items-center gap-1.5 font-semibold text-gray-900 min-w-0">
+                    <Plane
+                      className="w-4 h-4 text-gray-400 flex-shrink-0"
+                      strokeWidth={2}
+                    />
+                    <span className="truncate">{row.flightNo}</span>
                   </span>
-                  <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                  <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded truncate max-w-[40%] flex-shrink-0">
                     {row.note}
                   </span>
                 </div>
@@ -214,8 +220,8 @@ export default function FlightTable({
                       share `leading-5` so their line boxes match despite the
                       font-size difference — otherwise items-center reads as the
                       badge sitting low. */}
-                  <span className="inline-flex items-center gap-3">
-                    <span className="font-medium text-gray-900 leading-5">
+                  <span className="inline-flex items-center gap-3 max-w-full">
+                    <span className="font-medium text-gray-900 leading-5 truncate inline-block max-w-[200px] align-bottom">
                       {rows[0].flightNo}
                     </span>
                     <span className="inline-flex items-center gap-2 text-xs leading-5 bg-gray-100 px-2 py-1 rounded">
@@ -336,7 +342,7 @@ export default function FlightTable({
                     <td className="py-3 pr-4 lg:pr-8 text-gray-600">
                       {formatFlightDate(row.date) || "–"}
                     </td>
-                    <td className="py-3 pr-4 lg:pr-8 font-semibold text-gray-700">
+                    <td className="py-3 pr-4 lg:pr-8 font-semibold text-gray-700 max-w-[160px] truncate">
                       {row.flightNo}
                     </td>
                     <td className="py-3 pr-4 lg:pr-8">
