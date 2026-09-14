@@ -64,7 +64,23 @@ try {
   );
 }
 
-const languages = languageRows.map((r) => ({
+// `code` becomes a filename (messages/${code}.json) and a route segment
+// ([locale]) further down the pipeline — a row that slipped past CMS
+// validation (or predates it) with something like `<h1>...` in `code` would
+// otherwise crash the whole build over one bad language instead of just
+// dropping it.
+const VALID_LOCALE_CODE = /^[a-z]{2,3}$/;
+const validLanguageRows = languageRows.filter((r) => VALID_LOCALE_CODE.test(r.code));
+for (const r of languageRows) {
+  if (!VALID_LOCALE_CODE.test(r.code)) {
+    console.warn(`⚠ Bỏ qua language có code không hợp lệ: ${JSON.stringify(r.code)}`);
+  }
+}
+if (!validLanguageRows.length) {
+  throw new Error("No language row has a valid code after filtering");
+}
+
+const languages = validLanguageRows.map((r) => ({
   code: r.code,
   name: r.name,
 }));
