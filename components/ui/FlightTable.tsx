@@ -97,8 +97,14 @@ export default function FlightTable({
 
   return (
     <>
-      {/* Mobile: stacked cards, one card per flight; 2 cards per row when wide enough */}
-      <div className="md:hidden grid grid-cols-1 min-[570px]:grid-cols-2 gap-3">
+      {/* Mobile: stacked cards, one card per flight; 2 cards per row when wide
+          enough. A single flight hands off to the single-flight table below
+          at the same 570px point a second column would otherwise appear. */}
+      <div
+        className={`grid grid-cols-1 min-[570px]:grid-cols-2 gap-3 ${
+          rows.length === 1 ? "min-[570px]:hidden" : "md:hidden"
+        }`}
+      >
         {rows.map((row, idx) => {
           return (
             <div
@@ -187,11 +193,12 @@ export default function FlightTable({
         })}
       </div>
 
-      {/* Single flight, md+: rotated to one field per row — an 8-column table
-          for one line of data reads as a header looking for its rows. No/STT is
-          dropped, since it only numbered rows against each other. */}
+      {/* Single flight, 570px+: rotated to one field per row — an 8-column
+          table for one line of data reads as a header looking for its rows.
+          No/STT is dropped, since it only numbered rows against each other.
+          Below 570px the mobile card above covers it instead. */}
       {rows.length === 1 ? (
-        <div className="hidden md:block">
+        <div className="hidden min-[570px]:block">
           <table className="w-full max-w-2xl text-sm text-left">
             <tbody className="divide-y divide-gray-100">
               <tr>
@@ -315,7 +322,14 @@ export default function FlightTable({
               </thead>
               <tbody>
                 {rows.map((row, idx) => (
-                  <tr key={idx} className="border-b border-gray-100">
+                  <tr
+                    key={idx}
+                    className={
+                      idx < rows.length - 1
+                        ? "border-b border-gray-100"
+                        : undefined
+                    }
+                  >
                     <td className="py-3 pr-4 lg:pr-8 text-gray-600 text-center">
                       {row.no}
                     </td>

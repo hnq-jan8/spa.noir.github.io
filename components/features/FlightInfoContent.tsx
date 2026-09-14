@@ -43,7 +43,13 @@ export default function FlightInfoContent() {
         )}
         {/* Thẻ trắng khai báo ngoài hai nhánh: placeholder và bảng thật dùng
             chung đúng một cái hộp nên không lệch lúc bàn giao. */}
-        <div className="md:bg-white md:rounded-2xl md:p-6 md:card-shadow">
+        <div
+          className={
+            flights.length === 1
+              ? "min-[570px]:bg-white min-[570px]:rounded-2xl min-[570px]:px-6 min-[570px]:py-3 min-[570px]:card-shadow"
+              : "md:bg-white md:rounded-2xl md:px-6 md:pt-4 md:pb-2 md:card-shadow"
+          }
+        >
           {data ? (
             <FlightTable
               rows={flights}
