@@ -45,9 +45,11 @@ export default function FlightInfoContent() {
             chung đúng một cái hộp nên không lệch lúc bàn giao. */}
         <div
           className={
-            flights.length === 1
-              ? "min-[570px]:bg-white min-[570px]:rounded-2xl min-[570px]:px-6 min-[570px]:py-3 min-[570px]:card-shadow"
-              : "md:bg-white md:rounded-2xl md:px-6 md:pt-4 md:pb-2 md:card-shadow"
+            !data
+              ? "md:bg-white md:rounded-2xl md:px-6 md:py-6 md:card-shadow"
+              : flights.length === 1
+                ? "min-[570px]:bg-white min-[570px]:rounded-2xl min-[570px]:px-6 min-[570px]:py-3 min-[570px]:card-shadow"
+                : "md:bg-white md:rounded-2xl md:px-6 md:pt-4 md:pb-2 md:card-shadow"
           }
         >
           {data ? (

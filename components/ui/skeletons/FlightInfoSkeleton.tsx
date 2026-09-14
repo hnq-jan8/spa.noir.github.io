@@ -52,7 +52,7 @@ export function FlightTableSkeleton() {
       {/* Real layout varies here too (single-flight key/value table vs.
           multi-row grid, see FlightTable) — one block marks the area. */}
       <div className="hidden md:block">
-        <Skeleton className="skeleton-on-card h-64 w-full" />
+        <Skeleton className="skeleton-on-card bg-gray-100 h-64 w-full" />
       </div>
     </>
   );
