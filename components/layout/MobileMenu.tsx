@@ -54,7 +54,10 @@ export default function MobileMenu({
       // Mirrors the closed-state classes below so the drawer stays hidden even
       // if the stylesheet fails to load.
       style={open ? undefined : { visibility: "hidden", pointerEvents: "none" }}
-      // top-12 = đúng chiều cao header, không chồm lên nó.
+      // top gần đúng chiều cao header, chồm lên 1px: bo tròn subpixel giữa
+      // <header> (đứng ngoài, z-50) và drawer (z-40) thỉnh thoảng hở một
+      // đường kẻ lộ nền trang bên dưới — chồm để header che mất mép đó,
+      // không đẩy nội dung vì phần chồm nằm sau header.
       //
       // Hạ rèm bằng `clip-path` chứ không phải translate/height: hộp đứng yên
       // đúng chỗ, chỉ phần lộ ra lớn dần, nên nội dung không trượt theo và
@@ -63,7 +66,7 @@ export default function MobileMenu({
       // overflow-x-hidden: hai panel xếp chồng bên dưới nằm ngoài khung bằng
       // translate-x lúc ẩn, mà con đã transform vẫn nới overflow của cha —
       // không clip thì cả drawer cuộn ngang được đúng bằng khoảng đó.
-      className={`md:hidden fixed inset-x-0 top-12 h-[calc(100dvh-3rem)] z-40 bg-page text-gray-900 overflow-y-auto overflow-x-hidden overscroll-contain ${
+      className={`md:hidden fixed inset-x-0 top-[calc(3rem-1px)] h-[calc(100dvh-3rem+1px)] z-40 bg-chrome text-white overflow-y-auto overflow-x-hidden overscroll-contain ${
         open
           ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
           : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
@@ -106,8 +109,8 @@ export default function MobileMenu({
                     : "opacity-0 translate-y-3"
                 } ${
                   isActive
-                    ? "text-gray-900 font-semibold"
-                    : "text-gray-600 font-normal hover:text-gray-900 hover:font-medium active:text-gray-900 active:font-medium"
+                    ? "text-white font-semibold"
+                    : "text-gray-200 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
                 }`}
               >
                 {/* Anchors the unread dot to the text, not the row, so it sits on
@@ -119,7 +122,7 @@ export default function MobileMenu({
                       aria-hidden="true"
                       // Steady, not pulsing: it marks a state, and a pulse would
                       // compete with the homepage's live "as of" dot.
-                      className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-gray-900 shadow-[0_0_3px_1px_rgba(0,0,0,0.35)]"
+                      className="absolute -top-0.5 -right-3 w-2 h-2 rounded-full bg-white shadow-[0_0_3px_1px_rgba(255,255,255,0.5)]"
                     />
                   )}
                 </span>
@@ -157,8 +160,8 @@ export default function MobileMenu({
                       : "opacity-0 translate-y-3"
                   } ${
                     isActive
-                      ? "text-gray-900 font-semibold"
-                      : "text-gray-600 font-normal hover:text-gray-900 hover:font-medium active:text-gray-900 active:font-medium"
+                      ? "text-white font-semibold"
+                      : "text-gray-200 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
                   }`}
                 >
                   <span>{lang.label}</span>

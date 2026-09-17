@@ -67,7 +67,7 @@ export default async function LocaleLayout({
       <RememberLocale />
       <ActivePoller officialSiteUrl={officialSiteUrl} buildId={buildId} />
       <div className="flex flex-col min-h-[100dvh] bg-page">
-        <Navbar logoOnBlack={logoOnBlack} logoOnWhite={logoOnWhite} />
+        <Navbar logoOnBlack={logoOnBlack} />
         {/* Dải crumb của trang, chỉ có ở mobile — đứng ngay sau header vì nó
             sticky theo `top-12` của header đó. */}
         <Breadcrumb />
