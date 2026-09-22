@@ -14,6 +14,7 @@ import { useLocale } from "@/hooks/useLocale";
 import { formatTimestamp } from "@/lib/siteData";
 import { ContentLoadError } from "@/components/ui/EmptyState";
 import { excerptOf, titleOf } from "@/components/ui/ArticleCard";
+import { ARTICLE_PARAM, presetArticleKey } from "@/hooks/useArticleRoute";
 import {
   AsOfPillSkeleton,
   BrowseCardSkeleton,
@@ -113,13 +114,19 @@ export default function HomeContent() {
         {!data ? (
           <LatestUpdateSkeleton />
         ) : latestUpdate ? (
-          <CardLink
-            href={`/${locale}/official-updates`}
+          <div
             // Vạch trái là ngoại lệ cố ý của quy tắc card không viền: nó là
             // điểm nhấn, không phải đường bao, cho thẻ phải thắng cái nhìn đầu
             // tiên. Nền trắng và hover vẫn y hệt mọi card khác.
-            className="block border-l-4 border-l-gray-900 pt-5 pb-4"
+            className="group relative bg-white rounded-2xl p-6 card-shadow hover:bg-cardHover active:bg-cardHover border-l-4 border-l-gray-900 pt-5 pb-4"
           >
+            {/* Link phủ kín thẻ: cả thẻ mở thẳng bài viết, không qua danh sách. */}
+            <Link
+              href={`/${locale}/official-updates?${ARTICLE_PARAM}=${encodeURIComponent(latestUpdate.key)}`}
+              onClick={() => presetArticleKey(latestUpdate.key)}
+              className="absolute inset-0 rounded-2xl"
+              aria-label={titleOf(latestUpdate) ?? undefined}
+            />
             <p className="flex items-center gap-1.5 text-gray-600 text-xs font-semibold uppercase tracking-wide mb-4">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
               {home["officialUpdateBadge"]}
@@ -139,15 +146,19 @@ export default function HomeContent() {
                 {latestUpdate.date &&
                   formatTimestamp(latestUpdate.date, locale)}
               </span>
-              <span className="text-gray-600 font-semibold inline-flex items-center gap-1">
+              {/* Riêng link này mở trang danh sách, đè lên link phủ nhờ z-10. */}
+              <Link
+                href={`/${locale}/official-updates`}
+                className="group/viewall relative z-10 text-gray-600 font-semibold inline-flex items-center gap-1 hover:underline active:underline"
+              >
                 {home["viewAll"]}
                 <ChevronRight
-                  className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
+                  className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover/viewall:translate-x-1 group-active/viewall:translate-x-1"
                   strokeWidth={2}
                 />
-              </span>
+              </Link>
             </div>
-          </CardLink>
+          </div>
         ) : (
           <button
             type="button"

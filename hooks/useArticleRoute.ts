@@ -55,6 +55,15 @@ export function clearArticleRoute() {
   setKey(null);
 }
 
+/**
+ * Đồng bộ tay `currentKey` trước khi một <Link> ở trang khác tự mang `?a=`
+ * sang trang danh sách — `currentKey` chỉ tự đọc URL ở lần mount đầu của
+ * phiên, nên các lần sau cần gọi hàm này như open()/clearArticleRoute().
+ */
+export function presetArticleKey(key: string) {
+  setKey(key);
+}
+
 /** Current open article key, for components outside the article page. */
 export function useArticleKey(): string | null {
   const [key, setLocal] = useState<string | null>(currentKey);
