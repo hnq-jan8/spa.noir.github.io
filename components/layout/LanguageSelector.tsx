@@ -182,12 +182,15 @@ export function DesktopLanguageSelector({
       highlightFullyHiddenRef.current = true;
     }, HIGHLIGHT_FADE_MS);
   };
-  const close = () => {
+  const close = (keepHover = false) => {
     setHoveredCode(null);
     // Vuốt scroll (không phải tap) không phát `mouseleave` bù cho
     // `mouseenter` giả lập lúc chạm mở dropdown — reset thủ công, không thì
-    // pill kẹt sáng như đang hover dù dropdown đã đóng.
-    setHovering(false);
+    // pill kẹt sáng như đang hover dù dropdown đã đóng. Nhưng khi đóng bằng
+    // cách bấm lại nút (chuột vẫn đang ở trên pill, không có mouseleave nào
+    // xảy ra), giữ nguyên `hovering` — không thì pill tắt hover tới khi rê
+    // chuột ra rồi vào lại.
+    if (!keepHover) setHovering(false);
     // Cả dropdown vừa biến mất — lần mở lại sau luôn phải snap, không trượt
     // từ vị trí hover dở dang trước khi đóng.
     clearTimeout(highlightHideTimeoutRef.current);
@@ -276,7 +279,7 @@ export function DesktopLanguageSelector({
         aria-label={selectLanguageLabel}
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => (open ? close() : onOpenChange(true))}
+        onClick={() => (open ? close(true) : onOpenChange(true))}
         // self-stretch để hit-area khớp vùng hover (container ngoài) — viên
         // pill bo tròn chuyển xuống span con, chỉ còn là lớp hiển thị, nên
         // vòng focus cũng phải xuống theo nó (focus-ring-inner).
