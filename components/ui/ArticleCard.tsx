@@ -14,10 +14,14 @@ function PreviewImage({
   src,
   alt,
   className,
+  iconAtTop = false,
 }: {
   src: string;
   alt: string;
   className: string;
+  /** Tile "grid": chữ phủ lên nửa dưới ảnh, icon lỗi ở giữa sẽ bị tiêu đề che —
+   * đưa lên sát mép trên, chỗ còn thấy được. */
+  iconAtTop?: boolean;
 }) {
   const [status, setStatus] = useState<"loading" | "loaded" | "failed">(
     "loading",
@@ -25,7 +29,9 @@ function PreviewImage({
   if (status === "failed") {
     return (
       <div
-        className={`${className} bg-gray-200 flex items-center justify-center overflow-hidden`}
+        className={`${className} bg-gray-200 flex justify-center overflow-hidden ${
+          iconAtTop ? "items-start pt-2 sm:pt-3" : "items-center"
+        }`}
         aria-hidden="true"
       >
         <ImageOff className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
@@ -190,6 +196,7 @@ export default function ArticleCard({
               src={article.previewImage as string}
               alt=""
               className="absolute inset-0 w-full h-full"
+              iconAtTop
             />
             {/* Fade sits on the date's own row (not a separate strip above
                 it) and bottoms out at fully opaque — matching the title
