@@ -14,14 +14,16 @@ function PreviewImage({
   src,
   alt,
   className,
-  iconAtTop = false,
+  hideFailedIcon = false,
+  onFailed,
 }: {
   src: string;
   alt: string;
   className: string;
-  /** Tile "grid": chữ phủ lên nửa dưới ảnh, icon lỗi ở giữa sẽ bị tiêu đề che —
-   * đưa lên sát mép trên, chỗ còn thấy được. */
-  iconAtTop?: boolean;
+  /** Tile "grid": chữ phủ nửa dưới ảnh nên icon ở giữa bị che — tile tự đặt
+   * icon (qua `onFailed`) ở khoảng trống phía trên chữ. */
+  hideFailedIcon?: boolean;
+  onFailed?: () => void;
 }) {
   const [status, setStatus] = useState<"loading" | "loaded" | "failed">(
     "loading",
@@ -29,12 +31,12 @@ function PreviewImage({
   if (status === "failed") {
     return (
       <div
-        className={`${className} bg-gray-200 flex justify-center overflow-hidden ${
-          iconAtTop ? "items-start pt-2 sm:pt-3" : "items-center"
-        }`}
+        className={`${className} bg-gray-200 flex items-center justify-center overflow-hidden`}
         aria-hidden="true"
       >
-        <ImageOff className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
+        {!hideFailedIcon && (
+          <ImageOff className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
+        )}
       </div>
     );
   }
@@ -48,7 +50,10 @@ function PreviewImage({
         alt={alt}
         loading="lazy"
         onLoad={() => setStatus("loaded")}
-        onError={() => setStatus("failed")}
+        onError={() => {
+          setStatus("failed");
+          onFailed?.();
+        }}
         // Trước khi tải xong ẩn <img> đi (opacity-0) thay vì để trình duyệt tự
         // vẽ icon "ảnh vỡ" mặc định đè lên nền xám — chỉ hiện khi đã load xong.
         className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
@@ -128,6 +133,8 @@ export default function ArticleCard({
       : excerptOf(article, featured ? 220 : 150);
   const heading = titleOf(article);
   const hasImage = Boolean(article.previewImage);
+  // Chỉ tile "grid" dùng (xem `hideFailedIcon`).
+  const [gridImageFailed, setGridImageFailed] = useState(false);
 
   return (
     <button
@@ -196,7 +203,8 @@ export default function ArticleCard({
               src={article.previewImage as string}
               alt=""
               className="absolute inset-0 w-full h-full"
-              iconAtTop
+              hideFailedIcon
+              onFailed={() => setGridImageFailed(true)}
             />
             {/* Fade sits on the date's own row (not a separate strip above
                 it) and bottoms out at fully opaque — matching the title
@@ -204,7 +212,20 @@ export default function ArticleCard({
                 at the seam between them. Eased middle stops avoid the
                 "looks hard-edged" effect a plain 2-stop linear gradient
                 gets over a busy photo. */}
-            <div className="absolute inset-x-0 bottom-0 flex flex-col">
+            <div className="absolute inset-0 flex flex-col justify-end">
+              {/* Ảnh lỗi: icon căn giữa từ mép trên tới quanh dòng ngày. Margin
+                  âm cho vùng căn lấn vào dải fade (phần trên của dòng ngày là
+                  trong suốt) để icon không nằm quá cao; flex-1 tự co theo
+                  tiêu đề 1 hay 2 dòng. */}
+              {gridImageFailed && (
+                <div className="relative z-10 flex-1 flex items-center justify-center -mb-9 sm:-mb-11">
+                  <ImageOff
+                    className="w-5 h-5 text-gray-500"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                </div>
+              )}
               {article.date && (
                 <div className="relative h-12 sm:h-14 flex flex-col justify-end px-3.5 pb-1 sm:px-4">
                   <div className="absolute inset-0 card-fade" />
