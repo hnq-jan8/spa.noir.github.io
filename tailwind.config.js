@@ -33,6 +33,11 @@ module.exports = {
         cardHover: COLORS.cardHover,
       },
       keyframes: {
+        // Item dropdown ngôn ngữ lúc đóng: nhích lên 4px trong lúc mờ đi.
+        "item-out": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(-0.25rem)" },
+        },
         "pulse-glow": {
           "0%, 100%": {
             opacity: "1",
@@ -43,6 +48,7 @@ module.exports = {
         },
       },
       animation: {
+        "item-out": "item-out 150ms cubic-bezier(1, 0, 0.68, 0.28)",
         "pulse-glow": "pulse-glow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },

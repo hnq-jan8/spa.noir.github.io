@@ -9,7 +9,6 @@ import {
   type RefObject,
 } from "react";
 import { languages as configuredLanguages } from "@/i18n/routing";
-import { bundledLabels } from "@/i18n/labels";
 import { invalidateContent } from "@/hooks/useContentData";
 
 export function useDismissOnOutside(
@@ -47,24 +46,6 @@ export const languages = configuredLanguages.map((lang) => ({
 export interface LanguageOption {
   code: string;
   label: string;
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg
-      className="w-3 h-3 flex-shrink-0"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  );
 }
 
 /** Dùng chung cho trigger desktop và nút ngôn ngữ mobile trong header. */
@@ -137,10 +118,9 @@ export function DesktopLanguageSelector({
 }: LanguageSelectorProps) {
   const options = liveLanguages ?? languages;
 
-  // Hover khi đang đóng: chỉ đổi màu pill, không mở rộng / đổi chữ như lúc
-  // mở — xem cách dùng `pillActive` bên dưới.
+  // Hover cũng làm sáng pill như lúc mở — xem `pillActive` bên dưới.
   const [hovering, setHovering] = useState(false);
-  // Ngôn ngữ đang rê chuột tới: chữ trên pill đổi theo (xem `pillLabel`).
+  // Ngôn ngữ đang rê chuột tới: chỉ để trượt khối highlight.
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   // Vị trí highlight lúc rời hẳn khỏi danh sách (hoveredCode -> null): giữ
@@ -202,37 +182,26 @@ export function DesktopLanguageSelector({
 
   // Đo trên các phần tử không animate, để mọi animation chạy trên px cố định.
   const restRef = useRef<HTMLSpanElement>(null);
-  const openRef = useRef<HTMLSpanElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   // Bản sao ẩn để đo bề rộng thật (thẻ hiển thị bị gán `width` cố định).
   const measureListRef = useRef<HTMLDivElement>(null);
-  // Bản sao ẩn đo nhãn "select language" của MỌI ngôn ngữ, vì pill đổi chữ
-  // theo dòng đang rê chuột nên bề rộng phải đủ cho bản dịch dài nhất.
-  const measureSelectLabelRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{
     rest: number;
     open: number;
     h: number;
   } | null>(null);
+  // `options` là mảng mới mỗi lần Navbar render — đo lại theo nội dung, không
+  // thì mỗi lần bấm mở/đóng là một lượt ép layout giữa transition.
+  const optionsKey = options
+    .map((lang) => `${lang.code}:${lang.label}`)
+    .join("|");
   useLayoutEffect(() => {
     const measure = () => {
-      if (
-        !restRef.current ||
-        !listRef.current ||
-        !measureListRef.current ||
-        !measureSelectLabelRef.current
-      )
+      if (!restRef.current || !listRef.current || !measureListRef.current)
         return;
-      // Pill lúc mở và dropdown dùng chung 1 bề rộng: max giữa nhãn "select
-      // language" dài nhất và label ngôn ngữ dài nhất. `GLOBE_CLEARANCE` =
-      // khoảng tối thiểu mép nút–chữ, nhân đôi vì chữ căn giữa nút.
-      const GLOBE_CLEARANCE = 12 + 14 + 4;
       setSize({
         rest: restRef.current.offsetWidth,
-        open: Math.max(
-          measureSelectLabelRef.current.offsetWidth + GLOBE_CLEARANCE * 2,
-          measureListRef.current.offsetWidth,
-        ),
+        open: measureListRef.current.offsetWidth,
         h: listRef.current.offsetHeight,
       });
     };
@@ -243,28 +212,15 @@ export function DesktopLanguageSelector({
     // đo lại khi resize để không kẹt width 0 tới lúc reload.
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [options, locale, selectLanguageLabel]);
+  }, [optionsKey, locale]);
 
   // Menu liệt kê cả ngôn ngữ hiện tại (đánh dấu bằng icon check tròn).
   if (options.length <= 1) return null;
-
-  // Pill hiện nhãn "select language", dịch theo dòng đang rê chuột — chỉ
-  // trang hiện tại có nhãn từ CMS, còn lại tra `bundledLabels`.
-  const pillLabel =
-    hoveredCode && hoveredCode !== locale
-      ? (bundledLabels(hoveredCode, "nav")["selectLanguage"] ??
-        selectLanguageLabel)
-      : selectLanguageLabel;
 
   const hoveredIndex = options.findIndex((lang) => lang.code === hoveredCode);
   if (hoveredIndex >= 0) lastHoveredIndexRef.current = hoveredIndex;
   const highlightIndex =
     hoveredIndex >= 0 ? hoveredIndex : lastHoveredIndexRef.current;
-
-  const allSelectLanguageLabels = [
-    selectLanguageLabel,
-    ...options.map((lang) => bundledLabels(lang.code, "nav")["selectLanguage"]),
-  ].filter((label): label is string => Boolean(label));
 
   return (
     <div
@@ -286,53 +242,18 @@ export function DesktopLanguageSelector({
         className="relative focus-ring-inner self-stretch flex items-center text-xs font-medium"
       >
         <span
-          // Chỉ `width` (px đo sẵn) và nền animate; chữ chỉ mờ vào/ra, không
-          // dựng lại layout mỗi frame (Safari giật ở đúng chỗ đó).
-          style={{ width: size ? (open ? size.open : size.rest) : undefined }}
-          className={`relative flex items-center justify-end h-9 rounded-full overflow-hidden [transition:width_200ms_cubic-bezier(0.32,0.72,0,1)_-100ms,background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
-            pillActive ? "bg-gray-100" : "bg-transparent"
+          className={`relative flex items-center h-9 rounded-full [transition:background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
+            pillActive ? "bg-white/10" : "bg-transparent"
           }`}
         >
           <span
             ref={restRef}
-            className={`flex items-center gap-1.5 px-3 whitespace-nowrap transition-[opacity,transform,color] duration-150 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-              open
-                ? "opacity-0 -translate-x-3 text-gray-200"
-                : `opacity-100 translate-x-0 ${hovering ? "text-black" : "text-gray-200"}`
+            className={`flex items-center gap-1.5 px-3 whitespace-nowrap transition-colors duration-150 ${
+              pillActive ? "text-white" : "text-gray-200"
             }`}
           >
             <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
             {locale.toUpperCase()}
-          </span>
-
-          {/* `left-1/2 -translate-x-1/2` chứ không `inset-0`, để offsetWidth đo
-              ra bề rộng chữ chứ không phải bề rộng nút. */}
-          <span
-            ref={openRef}
-            aria-hidden
-            className={`absolute left-1/2 -translate-x-1/2 inset-y-0 flex items-center px-1 whitespace-nowrap text-black transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
-              open ? "duration-150 opacity-100" : "duration-0 opacity-0"
-            }`}
-          >
-            {pillLabel}
-          </span>
-
-          <span
-            aria-hidden
-            className={`absolute inset-y-0 right-0 flex items-center pr-3 text-black transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
-              open ? "duration-150 opacity-100" : "duration-0 opacity-0"
-            }`}
-          >
-            <ChevronDownIcon />
-          </span>
-
-          <span
-            aria-hidden
-            className={`absolute inset-y-0 left-3 flex items-center transition-opacity ease-[cubic-bezier(0.32,0.72,0,1)] ${
-              open ? "duration-150 opacity-100" : "duration-0 opacity-0"
-            }`}
-          >
-            <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0 text-black" />
           </span>
         </span>
       </button>
@@ -345,25 +266,42 @@ export function DesktopLanguageSelector({
         // pt-2.5 (10px) = khoảng cách từ pill (h-9, giữa container cao h-14)
         // xuống cạnh dưới navbar, để dropdown cách cạnh dưới navbar đúng
         // bằng khoảng pill cách cạnh dưới đó.
-        className={`absolute top-full -right-5 box-content px-5 pt-2.5 z-50 pointer-events-none [transition:opacity_0s,visibility_0s] ${
-          open ? "visible opacity-100" : "invisible opacity-0"
-        }`}
+        // Không đổi `visibility`: thẻ tự mờ + `pointer-events-none` lúc đóng.
+        // Bật/tắt visibility của phần tử có `backdrop-blur` làm navbar nháy
+        // khi bấm liên tục.
+        aria-hidden={!open}
+        className="absolute top-full -right-5 box-content px-5 pt-2.5 z-50 flex justify-end pointer-events-none"
       >
         <span
           aria-hidden
-          className="absolute inset-x-0 top-0 h-1 pointer-events-auto"
+          className={`absolute inset-x-0 top-0 h-1 ${open ? "pointer-events-auto" : ""}`}
         />
 
-        {/* Delay âm −62ms: vào transition ở trạng thái đã chạy sẵn ¼ đường
+        {/* Thẻ giãn cả chiều cao lẫn chiều ngang từ bề rộng viên pill (mép phải
+            cố định): mở 250ms, đóng ngược chiều 150ms và mờ hẳn trong 90ms
+            (xong trước khi chiều cao co được nửa). Danh sách bên trong rộng cố
+            định `size.open`, căn phải, bị `overflow-hidden` cắt. Delay âm
+            −62ms lúc mở: vào transition ở trạng thái đã chạy sẵn ¼ đường
             cong, bớt layout recalc — mẹo của lib/expandTransition. */}
         <div
-          style={{ height: open && size ? size.h : 0 }}
-          className="pointer-events-auto overflow-hidden rounded-[24px] bg-white/80 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.14)] [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
+          style={{
+            height: open && size ? size.h : 0,
+            width: size ? (open ? size.open : size.rest) : undefined,
+          }}
+          className={`flex items-start justify-end overflow-hidden rounded-[24px] bg-white/80 backdrop-blur-xl ring-1 ring-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
+            open
+              ? "opacity-100 pointer-events-auto [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,width_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,opacity_120ms_ease-out]"
+              : "opacity-0 pointer-events-none [transition:height_150ms_cubic-bezier(1,0,0.68,0.28),width_150ms_cubic-bezier(1,0,0.68,0.28),opacity_90ms_ease-out]"
+          }`}
         >
-          {/* p-2 (8px) quanh danh sách: margin 2 bên và trên/dưới (item
-              đầu/cuối) đều bằng nhau, không có gap giữa các item. rounded-2xl
-              (16px) trên khối hover = bo góc khối trắng (24px) − margin (8px). */}
-          <div ref={listRef} className="relative flex flex-col p-2">
+          {/* p-1.5 (6px) quanh danh sách, item không có gap. rounded-[18px] =
+              bo góc thẻ (24px) − margin (6px). `pl-4 pr-3` của item bù phần
+              padding bớt đi để chữ và icon check đứng yên. */}
+          <div
+            ref={listRef}
+            style={{ width: size?.open }}
+            className="relative flex flex-col flex-shrink-0 p-1.5"
+          >
             {/* Một khối nền duy nhất trượt theo `hoveredIndex`, thay vì mỗi
                 dòng tự tô hover riêng — mượt hơn khi rê chuột qua các dòng
                 liên tiếp. `z-10` trên Link để chữ/icon luôn nổi trên khối
@@ -371,7 +309,7 @@ export function DesktopLanguageSelector({
             <div
               ref={highlightRef}
               aria-hidden
-              className={`absolute inset-x-2 top-2 h-10 rounded-2xl bg-cardHover shadow-[0_0_0.5px_1.5px_rgba(255,255,255,0.6)] transition-[transform,opacity] duration-150 ease-out ${
+              className={`absolute inset-x-1.5 top-1.5 h-10 rounded-[18px] bg-cardHover shadow-[0_0_0.5px_1.5px_rgba(255,255,255,0.6)] transition-[transform,opacity] duration-150 ease-out ${
                 hoveredIndex >= 0 ? "opacity-100" : "opacity-0"
               }`}
               style={{
@@ -382,6 +320,7 @@ export function DesktopLanguageSelector({
               <Link
                 key={lang.code}
                 href={`/${lang.code}${pathWithoutLocale}`}
+                tabIndex={open ? undefined : -1}
                 onMouseEnter={() => handleItemEnter(lang.code)}
                 onMouseLeave={handleItemLeave}
                 onClick={() => {
@@ -393,10 +332,10 @@ export function DesktopLanguageSelector({
                     close();
                   }
                 }}
-                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 rounded-2xl text-sm text-black whitespace-nowrap active:bg-cardHover ${
+                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap active:bg-cardHover ${
                   open
                     ? "opacity-100 translate-y-0 [transition:opacity_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,transform_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
-                    : "opacity-0 -translate-y-5 [transition:none]"
+                    : "opacity-0 -translate-y-5 animate-item-out [transition:opacity_150ms_ease-out]"
                 }`}
               >
                 {lang.label}
@@ -412,29 +351,14 @@ export function DesktopLanguageSelector({
         aria-hidden
         className="absolute top-full right-0 invisible -z-10 pointer-events-none"
       >
-        <div ref={measureListRef} className="flex flex-col p-2">
+        <div ref={measureListRef} className="flex flex-col p-1.5">
           {options.map((lang) => (
             <div
               key={lang.code}
-              className="flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 text-sm whitespace-nowrap"
+              className="flex items-center justify-between gap-3 h-10 pl-4 pr-3 text-sm whitespace-nowrap"
             >
               {lang.label}
               <CircledCheckIcon active={lang.code === locale} />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Mỗi bản dịch một dòng riêng để đo ra bản dài nhất, không phải tổng
-          bề rộng — xem `measureSelectLabelRef`. */}
-      <div
-        aria-hidden
-        className="absolute top-full right-0 invisible -z-10 pointer-events-none"
-      >
-        <div ref={measureSelectLabelRef}>
-          {allSelectLanguageLabels.map((label, index) => (
-            <div key={index} className="px-1 whitespace-nowrap">
-              {label}
             </div>
           ))}
         </div>
