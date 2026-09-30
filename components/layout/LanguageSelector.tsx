@@ -393,7 +393,11 @@ export function DesktopLanguageSelector({
                     close();
                   }
                 }}
-                className="focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 rounded-2xl text-sm text-black whitespace-nowrap active:bg-cardHover"
+                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-3.5 pr-2.5 rounded-2xl text-sm text-black whitespace-nowrap active:bg-cardHover ${
+                  open
+                    ? "opacity-100 translate-y-0 [transition:opacity_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,transform_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
+                    : "opacity-0 -translate-y-5 [transition:none]"
+                }`}
               >
                 {lang.label}
                 <CircledCheckIcon active={lang.code === locale} />
