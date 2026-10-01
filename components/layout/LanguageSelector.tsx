@@ -332,10 +332,10 @@ export function DesktopLanguageSelector({
                     close();
                   }
                 }}
-                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-3 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap active:bg-cardHover ${
+                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-6 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap active:bg-cardHover ${
                   open
-                    ? "opacity-100 translate-y-0 [transition:opacity_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,transform_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
-                    : "opacity-0 -translate-y-5 animate-item-out [transition:opacity_150ms_ease-out]"
+                    ? "opacity-100 translate-x-0 translate-y-0 [transition:opacity_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,transform_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
+                    : "opacity-0 translate-x-5 -translate-y-5 animate-item-out [transition:opacity_150ms_ease-out]"
                 }`}
               >
                 {lang.label}
@@ -355,7 +355,7 @@ export function DesktopLanguageSelector({
           {options.map((lang) => (
             <div
               key={lang.code}
-              className="flex items-center justify-between gap-3 h-10 pl-4 pr-3 text-sm whitespace-nowrap"
+              className="flex items-center justify-between gap-6 h-10 pl-4 pr-3 text-sm whitespace-nowrap"
             >
               {lang.label}
               <CircledCheckIcon active={lang.code === locale} />
