@@ -6,6 +6,9 @@ import { ComponentProps, ReactNode } from "react";
 // đều 4 phía (0 offset, không lệch xuống dưới như shadow thường) để tách khỏi
 // màu nền trang. Thứ duy nhất phân biệt là phản hồi khi tương tác — hover/active
 // đổi màu nền (card nội dung thì đứng yên).
+//
+// Dưới xs (< 390px) card tràn sát mép, không bo góc: khung ngoài của mọi card
+// (kể cả skeleton) gắn `max-xs:card-bleed` (app/globals.css).
 export function CardLink({
   className = "",
   children,
@@ -17,7 +20,7 @@ export function CardLink({
   return (
     <Link
       {...linkProps}
-      className={`group bg-white rounded-2xl p-6 card-shadow hover:bg-cardHover active:bg-cardHover ${className}`}
+      className={`group bg-white rounded-2xl max-xs:card-bleed p-6 card-shadow hover:bg-cardHover active:bg-cardHover ${className}`}
     >
       {children}
     </Link>

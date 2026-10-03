@@ -208,7 +208,7 @@ export function DesktopLanguageSelector({
     measure();
     // Font web về muộn thì đo lại, không thì pill giữ số đo bằng font fallback.
     document.fonts?.ready.then(measure).catch(() => {});
-    // Dưới md component chỉ `hidden` (không unmount) nên offsetWidth ra 0 —
+    // Dưới xs component chỉ `hidden` (không unmount) nên offsetWidth ra 0 —
     // đo lại khi resize để không kẹt width 0 tới lúc reload.
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
@@ -224,11 +224,11 @@ export function DesktopLanguageSelector({
 
   return (
     <div
-      data-fallback-desktop-only
+      data-fallback-hide-below-xs
       ref={containerRef}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
-      className="hidden md:flex relative items-stretch flex-shrink-0 ml-6 lg:ml-2 w-max"
+      className="hidden xs:flex relative items-stretch flex-shrink-0 ml-2 md:ml-6 lg:ml-2 w-max"
     >
       <button
         type="button"
@@ -265,12 +265,13 @@ export function DesktopLanguageSelector({
         style={{ width: size?.open }}
         // pt-2.5 (10px) = khoảng cách từ pill (h-9, giữa container cao h-14)
         // xuống cạnh dưới navbar, để dropdown cách cạnh dưới navbar đúng
-        // bằng khoảng pill cách cạnh dưới đó.
+        // bằng khoảng pill cách cạnh dưới đó. Header mobile cao h-12 nên
+        // khoảng đó còn 6px (pt-1.5).
         // Không đổi `visibility`: thẻ tự mờ + `pointer-events-none` lúc đóng.
         // Bật/tắt visibility của phần tử có `backdrop-blur` làm navbar nháy
         // khi bấm liên tục.
         aria-hidden={!open}
-        className="absolute top-full -right-5 box-content px-5 pt-2.5 z-50 flex justify-end pointer-events-none"
+        className="absolute top-full -right-5 box-content px-5 pt-1.5 md:pt-2.5 z-50 flex justify-end pointer-events-none"
       >
         <span
           aria-hidden
@@ -335,7 +336,7 @@ export function DesktopLanguageSelector({
                 className={`focus-ring-inset relative z-10 flex items-center justify-between gap-6 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap active:bg-cardHover ${
                   open
                     ? "opacity-100 translate-x-0 translate-y-0 [transition:opacity_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,transform_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
-                    : "opacity-0 translate-x-5 -translate-y-5 animate-item-out [transition:opacity_150ms_ease-out]"
+                    : "opacity-0 translate-x-5 -translate-y-3 animate-item-out [transition:opacity_150ms_ease-out]"
                 }`}
               >
                 {lang.label}

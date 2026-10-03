@@ -1,4 +1,5 @@
 const colors = require("tailwindcss/colors");
+const defaultTheme = require("tailwindcss/defaultTheme");
 const { COLORS } = require("./lib/theme-colors");
 
 /** @type {import('tailwindcss').Config} */
@@ -14,6 +15,14 @@ module.exports = {
     "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    // `xs` đứng đầu (không nhét qua `extend`, vì extend nối vào cuối làm sai
+    // thứ tự media query). Dưới 390px là màn mobile nhỏ — iPhone mini/SE, hay
+    // iPhone thường bật Display Zoom: card tràn sát mép, bỏ bo góc (variant
+    // `max-xs:`), và chọn ngôn ngữ chuyển vào drawer full-screen.
+    screens: {
+      xs: "390px",
+      ...defaultTheme.screens,
+    },
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

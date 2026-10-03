@@ -12,7 +12,7 @@ import Skeleton, { SkeletonText } from "@/components/ui/Skeleton";
 /** Pill "thông tin tính đến": mượn nguyên khung của bản thật. */
 export function AsOfPillSkeleton() {
   return (
-    <div className="relative flex items-center gap-2 border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
+    <div className="relative flex items-center gap-2 border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md max-xs:strip-flat">
       <Skeleton className="w-1.5 aspect-square rounded-full flex-shrink-0" />
       <div className="flex items-center min-h-[24px]">
         <Skeleton className="h-3 w-56 max-w-full" />
@@ -33,7 +33,7 @@ export function SectionLabelSkeleton({ width }: { width: string }) {
 /** Thẻ cập nhật chính thức — vạch trái nhạt bớt nhưng vẫn nhận ra thẻ ngay. */
 export function LatestUpdateSkeleton() {
   return (
-    <div className="bg-white border-l-4 border-l-gray-900/30 rounded-2xl pt-5 pb-4 px-6 card-shadow">
+    <div className="bg-white border-l-4 border-l-gray-900/30 rounded-2xl max-xs:card-bleed pt-5 pb-4 px-6 card-shadow">
       {/* Từng khối lấy đúng line box của chữ nó thay: nhãn text-xs = 16,
           tiêu đề text-xl = 28 và sm:text-2xl = 32, mỗi dòng excerpt
           text-sm = 20, hàng cuối text-xs = 16. Đặt bar mảnh vào giữa hộp đó,
@@ -61,7 +61,7 @@ export function LatestUpdateSkeleton() {
 export function HotlinesSkeleton({ hasNotice }: { hasNotice: boolean }) {
   return (
     <>
-      <div className="relative z-[2] bg-surface rounded-2xl p-6 card-shadow">
+      <div className="relative z-[2] bg-surface rounded-2xl max-xs:card-bleed p-6 card-shadow">
         <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
           {[0, 1, 2, 3].map((i) => (
             <div key={i}>
@@ -80,7 +80,7 @@ export function HotlinesSkeleton({ hasNotice }: { hasNotice: boolean }) {
         </div>
       </div>
       {hasNotice && (
-        <div className="relative z-[1] -mt-3.5 rounded-b-2xl bg-gray-300 px-6 pt-5 pb-2.5 flex gap-2.5 items-center">
+        <div className="relative z-[1] -mt-3.5 rounded-b-2xl max-xs:card-bleed bg-gray-300 px-4 max-xs:px-2.5 pt-5 pb-2.5 flex gap-2.5 items-center">
           <Skeleton className="w-4 h-4 flex-shrink-0 rounded-full skeleton-on-notice" />
           {/* text-xs + leading-relaxed = 19.5px/dòng. Dưới md câu lưu ý
               xuống 3 dòng, từ md trở lên vừa đúng một dòng — placeholder

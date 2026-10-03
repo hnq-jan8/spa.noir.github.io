@@ -18,8 +18,8 @@ export function FaqsSearchFieldSkeleton() {
  */
 export default function FaqsSkeleton() {
   return (
-    <div className="space-y-3">
-      <div className="bg-white rounded-2xl overflow-hidden card-shadow">
+    <div className="space-y-3 max-xs:space-y-px">
+      <div className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow">
         <div className="flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4">
           <Skeleton className="skeleton-on-card h-4 w-3/5" />
           <Skeleton className="skeleton-on-card w-[18px] h-[18px] flex-shrink-0" />
@@ -34,7 +34,7 @@ export default function FaqsSkeleton() {
       {[0, 1, 2, 3].map((i) => (
         <div
           key={i}
-          className="bg-white rounded-2xl overflow-hidden card-shadow"
+          className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow"
         >
           <div className="flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4">
             {/* Alternating widths so the stack doesn't read as a striped

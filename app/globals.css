@@ -283,6 +283,29 @@
   }
 }
 
+@layer utilities {
+  /* Mobile nhỏ (`max-xs:card-bleed`): card tràn sát hai mép màn hình, bỏ bo
+     góc. -1rem khớp px-4 của .container-page ở size này. Ở layer utilities
+     (không phải components) để variant `max-xs:` sinh được và thắng
+     `rounded-2xl` của chính card. Card nào có `w-full` thì cộng thêm
+     `max-xs:w-[calc(100%+2rem)]`, không thì margin âm chỉ dịch card sang trái. */
+  .card-bleed {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+  }
+
+  /* Mobile nhỏ (`max-xs:strip-flat`): viên thuốc as-of / breadcrumb duỗi thành
+     dải phẳng sát dưới header — không bo, chỉ giữ viền đáy mảnh. */
+  .strip-flat {
+    border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    padding: 5px 1rem;
+  }
+}
+
 /* Header dùng `fixed` từ md: trở lên (xem Navbar.tsx) — khi in, trình duyệt
    tính lại vị trí `fixed` theo khổ giấy thay vì viewport, cắt header vỡ vụn ở
    hai mép trang. Trang in không cần thanh điều hướng nên ẩn hẳn, đỡ phải vá

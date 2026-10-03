@@ -101,7 +101,7 @@ export default function FlightTable({
           enough. A single flight hands off to the single-flight table below
           at the same 570px point a second column would otherwise appear. */}
       <div
-        className={`grid grid-cols-1 min-[570px]:grid-cols-2 gap-3 ${
+        className={`grid grid-cols-1 min-[570px]:grid-cols-2 gap-3 max-xs:gap-px ${
           rows.length === 1 ? "min-[570px]:hidden" : "md:hidden"
         }`}
       >
@@ -109,7 +109,7 @@ export default function FlightTable({
           return (
             <div
               key={idx}
-              className="bg-white rounded-2xl overflow-hidden card-shadow"
+              className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow"
             >
               <div className="px-4 pt-4">
                 <div className="flex items-center justify-between gap-2 mb-3">
@@ -147,19 +147,21 @@ export default function FlightTable({
               </div>
 
               {stackFields ? (
-                /* Nhãn dài: mỗi trường một dòng, nhãn trái – giá trị phải. */
-                <div className="divide-y divide-gray-100 border-t border-gray-100 mt-4 text-sm">
-                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
+                /* Nhãn dài: mỗi trường một dòng, nhãn trái – giá trị phải.
+                   mx-4 thụt các đường kẻ vào trong, không thì chúng chạy sát
+                   mép và lẫn với khe 1px giữa các thẻ ở mobile nhỏ. */
+                <div className="divide-y divide-gray-100 border-t border-gray-100 max-xs:divide-y-0 max-xs:border-t-0 max-xs:pb-3 mt-4 mx-4 text-sm">
+                  <div className="flex items-center justify-between gap-4 py-2.5">
                     <p className="text-xs text-gray-600">{h.date}</p>
                     <p className="font-medium text-gray-900">
                       {formatFlightDate(row.date) || "–"}
                     </p>
                   </div>
-                  <div className="flex items-start justify-between gap-4 px-4 pt-2 pb-1">
+                  <div className="flex items-start justify-between gap-4 pt-2 pb-1">
                     <p className="text-xs text-gray-600 leading-5">{h.srtd}</p>
                     <TimeValue value={row.srtd} stack align="end" />
                   </div>
-                  <div className="flex items-start justify-between gap-4 px-4 pt-2 pb-1">
+                  <div className="flex items-start justify-between gap-4 pt-2 pb-1">
                     <p className="text-xs text-gray-600 leading-5">{h.atd}</p>
                     <TimeValue value={row.atd} stack align="end" />
                   </div>
@@ -168,7 +170,7 @@ export default function FlightTable({
                 /* Date joins the two times as even thirds — one date and two
                     times balance in a way the old type/capacity pair needed its
                     own row and second divider for. */
-                <div className="grid grid-cols-3 divide-x divide-gray-200 text-sm text-center pt-4 pb-3">
+                <div className="grid grid-cols-3 divide-x divide-gray-200 max-xs:divide-x-0 text-sm text-center pt-4 pb-3">
                   {/* Nhãn ở trên cùng để ba nhãn thẳng hàng; giá trị chiếm
                       phần còn lại và canh giữa. */}
                   <div className="flex flex-col">

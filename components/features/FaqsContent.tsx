@@ -175,7 +175,7 @@ export default function FaqsContent() {
       // ô tìm kiếm đang đứng, để ô và card trượt lên cùng một nhịp.
       // md:pt-[18px] khớp chính xác top-[58px] — lệch 2px là sticky kẹp ô sớm
       // trong khi card còn đang chạy, nhìn ra ngay là hai thứ rời nhau.
-      className={`container-page pb-8 md:pb-8 max-w-3xl mx-auto pt-4 transition-[padding-top] duration-300 ease-out ${
+      className={`container-page pb-8 max-xs:pb-0 md:pb-8 max-w-3xl mx-auto pt-4 max-xs:pt-[35px] transition-[padding-top] duration-300 ease-out ${
         desktopFieldEngaged ? "md:pt-[18px]" : "md:pt-8"
       } ${desktopFieldEngaged || mobileSearchOpen ? "min-h-[100dvh]" : ""}`}
       {...loadingProps(!data)}
@@ -312,9 +312,11 @@ export default function FaqsContent() {
 
       {/* Mobile, capsule open: the hidden breadcrumb still reserves its row
           (hooks/useBreadcrumbVisibility.ts), leaving too much air below the
-          field. */}
+          field. Below xs that row is a flat 35px strip, shorter than the
+          capsule's reach (top-16 + 34px), so the container's max-xs:pt-[35px]
+          puts the list 20px below the capsule; open, it rises 2px. */}
       <div
-        className={`transition-[margin-top] ${CAPSULE_TRANSITION} ${mobileSearchOpen ? "-mt-6 md:mt-0" : "mt-0"}`}
+        className={`transition-[margin-top] ${CAPSULE_TRANSITION} ${mobileSearchOpen ? "-mt-6 max-xs:-mt-0.5 md:mt-0" : "mt-0"}`}
       >
         {!data ? (
           // Placeholder đi chung <Reveal> với accordion thật nên React giữ

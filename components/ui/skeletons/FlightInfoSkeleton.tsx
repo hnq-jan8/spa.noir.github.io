@@ -9,7 +9,7 @@ import Skeleton, { SkeletonText } from "@/components/ui/Skeleton";
 /** One stacked flight card — the below-md layout of FlightTable. */
 function FlightCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden card-shadow">
+    <div className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow">
       <div className="px-4 pt-4">
         <div className="flex items-center justify-between mb-3">
           <Skeleton className="skeleton-on-card h-4 w-24" />
@@ -44,7 +44,7 @@ export function FlightTitleSkeleton() {
 export function FlightTableSkeleton() {
   return (
     <>
-      <div className="md:hidden grid grid-cols-1 min-[570px]:grid-cols-2 gap-3">
+      <div className="md:hidden grid grid-cols-1 min-[570px]:grid-cols-2 gap-3 max-xs:gap-px">
         <FlightCardSkeleton />
         <FlightCardSkeleton />
       </div>

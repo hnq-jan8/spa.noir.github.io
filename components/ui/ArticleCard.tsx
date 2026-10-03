@@ -142,7 +142,7 @@ export default function ArticleCard({
       onClick={onOpen}
       // No padding on the card: the thumbnail runs flush to its edges and the
       // text block supplies its own insets.
-      className={`group w-full text-left bg-white rounded-2xl overflow-hidden card-shadow hover:bg-cardHover active:bg-cardHover ${
+      className={`group w-full max-xs:w-[calc(100%+2rem)] text-left bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow hover:bg-cardHover active:bg-cardHover ${
         featured
           ? ""
           : layout === "grid"
@@ -282,7 +282,9 @@ export default function ArticleCard({
               alt=""
               // The 2-slot half of a grid row (hideExcerpt) is a secondary
               // item — its image stays smaller than a full list card's.
-              className={`${hideExcerpt ? "w-24 sm:w-32" : "w-32 sm:w-44"} self-stretch flex-shrink-0`}
+              // Mobile nhỏ: mọi card list cùng bề rộng ảnh nhỏ, ảnh thụt vào
+              // (trên/trái/dưới) thay vì tràn sát mép card.
+              className={`${hideExcerpt ? "w-24 sm:w-32" : "w-32 sm:w-44"} max-xs:w-24 max-xs:my-3 max-xs:ml-3 max-xs:rounded-lg self-stretch flex-shrink-0`}
             />
           )}
           {hideExcerpt && compact ? (

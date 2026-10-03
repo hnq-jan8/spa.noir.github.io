@@ -78,19 +78,21 @@ export default function HomeContent() {
 
   return (
     <div
-      className="container-page pb-8 md:pt-3 md:pb-11 max-w-3xl mx-auto"
+      className="container-page pb-8 max-xs:pb-0 md:pt-3 md:pb-11 max-w-3xl mx-auto"
       {...loadingProps(!data)}
     >
       {/* As-of timestamp. Extra bottom margin at md+ — with no outline on
           either element, the pill sits too close to the card below it. */}
-      <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6">
-        <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none" />
+      {/* Mobile nhỏ (< xs): pill thành dải sát ngay dưới header, tràn hai
+          mép, không bo, chỉ còn viền đáy mảnh — cùng kiểu với dải breadcrumb. */}
+      <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6 max-xs:pt-0 max-xs:mb-0 max-xs:-mx-4">
+        <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none max-xs:hidden" />
         {/* Ba trạng thái chứ không hai: có mốc -> pill; chưa có data ->
             skeleton; có data mà không mốc -> giấu hẳn, vì nhãn cụt kèm chấm
             "đang sống" là sai, mà skeleton quay mãi cũng sai. Trường hợp cuối
             đến từ emptyContentPayload() trong lib/buildContentPayload.ts. */}
         {data && asOf ? (
-          <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md">
+          <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md max-xs:strip-flat">
             {/* `aspect-square`, not `h-1.5` — with both width and height set
                 independently, fractional browser zoom can round them to
                 different physical pixel counts even though they're the same
@@ -118,13 +120,13 @@ export default function HomeContent() {
             // Vạch trái là ngoại lệ cố ý của quy tắc card không viền: nó là
             // điểm nhấn, không phải đường bao, cho thẻ phải thắng cái nhìn đầu
             // tiên. Nền trắng và hover vẫn y hệt mọi card khác.
-            className="group relative bg-white rounded-2xl p-6 card-shadow hover:bg-cardHover active:bg-cardHover border-l-4 border-l-gray-900 pt-5 pb-4"
+            className="group relative bg-white rounded-2xl max-xs:card-bleed p-6 card-shadow hover:bg-cardHover active:bg-cardHover border-l-4 border-l-gray-900 pt-5 pb-4"
           >
             {/* Link phủ kín thẻ: cả thẻ mở thẳng bài viết, không qua danh sách. */}
             <Link
               href={`/${locale}/official-updates?${ARTICLE_PARAM}=${encodeURIComponent(latestUpdate.key)}`}
               onClick={() => presetArticleKey(latestUpdate.key)}
-              className="absolute inset-0 rounded-2xl"
+              className="absolute inset-0 rounded-2xl max-xs:rounded-none"
               aria-label={titleOf(latestUpdate) ?? undefined}
             />
             <p className="flex items-center gap-1.5 text-gray-600 text-xs font-semibold uppercase tracking-wide mb-4">
@@ -165,7 +167,7 @@ export default function HomeContent() {
             // Exception to the no-lines card rule: the dashed outline is what
             // reads as an empty slot. Silent on hover despite retrying on tap —
             // an affordance here would promise content that isn't there.
-            className="w-full flex items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl px-6 py-4 text-gray-600 text-left"
+            className="w-full max-xs:w-[calc(100%+2rem)] flex items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl max-xs:card-bleed max-xs:border-x-0 px-6 py-4 text-gray-600 text-left"
             onClick={() => invalidateContent()}
           >
             <Megaphone className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
@@ -189,7 +191,7 @@ export default function HomeContent() {
       <Reveal delay={50} className="relative mb-4">
         {data ? (
           <>
-            <div className="relative z-[2] bg-surface rounded-2xl p-6 card-shadow">
+            <div className="relative z-[2] bg-surface rounded-2xl max-xs:card-bleed p-6 card-shadow">
               <div className="grid grid-cols-1 min-[550px]:grid-cols-2 gap-5">
                 {contacts.map(([key, value]) => {
                   const isEmail = value.includes("@");
@@ -213,9 +215,11 @@ export default function HomeContent() {
               </div>
             </div>
             {/* Chìm hơn `surface` của card nằm trên một bậc rõ rệt, không thì
-                hai lớp dính vào nhau và dải này mất nghĩa "nằm dưới". */}
+                hai lớp dính vào nhau và dải này mất nghĩa "nằm dưới".
+                Padding ngang = bán kính bo (16px) khi còn bo góc; mobile nhỏ
+                vuông góc thì bằng gap icon–chữ (10px). */}
             {home["mediaNotice"] && (
-              <div className="relative z-[1] -mt-3.5 rounded-b-2xl bg-gray-300 px-6 pt-5 pb-2.5 flex gap-2.5 items-center">
+              <div className="relative z-[1] -mt-3.5 rounded-b-2xl max-xs:card-bleed bg-gray-300 px-4 max-xs:px-2.5 pt-5 pb-2.5 flex gap-2.5 items-center">
                 <Info
                   className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5"
                   strokeWidth={2}
@@ -247,8 +251,8 @@ export default function HomeContent() {
       {/* Below 800px: one grouped surface with hairline-divided rows, iOS
           Settings-style, instead of three separate cards with gaps between
           them. */}
-      <Reveal delay={100} className="min-[800px]:hidden mb-4">
-        <div className="bg-white rounded-2xl divide-y divide-gray-100 overflow-hidden card-shadow">
+      <Reveal delay={100} className="min-[800px]:hidden mb-4 max-xs:mb-0">
+        <div className="bg-white rounded-2xl max-xs:card-bleed divide-y divide-gray-100 overflow-hidden card-shadow">
           {browseItems.map((item, index) =>
             data ? (
               <Link

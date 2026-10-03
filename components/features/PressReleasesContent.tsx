@@ -62,7 +62,9 @@ export default function PressReleasesContent() {
         // `flex flex-col flex-1` để chiếm phần cao còn thừa của main — bài ngắn
         // vẫn phủ trắng tới footer. Không padding đáy: thanh back của
         // ArticleDetail giữ mép đó (xem mt-auto của nó).
-        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 md:mt-0 pb-0"
+        // max-xs:pt-32: breadcrumb ở mobile nhỏ không còn pb-6 đệm phía dưới
+        // (xem Breadcrumb.tsx), bù 2rem để dòng meta không dính sát dải đó.
+        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 max-xs:pt-32 md:mt-0 pb-0"
       >
         <ArticleDetail
           article={opened ?? null}
@@ -99,7 +101,7 @@ export default function PressReleasesContent() {
 
   return (
     <div
-      className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto"
+      className="container-page pt-4 max-xs:pt-0 pb-8 max-xs:pb-0 md:py-8 max-w-3xl mx-auto"
       {...loadingProps(!data)}
     >
       <Reveal>
@@ -116,7 +118,7 @@ export default function PressReleasesContent() {
               featured
             />
             {listItems.length > 0 && (
-              <div className="mt-4 space-y-3">
+              <div className="mt-4 space-y-3 max-xs:mt-px max-xs:space-y-px">
                 {listItems.map((release) => (
                   <ArticleCard
                     key={release.key}
@@ -128,7 +130,7 @@ export default function PressReleasesContent() {
               </div>
             )}
             {gridRows.map((row) => (
-              <div key={row[0].key} className="mt-3">
+              <div key={row[0].key} className="mt-3 max-xs:mt-px">
                 {row.length === 1 ? (
                   // Lone leftover in this row: full width, same image + title +
                   // excerpt treatment as the list items above.
@@ -145,7 +147,7 @@ export default function PressReleasesContent() {
                     doesn't fit, so every item in the row just stacks as a
                     plain compact card (no excerpt, to save height) instead
                     of splitting into columns. */}
-                    <div className="space-y-3 md:hidden">
+                    <div className="space-y-3 max-xs:space-y-px md:hidden">
                       {row.map((release) => (
                         <ArticleCard
                           key={release.key}

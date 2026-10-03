@@ -3,8 +3,8 @@ import Skeleton from "@/components/ui/Skeleton";
 /** One full-width list card: thumbnail beside date/title/excerpt. */
 function ListCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden card-shadow flex items-stretch">
-      <Skeleton className="skeleton-on-card w-32 sm:w-44 self-stretch flex-shrink-0 rounded-none" />
+    <div className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow flex items-stretch">
+      <Skeleton className="skeleton-on-card w-32 sm:w-44 max-xs:w-24 max-xs:my-3 max-xs:ml-3 self-stretch flex-shrink-0 rounded-none max-xs:rounded-lg" />
       <div className="flex-1 min-w-0 flex flex-col justify-center pt-2 sm:pt-2.5 pl-3 sm:pl-3.5 pr-3 sm:pr-4 pb-3 sm:pb-4">
         <Skeleton className="skeleton-on-card h-3 w-24 mb-3" />
         <Skeleton className="skeleton-on-card h-4 w-4/5 mb-2" />
@@ -39,7 +39,7 @@ function GridTileSkeleton() {
 export default function PressReleasesSkeleton() {
   return (
     <>
-      <div className="bg-white rounded-2xl overflow-hidden card-shadow">
+      <div className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow">
         <Skeleton className="skeleton-on-card w-full h-44 sm:h-56 rounded-none" />
         <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
           <Skeleton className="skeleton-on-card h-3.5 w-24 mb-3" />
@@ -54,13 +54,13 @@ export default function PressReleasesSkeleton() {
         </div>
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 space-y-3 max-xs:mt-px max-xs:space-y-px">
         <ListCardSkeleton />
         <ListCardSkeleton />
       </div>
 
-      <div className="mt-3">
-        <div className="space-y-3 md:hidden">
+      <div className="mt-3 max-xs:mt-px">
+        <div className="space-y-3 max-xs:space-y-px md:hidden">
           <ListCardSkeleton />
         </div>
         <div className="hidden md:grid grid-cols-3 gap-3">

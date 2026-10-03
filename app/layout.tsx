@@ -62,7 +62,7 @@ export default async function RootLayout({
             desktop nav/language markup stacked on top of the mobile ones. */}
         <style
           dangerouslySetInnerHTML={{
-            __html: `@media (max-width:767px){[data-fallback-desktop-only]{display:none !important;}}`,
+            __html: `@media (max-width:767px){[data-fallback-desktop-only]{display:none !important;}}@media (max-width:389px){[data-fallback-hide-below-xs]{display:none !important;}}`,
           }}
         />
       </head>

@@ -22,7 +22,7 @@ export default function FlightInfoContent() {
 
   if (data && flights.length === 0) {
     return (
-      <div className="container-page pt-4 pb-8 md:py-8">
+      <div className="container-page pt-4 max-xs:pt-6 pb-8 md:py-8">
         <EmptyState data={data} />
       </div>
     );
@@ -30,7 +30,7 @@ export default function FlightInfoContent() {
 
   return (
     <div
-      className="container-page pt-4 pb-8 md:py-8 md:max-w-6xl md:mx-auto"
+      className="container-page pt-4 max-xs:pt-6 pb-8 md:py-8 md:max-w-6xl md:mx-auto"
       {...loadingProps(!data)}
     >
       {/* Placeholder nằm chung <Reveal> với bảng thật: đổi ruột giữa chừng,

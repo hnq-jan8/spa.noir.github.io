@@ -56,7 +56,11 @@ export default function Navbar({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  // Shared by the desktop dropdown and the mobile drawer's language
+  // < xs (390px): the only size where language picking lives in the drawer's
+  // full-screen sub-view. From xs up the header's dropdown pill takes over,
+  // drawer or not.
+  const [isSmallMobile, setIsSmallMobile] = useState(false);
+  // Shared by the header dropdown and the small-mobile drawer's language
   // sub-view, so a resize between breakpoints keeps the same open state.
   const [langOpen, setLangOpen] = useState(false);
   const [iconAnimating, setIconAnimating] = useState(false);
@@ -90,27 +94,35 @@ export default function Navbar({
 
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 767px)");
-    const sync = () => setIsMobile(mql.matches);
+    const smallMql = window.matchMedia("(max-width: 389px)");
+    const sync = () => {
+      setIsMobile(mql.matches);
+      setIsSmallMobile(smallMql.matches);
+    };
     sync();
     mql.addEventListener("change", sync);
-    return () => mql.removeEventListener("change", sync);
+    smallMql.addEventListener("change", sync);
+    return () => {
+      mql.removeEventListener("change", sync);
+      smallMql.removeEventListener("change", sync);
+    };
   }, []);
 
   useEffect(() => {
     if (!menuOpen) setLangOpen(false);
   }, [menuOpen]);
 
-  // Opening langOpen from desktop then resizing down to mobile should reveal
-  // the drawer already on the language screen. Gated on `isMobile`, not just
-  // langOpen, so opening the desktop dropdown doesn't also trigger the scroll
-  // lock below on desktop.
+  // Opening the header dropdown then resizing down to small mobile should
+  // reveal the drawer already on the language screen. Gated on
+  // `isSmallMobile`, not just langOpen, so opening the dropdown at larger
+  // sizes doesn't also pop the drawer open (and its scroll lock).
   useEffect(() => {
-    if (!isMobile || !langOpen) return;
+    if (!isSmallMobile || !langOpen) return;
     setMenuOpen((prev) => {
       if (!prev) menuOpenedByLangSync.current = true;
       return true;
     });
-  }, [isMobile, langOpen]);
+  }, [isSmallMobile, langOpen]);
 
   useEffect(() => {
     if (!langOpen && menuOpenedByLangSync.current) {
@@ -184,9 +196,9 @@ export default function Navbar({
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">
-            {/* Logo — crossfades with the "Select language" label on mobile
-                while the drawer's language sub-screen is open, same slot the
-                logo normally owns. Gated on `menuOpen` too, so `langOpen`
+            {/* Logo — crossfades with the "Select language" label on small
+                mobile (< xs) while the drawer's language sub-screen is open,
+                same slot the logo normally owns. Gated on `menuOpen` too, so `langOpen`
                 being shared with the desktop dropdown doesn't crossfade the
                 logo there. Both layers stay mounted (never unmount) so the
                 swap is a crossfade instead of a snap. */}
@@ -200,7 +212,7 @@ export default function Navbar({
                 // span nhãn bên dưới.
                 className={`group focus-ring-inner flex items-center h-full transform-gpu transition-opacity ease-out ${
                   langOpen && menuOpen
-                    ? "duration-100 opacity-0 pointer-events-none md:duration-300 md:opacity-100 md:pointer-events-auto"
+                    ? "duration-100 opacity-0 pointer-events-none xs:duration-300 xs:opacity-100 xs:pointer-events-auto"
                     : "duration-200 opacity-100"
                 }`}
                 onClick={(e) => {
@@ -224,7 +236,7 @@ export default function Navbar({
               </Link>
               {nav?.["selectLanguage"] && (
                 <span
-                  className={`md:hidden absolute inset-0 flex items-center text-base font-light text-gray-200 transform-gpu transition-opacity ease-out ${
+                  className={`xs:hidden absolute inset-0 flex items-center text-base font-light text-gray-200 transform-gpu transition-opacity ease-out ${
                     langOpen && menuOpen
                       ? "duration-200 opacity-100"
                       : "duration-100 opacity-0 pointer-events-none"
@@ -355,7 +367,9 @@ export default function Navbar({
             />
 
             <div className="flex md:hidden items-stretch gap-1">
-              {/* Cùng vị trí với DesktopLanguageSelector ở size lớn hơn —
+              {/* Chỉ ở mobile nhỏ (< xs) — từ xs trở lên DesktopLanguageSelector
+                  hiện thẳng trên header, kể cả khi drawer đang mở.
+                  Cùng vị trí với DesktopLanguageSelector ở size lớn hơn —
                   luôn mounted (không chỉ khi drawer mở) để fade vào/ra chứ
                   không bật/tắt đột ngột; pointer-events tắt lúc ẩn nên không
                   bấm/tab vào được. Bấm để chuyển sang màn hình chọn ngôn ngữ
@@ -368,7 +382,7 @@ export default function Navbar({
                   onClick={() => setLangOpen((v) => !v)}
                   tabIndex={menuOpen ? 0 : -1}
                   aria-hidden={!menuOpen}
-                  className={`relative z-50 self-center h-9 min-w-[44px] pl-2.5 pr-3 flex items-center justify-center gap-1.5 rounded-full transition-[opacity,background-color,color] duration-300 ease-out ${
+                  className={`xs:hidden relative z-50 self-center h-9 min-w-[44px] pl-2.5 pr-3 flex items-center justify-center gap-1.5 rounded-full transition-[opacity,background-color,color] duration-300 ease-out ${
                     menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                   } ${
                     langOpen
@@ -433,7 +447,7 @@ export default function Navbar({
         {/* Mobile full-screen menu */}
         <MobileMenu
           open={menuOpen}
-          langView={langOpen}
+          langView={langOpen && isSmallMobile}
           navItems={navItems}
           normalizedPath={normalizedPath}
           languageOptions={languageOptions}

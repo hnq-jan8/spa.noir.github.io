@@ -49,12 +49,17 @@ export default function Breadcrumb() {
     // `invisible`, not unmounted, when a page needs this row for something
     // else (FAQs search capsule) — keeps its layout space and is more
     // reliable than masking it (hooks/useBreadcrumbVisibility.ts).
+    //
+    // Mobile nhỏ (< xs): viên thuốc duỗi thành dải sát dưới header, tràn hai
+    // mép, không bo, chỉ còn viền đáy mảnh. Ô tìm kiếm FAQ (FaqsContent) không
+    // bám theo dải này — nó vẫn là lớp nổi riêng ở top-16 như mọi size mobile.
     <div
-      className={`md:hidden sticky top-12 z-10 px-4 pt-4 pb-6 ${breadcrumbHidden ? "invisible" : ""}`}
+      className={`md:hidden sticky top-12 z-10 px-4 pt-4 pb-6 max-xs:px-0 max-xs:pt-0 max-xs:pb-0 ${breadcrumbHidden ? "invisible" : ""}`}
     >
       <div
         className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full overflow-hidden whitespace-nowrap
-                bg-white/75 backdrop-blur-md border border-gray-200 text-xs text-black max-w-full"
+                bg-white/75 backdrop-blur-md border border-gray-200 text-xs text-black max-w-full
+                max-xs:flex max-xs:w-full max-xs:strip-flat"
       >
         <Link
           href={`/${locale}`}
