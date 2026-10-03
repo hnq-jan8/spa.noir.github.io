@@ -33,10 +33,10 @@ function resolveCmsAsset(id: string | null): string | null {
   if (!id) return null;
   try {
     const manifest = JSON.parse(
-      readFileSync(resolve(process.cwd(), "public/cms-assets/manifest.json"), "utf-8"),
+      readFileSync(resolve(process.cwd(), "public/assets/manifest.json"), "utf-8"),
     );
     const filename = manifest[id];
-    if (filename) return `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/cms-assets/${filename}`;
+    if (filename) return `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/assets/${filename}`;
   } catch {
     // manifest chưa có (vd next dev chưa chạy prebuild) — fallback bên dưới.
   }

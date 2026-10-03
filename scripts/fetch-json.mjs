@@ -76,10 +76,10 @@ const [
 
 // ─── Build content.json payload (dùng chung scripts/content-payload.mjs) ──────
 
-// ─── Bake ảnh bài về out/cms-assets/ (incremental) ───────────────────────────
+// ─── Bake ảnh bài về out/assets/ (incremental) ───────────────────────────
 
-// Content-only local: tải ảnh bài (preview_image + inline) về out/cms-assets/
-// rồi trỏ content.json sang /cms-assets/ — khớp với CMS endpoint (prod) và full
+// Content-only local: tải ảnh bài (preview_image + inline) về out/assets/
+// rồi trỏ content.json sang /assets/ — khớp với CMS endpoint (prod) và full
 // build. Logo/favicon đã có trong out/ từ full build trước; downloadCmsAssets
 // merge vào manifest sẵn có.
 const outDir = resolve(root, "out");

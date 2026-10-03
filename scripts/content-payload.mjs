@@ -66,7 +66,7 @@ function i18nRichText(translations, field, directusUrl, assetOpts) {
 
 /**
  * Như i18nMap nhưng cho field file (preview_image): UUID → URL asset (xem
- * asset-url.mjs — ảnh đã bake `/cms-assets/` nếu có trong manifest, nếu không
+ * asset-url.mjs — ảnh đã bake `/assets/` nếu có trong manifest, nếu không
  * thì Directus trực tiếp / `asset_url`).
  * MarkdownImage/PreviewImage đã xử lý ảnh hỏng nên không cần fallback ở đây.
  */
@@ -96,7 +96,7 @@ export function assembleContentPayload({
 }) {
   const languageCodes = languages.map((l) => l.code);
   const labelsByNs = buildLabels(languageCodes, labelRows);
-  // Khi có manifest: preview_image + <img> rich-text trỏ ảnh tĩnh /cms-assets/.
+  // Khi có manifest: preview_image + <img> rich-text trỏ ảnh tĩnh /assets/.
   const assetOpts = { assetManifest, assetBasePath };
 
   return {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Prebuild step (chạy trước `next build`): tải logo + favicon + ảnh bài
- * (preview_image & ảnh inline rich-text) CMS về public/cms-assets/ để static
+ * (preview_image & ảnh inline rich-text) CMS về public/assets/ để static
  * export copy theo public/ → out/. Xem scripts/cms-assets.mjs.
  *
  * Usage: node scripts/fetch-cms-assets.mjs
@@ -39,7 +39,7 @@ const publicDir = resolve(root, "public");
 let manifest = {};
 try {
   // logo/favicon + ảnh bài (preview_image & inline rich-text) — bake hết về
-  // public/cms-assets/ để site tĩnh tự phục vụ ảnh, không còn hit Directus
+  // public/assets/ để site tĩnh tự phục vụ ảnh, không còn hit Directus
   // /assets ở runtime (gỡ được Public directus_files:read). collectAssetIds
   // dùng chung với CMS extension (deploy-content-endpoint) nên hai bên cùng tập.
   const [assets, officialUpdates, pressReleases, siteConfig] = await Promise.all([
@@ -57,7 +57,7 @@ try {
   });
 } catch (err) {
   // `ids` rỗng = chỉ đọc lại manifest.json trên đĩa, không gọi mạng nữa. Trên
-  // agent self-hosted, public/cms-assets/ sống qua các lượt chạy (nằm trong
+  // agent self-hosted, public/assets/ sống qua các lượt chạy (nằm trong
   // .gitignore, ngoài bước Clean) nên ảnh lượt trước vẫn dùng lại nguyên vẹn.
   manifest = await downloadCmsAssets({
     base: BASE,

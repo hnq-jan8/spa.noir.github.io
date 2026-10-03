@@ -1,11 +1,9 @@
 export interface AssetUrlOptions {
-  /** Map id -> filename ảnh đã bake; có thì trả URL /cms-assets/ tĩnh. */
+  /** Map id -> filename ảnh đã bake; có thì trả URL /assets/ tĩnh. */
   assetManifest?: Record<string, string> | null;
-  /** basePath của site (deploy dưới subpath); ghép trước /cms-assets/. */
+  /** basePath của site (deploy dưới subpath); ghép trước /assets/. */
   assetBasePath?: string;
 }
-
-export declare function resolveAssetBase(directusUrl: string): string;
 
 export declare function cmsAssetUrl(
   filename: string,

@@ -16,13 +16,13 @@ import { resolveBasePath } from "../scripts/cms-assets.mjs";
 import { fetchLiveContent, fetchLiveStatus } from "../scripts/live-content.mjs";
 
 // Manifest ảnh đã bake (scripts/fetch-cms-assets.mjs chạy ở prebuild → ghi
-// public/cms-assets/manifest.json). Có thì preview_image + ảnh inline trỏ
-// /cms-assets/ tĩnh; không có (id thiếu) thì buildAssetUrl tự rơi về Directus.
+// public/assets/manifest.json). Có thì preview_image + ảnh inline trỏ
+// /assets/ tĩnh; không có (id thiếu) thì buildAssetUrl tự rơi về Directus.
 function loadAssetManifest(): Record<string, string> | null {
   try {
     return JSON.parse(
       readFileSync(
-        resolve(process.cwd(), "public/cms-assets/manifest.json"),
+        resolve(process.cwd(), "public/assets/manifest.json"),
         "utf-8",
       ),
     );

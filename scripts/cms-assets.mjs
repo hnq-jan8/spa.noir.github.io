@@ -24,7 +24,7 @@ const EXT_BY_CONTENT_TYPE = {
  */
 export async function downloadCmsAssets({ base, token, ids, destDir }) {
   const uniqueIds = [...new Set(ids.filter(Boolean))];
-  const cmsAssetsDir = resolve(destDir, "cms-assets");
+  const cmsAssetsDir = resolve(destDir, "assets");
 
   let manifest = {};
   try {
@@ -60,7 +60,7 @@ export async function downloadCmsAssets({ base, token, ids, destDir }) {
 
 /**
  * Suy ra basePath giống hệt logic trong next.config.mjs, để đường dẫn
- * /cms-assets/... khớp với site deploy dưới subpath (GitHub Pages project page).
+ * /assets/... khớp với site deploy dưới subpath (GitHub Pages project page).
  */
 export function resolveBasePath() {
   const siteUrl = (
