@@ -43,4 +43,8 @@ export declare function assembleContentPayload(input: {
   labelRows: UiLabel[];
   /** Origin của Directus, dùng dựng URL đầy đủ cho preview_image. */
   directusUrl?: string;
+  /** Map id -> filename ảnh đã bake; có thì URL trỏ /cms-assets/ tĩnh. */
+  assetManifest?: Record<string, string> | null;
+  /** basePath của site (deploy dưới subpath); ghép trước /cms-assets/. */
+  assetBasePath?: string;
 }): ContentPayload;

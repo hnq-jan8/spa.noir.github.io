@@ -10,6 +10,8 @@ import { writeFileSync, readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { assembleContentPayload } from "./content-payload.mjs";
+import { downloadCmsAssets, resolveBasePath } from "./cms-assets.mjs";
+import { collectAssetIds } from "./asset-url.mjs";
 import {
   LANGUAGES_QUERY,
   UI_LABELS_QUERY,
@@ -74,6 +76,24 @@ const [
 
 // ─── Build content.json payload (dùng chung scripts/content-payload.mjs) ──────
 
+// ─── Bake ảnh bài về out/cms-assets/ (incremental) ───────────────────────────
+
+// Content-only local: tải ảnh bài (preview_image + inline) về out/cms-assets/
+// rồi trỏ content.json sang /cms-assets/ — khớp với CMS endpoint (prod) và full
+// build. Logo/favicon đã có trong out/ từ full build trước; downloadCmsAssets
+// merge vào manifest sẵn có.
+const outDir = resolve(root, "out");
+const assetManifest = await downloadCmsAssets({
+  base: BASE,
+  token: TOKEN,
+  ids: collectAssetIds({
+    officialUpdates: rawUpdates,
+    pressReleases: releases,
+    siteConfig: config,
+  }),
+  destDir: outDir,
+});
+
 const contentPayload = assembleContentPayload({
   generatedAt: new Date().toISOString(),
   officialUpdates: rawUpdates,
@@ -85,13 +105,14 @@ const contentPayload = assembleContentPayload({
   languages: languageRows,
   labelRows,
   directusUrl: BASE,
+  assetManifest,
+  assetBasePath: resolveBasePath(),
 });
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
 // buildId chỉ đổi khi có full rebuild — deploy content-only phải giữ nguyên
 // giá trị trong out/status.json, không tự sinh mới. Xem lib/buildMode.ts.
-const outDir = resolve(root, "out");
 let buildId = "dev";
 try {
   buildId = JSON.parse(readFileSync(resolve(outDir, "status.json"), "utf-8")).buildId ?? "dev";

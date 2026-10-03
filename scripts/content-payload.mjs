@@ -55,25 +55,26 @@ function i18nMap(translations, field) {
 }
 
 /** Như i18nMap nhưng cho field rich-text (description/body/flight_policy): rewrite <img src>. */
-function i18nRichText(translations, field, directusUrl) {
+function i18nRichText(translations, field, directusUrl, assetOpts) {
   return Object.fromEntries(
     translations.map((t) => [
       t.languages_code,
-      rewriteAssetUrls(t[field], directusUrl),
+      rewriteAssetUrls(t[field], directusUrl, assetOpts),
     ]),
   );
 }
 
 /**
  * Như i18nMap nhưng cho field file (preview_image): UUID → URL asset (xem
- * asset-url.mjs — Directus trực tiếp, hoặc `asset_url` nếu có).
+ * asset-url.mjs — ảnh đã bake `/cms-assets/` nếu có trong manifest, nếu không
+ * thì Directus trực tiếp / `asset_url`).
  * MarkdownImage/PreviewImage đã xử lý ảnh hỏng nên không cần fallback ở đây.
  */
-function i18nAsset(translations, field, directusUrl) {
+function i18nAsset(translations, field, directusUrl, assetOpts) {
   return Object.fromEntries(
     translations.map((t) => [
       t.languages_code,
-      buildAssetUrl(t[field], directusUrl),
+      buildAssetUrl(t[field], directusUrl, assetOpts),
     ]),
   );
 }
@@ -90,9 +91,13 @@ export function assembleContentPayload({
   languages,
   labelRows,
   directusUrl = "",
+  assetManifest = null,
+  assetBasePath = "",
 }) {
   const languageCodes = languages.map((l) => l.code);
   const labelsByNs = buildLabels(languageCodes, labelRows);
+  // Khi có manifest: preview_image + <img> rich-text trỏ ảnh tĩnh /cms-assets/.
+  const assetOpts = { assetManifest, assetBasePath };
 
   return {
     generatedAt,
@@ -151,6 +156,7 @@ export function assembleContentPayload({
         siteConfig.translations,
         "flight_policy",
         directusUrl,
+        assetOpts,
       ),
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.flightInfo),
     },
@@ -159,9 +165,9 @@ export function assembleContentPayload({
         id: String(u.id),
         date: u.date,
         title: i18nMap(u.translations, "title"),
-        description: i18nRichText(u.translations, "description", directusUrl),
+        description: i18nRichText(u.translations, "description", directusUrl, assetOpts),
         previewExcerpt: i18nMap(u.translations, "preview_excerpt"),
-        previewImage: i18nAsset(u.translations, "preview_image", directusUrl),
+        previewImage: i18nAsset(u.translations, "preview_image", directusUrl, assetOpts),
       })),
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.officialUpdates),
     },
@@ -171,9 +177,9 @@ export function assembleContentPayload({
         id: String(r.id),
         publishedAt: r.published_at ?? null,
         title: i18nMap(r.translations, "title"),
-        body: i18nRichText(r.translations, "body", directusUrl),
+        body: i18nRichText(r.translations, "body", directusUrl, assetOpts),
         previewExcerpt: i18nMap(r.translations, "preview_excerpt"),
-        previewImage: i18nAsset(r.translations, "preview_image", directusUrl),
+        previewImage: i18nAsset(r.translations, "preview_image", directusUrl, assetOpts),
       })),
       labels: pickNamespaces(labelsByNs, LABEL_NAMESPACES.pressReleases),
     },

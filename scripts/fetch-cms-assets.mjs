@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Prebuild step (chạy trước `next build`): tải logo + favicon CMS về
- * public/cms-assets/ để static export copy theo public/ → out/.
- * Xem scripts/cms-assets.mjs.
+ * Prebuild step (chạy trước `next build`): tải logo + favicon + ảnh bài
+ * (preview_image & ảnh inline rich-text) CMS về public/cms-assets/ để static
+ * export copy theo public/ → out/. Xem scripts/cms-assets.mjs.
  *
  * Usage: node scripts/fetch-cms-assets.mjs
  * Env:   DIRECTUS_URL, DIRECTUS_STATIC_TOKEN, NEXT_PUBLIC_SITE_URL
@@ -11,7 +11,13 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { downloadCmsAssets } from "./cms-assets.mjs";
 import { directusGet } from "./directus-fetch.mjs";
-import { SITE_ASSETS_QUERY } from "./directus-queries.mjs";
+import { collectAssetIds } from "./asset-url.mjs";
+import {
+  SITE_ASSETS_QUERY,
+  OFFICIAL_UPDATES_QUERY,
+  PRESS_RELEASES_QUERY,
+  SITE_CONFIG_QUERY,
+} from "./directus-queries.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -32,13 +38,21 @@ const publicDir = resolve(root, "public");
 
 let manifest = {};
 try {
-  const assets = await directusGet(BASE, SITE_ASSETS_QUERY, {
-    token: TOKEN,
-  });
+  // logo/favicon + ảnh bài (preview_image & inline rich-text) — bake hết về
+  // public/cms-assets/ để site tĩnh tự phục vụ ảnh, không còn hit Directus
+  // /assets ở runtime (gỡ được Public directus_files:read). collectAssetIds
+  // dùng chung với CMS extension (deploy-content-endpoint) nên hai bên cùng tập.
+  const [assets, officialUpdates, pressReleases, siteConfig] = await Promise.all([
+    directusGet(BASE, SITE_ASSETS_QUERY, { token: TOKEN }),
+    directusGet(BASE, OFFICIAL_UPDATES_QUERY, { token: TOKEN }),
+    directusGet(BASE, PRESS_RELEASES_QUERY, { token: TOKEN }),
+    directusGet(BASE, SITE_CONFIG_QUERY, { token: TOKEN }),
+  ]);
+  const articleIds = collectAssetIds({ officialUpdates, pressReleases, siteConfig });
   manifest = await downloadCmsAssets({
     base: BASE,
     token: TOKEN,
-    ids: [assets.logo_on_black, assets.logo_on_white, assets.favicon],
+    ids: [assets.logo_on_black, assets.logo_on_white, assets.favicon, ...articleIds],
     destDir: publicDir,
   });
 } catch (err) {

@@ -12,7 +12,24 @@ import {
 } from "@/lib/directus";
 import type { ContentPayload } from "@/lib/contentData";
 import { assembleContentPayload } from "../scripts/content-payload.mjs";
+import { resolveBasePath } from "../scripts/cms-assets.mjs";
 import { fetchLiveContent, fetchLiveStatus } from "../scripts/live-content.mjs";
+
+// Manifest ảnh đã bake (scripts/fetch-cms-assets.mjs chạy ở prebuild → ghi
+// public/cms-assets/manifest.json). Có thì preview_image + ảnh inline trỏ
+// /cms-assets/ tĩnh; không có (id thiếu) thì buildAssetUrl tự rơi về Directus.
+function loadAssetManifest(): Record<string, string> | null {
+  try {
+    return JSON.parse(
+      readFileSync(
+        resolve(process.cwd(), "public/cms-assets/manifest.json"),
+        "utf-8",
+      ),
+    );
+  } catch {
+    return null;
+  }
+}
 
 // Cache trong tiến trình build — phòng buildContentPayload() bị gọi nhiều
 // lần trong cùng một route/worker (tránh gọi lại Directus không cần thiết).
@@ -117,6 +134,8 @@ export async function buildContentPayload(): Promise<ContentPayload> {
       languages,
       labelRows,
       directusUrl: process.env.DIRECTUS_URL ?? "http://localhost:8055",
+      assetManifest: loadAssetManifest(),
+      assetBasePath: resolveBasePath(),
     });
   } catch (err) {
     // content.json/status.json là JSON tĩnh, refresh lại được sau (xem
