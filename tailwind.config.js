@@ -19,6 +19,8 @@ module.exports = {
     // thứ tự media query). Dưới 390px là màn mobile nhỏ — iPhone mini/SE, hay
     // iPhone thường bật Display Zoom: card tràn sát mép, bỏ bo góc (variant
     // `max-xs:`), và chọn ngôn ngữ chuyển vào drawer full-screen.
+    // Đổi mốc này thì sửa luôn hai chỗ viết cứng `max-width: 389px`:
+    // matchMedia trong Navbar.tsx và CSS dự phòng trong app/layout.tsx.
     screens: {
       xs: "390px",
       ...defaultTheme.screens,

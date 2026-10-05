@@ -62,9 +62,9 @@ export default function PressReleasesContent() {
         // `flex flex-col flex-1` để chiếm phần cao còn thừa của main — bài ngắn
         // vẫn phủ trắng tới footer. Không padding đáy: thanh back của
         // ArticleDetail giữ mép đó (xem mt-auto của nó).
-        // max-xs:pt-32: breadcrumb ở mobile nhỏ không còn pb-6 đệm phía dưới
-        // (xem Breadcrumb.tsx), bù 2rem để dòng meta không dính sát dải đó.
-        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 max-xs:pt-32 md:mt-0 pb-0"
+        // max-xs:pt-[108px]: breadcrumb ở mobile nhỏ không còn pb-6 đệm phía dưới
+        // (xem Breadcrumb.tsx), bù 12px để dòng meta không dính sát dải đó.
+        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 max-xs:pt-[108px] md:mt-0 pb-0"
       >
         <ArticleDetail
           article={opened ?? null}

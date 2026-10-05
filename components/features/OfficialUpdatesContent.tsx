@@ -48,7 +48,7 @@ export default function OfficialUpdatesContent() {
         // and `flex flex-col flex-1` claims `main`'s leftover space so a
         // short update's white still reaches the footer, with no bottom
         // padding — ArticleDetail's own back bar owns that edge.
-        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 max-xs:pt-32 md:mt-0 pb-0"
+        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 max-xs:pt-[108px] md:mt-0 pb-0"
       >
         <ArticleDetail
           article={opened ?? null}
@@ -77,7 +77,7 @@ export default function OfficialUpdatesContent() {
 
   return (
     <div
-      className="container-page pt-4 max-xs:pt-8 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4"
+      className="container-page pt-4 max-xs:pt-3 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4"
       {...loadingProps(!data)}
     >
       <Reveal>

@@ -161,7 +161,7 @@ export default function ArticleCard({
             <PreviewImage
               src={article.previewImage as string}
               alt=""
-              className="w-full h-44 sm:h-56"
+              className="w-full h-44 sm:h-56 max-xs:w-auto max-xs:mx-2 max-xs:mt-2 max-xs:rounded-lg"
             />
           )}
           <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
@@ -283,8 +283,8 @@ export default function ArticleCard({
               // The 2-slot half of a grid row (hideExcerpt) is a secondary
               // item — its image stays smaller than a full list card's.
               // Mobile nhỏ: mọi card list cùng bề rộng ảnh nhỏ, ảnh thụt vào
-              // (trên/trái/dưới) thay vì tràn sát mép card.
-              className={`${hideExcerpt ? "w-24 sm:w-32" : "w-32 sm:w-44"} max-xs:w-24 max-xs:my-3 max-xs:ml-3 max-xs:rounded-lg self-stretch flex-shrink-0`}
+              // (trên/trái/dưới 8px) thay vì tràn sát mép card — ảnh card nổi bật cũng vậy.
+              className={`${hideExcerpt ? "w-24 sm:w-32" : "w-32 sm:w-44"} max-xs:w-24 max-xs:my-2 max-xs:ml-2 max-xs:rounded-lg self-stretch flex-shrink-0`}
             />
           )}
           {hideExcerpt && compact ? (

@@ -179,6 +179,7 @@ export function DesktopLanguageSelector({
   };
   useDismissOnOutside(containerRef, open, close);
   const pillActive = open || hovering;
+  const lastPointerTypeRef = useRef<string>("mouse");
 
   // Đo trên các phần tử không animate, để mọi animation chạy trên px cố định.
   const restRef = useRef<HTMLSpanElement>(null);
@@ -235,7 +236,16 @@ export function DesktopLanguageSelector({
         aria-label={selectLanguageLabel}
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => (open ? close(true) : onOpenChange(true))}
+        // Chạm (touch) không có mouseleave bù cho mouseenter giả lập, nên chỉ
+        // giữ hover khi đóng bằng chuột thật — chạm lại để đóng thì tắt luôn.
+        onPointerDown={(e) => {
+          lastPointerTypeRef.current = e.pointerType;
+        }}
+        onClick={() =>
+          open
+            ? close(lastPointerTypeRef.current === "mouse")
+            : onOpenChange(true)
+        }
         // self-stretch để hit-area khớp vùng hover (container ngoài) — viên
         // pill bo tròn chuyển xuống span con, chỉ còn là lớp hiển thị, nên
         // vòng focus cũng phải xuống theo nó (focus-ring-inner).

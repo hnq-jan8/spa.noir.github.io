@@ -92,6 +92,16 @@ export default function Navbar({
     return () => clearTimeout(iconAnimationTimeoutRef.current);
   }, []);
 
+  // `data-scrolled` trên <html>: dải as-of / breadcrumb ở mobile nhỏ chỉ hiện
+  // nền + viền đáy khi trang đã rời đỉnh (xem .strip-flat trong globals.css).
+  useEffect(() => {
+    const html = document.documentElement;
+    const sync = () => html.toggleAttribute("data-scrolled", window.scrollY > 0);
+    sync();
+    window.addEventListener("scroll", sync, { passive: true });
+    return () => window.removeEventListener("scroll", sync);
+  }, []);
+
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 767px)");
     const smallMql = window.matchMedia("(max-width: 389px)");

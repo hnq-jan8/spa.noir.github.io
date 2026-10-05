@@ -4,7 +4,7 @@ import Skeleton from "@/components/ui/Skeleton";
 function ListCardSkeleton() {
   return (
     <div className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow flex items-stretch">
-      <Skeleton className="skeleton-on-card w-32 sm:w-44 max-xs:w-24 max-xs:my-3 max-xs:ml-3 self-stretch flex-shrink-0 rounded-none max-xs:rounded-lg" />
+      <Skeleton className="skeleton-on-card w-32 sm:w-44 max-xs:w-24 max-xs:my-2 max-xs:ml-2 self-stretch flex-shrink-0 rounded-none max-xs:rounded-lg" />
       <div className="flex-1 min-w-0 flex flex-col justify-center pt-2 sm:pt-2.5 pl-3 sm:pl-3.5 pr-3 sm:pr-4 pb-3 sm:pb-4">
         <Skeleton className="skeleton-on-card h-3 w-24 mb-3" />
         <Skeleton className="skeleton-on-card h-4 w-4/5 mb-2" />
@@ -40,7 +40,7 @@ export default function PressReleasesSkeleton() {
   return (
     <>
       <div className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow">
-        <Skeleton className="skeleton-on-card w-full h-44 sm:h-56 rounded-none" />
+        <Skeleton className="skeleton-on-card w-full h-44 sm:h-56 rounded-none max-xs:w-auto max-xs:mx-2 max-xs:mt-2 max-xs:rounded-lg" />
         <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
           <Skeleton className="skeleton-on-card h-3.5 w-24 mb-3" />
           <Skeleton className="skeleton-on-card h-6 w-11/12 mb-2" />

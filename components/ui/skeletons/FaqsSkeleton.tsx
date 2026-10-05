@@ -24,7 +24,7 @@ export default function FaqsSkeleton() {
           <Skeleton className="skeleton-on-card h-4 w-3/5" />
           <Skeleton className="skeleton-on-card w-[18px] h-[18px] flex-shrink-0" />
         </div>
-        <div className="mx-4 sm:mx-6 border-t border-gray-200 pt-3 sm:pt-4 pb-4 sm:pb-6">
+        <div className="mx-4 sm:mx-6 border-t border-gray-200 max-xs:border-t-0 pt-3 max-xs:pt-0 sm:pt-4 pb-4 sm:pb-6">
           <Skeleton className="skeleton-on-card h-3.5 w-full mb-2" />
           <Skeleton className="skeleton-on-card h-3.5 w-full mb-2" />
           <Skeleton className="skeleton-on-card h-3.5 w-2/3" />

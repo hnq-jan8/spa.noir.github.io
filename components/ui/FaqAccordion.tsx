@@ -190,7 +190,7 @@ export default function FaqAccordion({
           </svg>
         </button>
         <AccordionPanel isOpen={isOpen} panelId={panelId}>
-          <div className="mx-4 sm:mx-6 border-t border-gray-200 pt-3 sm:pt-4 pb-4 sm:pb-6 text-gray-700 leading-relaxed text-sm">
+          <div className="mx-4 sm:mx-6 border-t border-gray-200 max-xs:border-t-0 pt-3 max-xs:pt-0 sm:pt-4 pb-4 sm:pb-6 text-gray-700 leading-relaxed text-sm">
             {item.answer}
           </div>
         </AccordionPanel>

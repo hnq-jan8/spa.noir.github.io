@@ -92,7 +92,7 @@ export default function HomeContent() {
             "đang sống" là sai, mà skeleton quay mãi cũng sai. Trường hợp cuối
             đến từ emptyContentPayload() trong lib/buildContentPayload.ts. */}
         {data && asOf ? (
-          <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md max-xs:strip-flat">
+          <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md max-xs:strip-flat max-xs:gap-4">
             {/* `aspect-square`, not `h-1.5` — with both width and height set
                 independently, fractional browser zoom can round them to
                 different physical pixel counts even though they're the same

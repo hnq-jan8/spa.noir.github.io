@@ -296,13 +296,19 @@
   }
 
   /* Mobile nhỏ (`max-xs:strip-flat`): viên thuốc as-of / breadcrumb duỗi thành
-     dải phẳng sát dưới header — không bo, chỉ giữ viền đáy mảnh. */
+     dải phẳng sát dưới header — không bo, chỉ còn viền đáy mảnh. Ở đỉnh trang
+     cả nền lẫn viền trong suốt, hoà vào trang; cuộn đi (`data-scrolled` do
+     Navbar gắn) thì trả về nền/viền của chính phần tử. */
   .strip-flat {
     border-radius: 0;
     border-left-width: 0;
     border-right-width: 0;
     border-top-width: 0;
     padding: 5px 1rem;
+  }
+  html:not([data-scrolled]) .strip-flat {
+    border-bottom-color: transparent;
+    background-color: transparent;
   }
 }
 

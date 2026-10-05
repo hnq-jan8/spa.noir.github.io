@@ -12,7 +12,7 @@ import Skeleton, { SkeletonText } from "@/components/ui/Skeleton";
 /** Pill "thông tin tính đến": mượn nguyên khung của bản thật. */
 export function AsOfPillSkeleton() {
   return (
-    <div className="relative flex items-center gap-2 border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md max-xs:strip-flat">
+    <div className="relative flex items-center gap-2 border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md max-xs:strip-flat max-xs:gap-4">
       <Skeleton className="w-1.5 aspect-square rounded-full flex-shrink-0" />
       <div className="flex items-center min-h-[24px]">
         <Skeleton className="h-3 w-56 max-w-full" />
