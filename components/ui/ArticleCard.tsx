@@ -142,7 +142,7 @@ export default function ArticleCard({
       onClick={onOpen}
       // No padding on the card: the thumbnail runs flush to its edges and the
       // text block supplies its own insets.
-      className={`group w-full max-xs:w-[calc(100%+2rem)] text-left bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow hover:bg-cardHover active:bg-cardHover ${
+      className={`group w-full max-xs:w-[calc(100%+2rem)] text-left bg-white rounded-2xl max-xs:card-bleed max-xs:border-b max-xs:border-gray-100 overflow-hidden card-shadow hover:bg-cardHover active:bg-cardHover ${
         featured
           ? ""
           : layout === "grid"

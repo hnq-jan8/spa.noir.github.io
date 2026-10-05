@@ -101,7 +101,11 @@ export default function PressReleasesContent() {
 
   return (
     <div
-      className="container-page pt-4 max-xs:pt-0 pb-8 max-xs:pb-0 md:py-8 max-w-3xl mx-auto"
+      // Mobile nhỏ: cả trang trắng như trang xem bài — cùng mẹo kéo nền lên
+      // sau breadcrumb (-mt-24 + pt-24, z-0) và flex-1 phủ tới footer. Card
+      // trắng trên nền trắng nên ngăn nhau bằng viền đáy (ArticleCard), không
+      // còn khe 1px.
+      className="container-page pt-4 max-xs:relative max-xs:z-0 max-xs:flex-1 max-xs:bg-white max-xs:-mt-24 max-xs:pt-24 pb-8 max-xs:pb-0 md:py-8 max-w-3xl mx-auto"
       {...loadingProps(!data)}
     >
       <Reveal>
@@ -118,7 +122,7 @@ export default function PressReleasesContent() {
               featured
             />
             {listItems.length > 0 && (
-              <div className="mt-4 space-y-3 max-xs:mt-px max-xs:space-y-px">
+              <div className="mt-4 space-y-3 max-xs:mt-0 max-xs:space-y-0">
                 {listItems.map((release) => (
                   <ArticleCard
                     key={release.key}
@@ -130,7 +134,7 @@ export default function PressReleasesContent() {
               </div>
             )}
             {gridRows.map((row) => (
-              <div key={row[0].key} className="mt-3 max-xs:mt-px">
+              <div key={row[0].key} className="mt-3 max-xs:mt-0">
                 {row.length === 1 ? (
                   // Lone leftover in this row: full width, same image + title +
                   // excerpt treatment as the list items above.
@@ -147,7 +151,7 @@ export default function PressReleasesContent() {
                     doesn't fit, so every item in the row just stacks as a
                     plain compact card (no excerpt, to save height) instead
                     of splitting into columns. */}
-                    <div className="space-y-3 max-xs:space-y-px md:hidden">
+                    <div className="space-y-3 max-xs:space-y-0 md:hidden">
                       {row.map((release) => (
                         <ArticleCard
                           key={release.key}

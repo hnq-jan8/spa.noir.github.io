@@ -227,8 +227,11 @@ export function DesktopLanguageSelector({
     <div
       data-fallback-hide-below-xs
       ref={containerRef}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      // Pointer events lọc theo `pointerType`: chạm cũng bắn mouseenter giả
+      // lập (không có mouseleave bù), làm pill/khối highlight dính sáng và
+      // nhảy giật dưới ngón tay. Cảm ứng chỉ dùng trạng thái `active:`.
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHovering(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setHovering(false)}
       className="hidden xs:flex relative items-stretch flex-shrink-0 ml-2 md:ml-6 lg:ml-2 w-max"
     >
       <button
@@ -332,8 +335,12 @@ export function DesktopLanguageSelector({
                 key={lang.code}
                 href={`/${lang.code}${pathWithoutLocale}`}
                 tabIndex={open ? undefined : -1}
-                onMouseEnter={() => handleItemEnter(lang.code)}
-                onMouseLeave={handleItemLeave}
+                onPointerEnter={(e) =>
+                  e.pointerType === "mouse" && handleItemEnter(lang.code)
+                }
+                onPointerLeave={(e) =>
+                  e.pointerType === "mouse" && handleItemLeave()
+                }
                 onClick={() => {
                   // Cùng locale thì Link không điều hướng, không remount nào
                   // tự đóng dropdown hay refetch. Giữ nguyên bài đang mở —
@@ -343,7 +350,7 @@ export function DesktopLanguageSelector({
                     close();
                   }
                 }}
-                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-6 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap active:bg-cardHover ${
+                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-6 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap active:bg-cardHover active:shadow-[0_0_0.5px_1.5px_rgba(255,255,255,0.6)] ${
                   open
                     ? "opacity-100 translate-x-0 translate-y-0 [transition:opacity_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,transform_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
                     : "opacity-0 translate-x-5 -translate-y-3 animate-item-out [transition:opacity_150ms_ease-out]"
