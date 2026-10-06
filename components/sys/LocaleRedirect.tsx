@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { routing, languages } from "@/i18n/routing";
+import { routing, languages, activeLocales } from "@/i18n/routing";
 import { getSavedLocale } from "@/i18n/preference";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -10,7 +10,8 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const VIETNAM_TIMEZONES = ["Asia/Ho_Chi_Minh", "Asia/Saigon"];
 
 function detectLocale(): string {
-  const locales = routing.locales as readonly string[];
+  // Chỉ nhắm tới ngôn ngữ đang bật — route của ngôn ngữ tắt tồn tại nhưng 404.
+  const locales: readonly string[] = activeLocales;
 
   // 1. Lựa chọn user đã lưu từ lần truy cập trước
   const saved = getSavedLocale();

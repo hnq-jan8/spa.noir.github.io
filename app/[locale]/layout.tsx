@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, activeLocales } from "@/i18n/routing";
 import Navbar from "@/components/layout/Navbar";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import Footer from "@/components/layout/Footer";
 import RememberLocale from "@/components/sys/RememberLocale";
 import ActivePoller from "@/components/sys/ActivePoller";
+import LocaleGate from "@/components/sys/LocaleGate";
 import { COLORS } from "@/lib/theme-colors";
 import { getBuildMode } from "@/lib/buildMode";
 
@@ -22,6 +23,8 @@ export async function generateMetadata({
   const title = seoTitle[locale] ?? seoTitle[routing.defaultLocale];
   const description = seoDescription[locale] ?? seoDescription[routing.defaultLocale];
   return {
+    // Locale tắt lúc build vẫn có file HTML (superset) → đừng cho index.
+    robots: activeLocales.includes(locale) ? undefined : { index: false },
     title: { default: title, template: `%s | ${title}` },
     description,
     icons: favicon ? { icon: favicon } : undefined,
@@ -79,7 +82,11 @@ export default async function LocaleLayout({
         <div className="hidden md:block md:h-14 flex-shrink-0" aria-hidden="true" />
         {/* flex column so a page can claim leftover height with `flex-1`
             — see PressReleasesContent's article wrapper. */}
-        <main className="flex-1 flex flex-col">{children}</main>
+        <main className="flex-1 flex flex-col">
+          <LocaleGate buildActive={activeLocales.includes(locale)}>
+            {children}
+          </LocaleGate>
+        </main>
         <Footer logoOnWhite={logoOnWhite} />
       </div>
     </>

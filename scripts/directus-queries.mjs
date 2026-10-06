@@ -6,6 +6,13 @@
 export const LANGUAGES_QUERY =
   "/items/languages?fields=code,name&sort=sort&filter[deleted_at][_null]=true&filter[status][_eq]=true";
 
+// Superset: mọi ngôn ngữ chưa xoá, kể cả status=false. generate-i18n dùng để
+// sinh sẵn route + messages cho cả tập này; bật/tắt một ngôn ngữ trong tập chỉ
+// cần quick build (content.json quyết định ngôn ngữ nào hiện), không cần build
+// lại route. Ngôn ngữ ngoài tập (mới tạo) vẫn cần full build.
+export const ALL_LANGUAGES_QUERY =
+  "/items/languages?fields=code,name,status&sort=sort&filter[deleted_at][_null]=true";
+
 export const UI_LABELS_QUERY =
   "/items/ui_labels?fields=namespace,key,translations.languages_code,translations.value&limit=-1&filter[deleted_at][_null]=true";
 
