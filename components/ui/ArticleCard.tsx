@@ -227,7 +227,11 @@ export default function ArticleCard({
                 </div>
               )}
               {article.date && (
-                <div className="relative h-12 sm:h-14 flex flex-col justify-end px-3.5 pb-1 sm:px-4">
+                // -mb-px (ở đây và ở panel tiêu đề): toạ độ lẻ pixel của tile
+                // làm hở một đường ảnh giữa dải fade và panel trắng, và ở mép
+                // đáy card. Chồng 1px lên nhau / tràn 1px ra ngoài (bị
+                // overflow-hidden của card cắt) để không còn khe nào.
+                <div className="relative h-12 sm:h-14 -mb-px flex flex-col justify-end px-3.5 pb-1 sm:px-4">
                   <div className="absolute inset-0 card-fade" />
                   <p className="relative text-xs text-gray-600">
                     {formatTimestamp(article.date, locale)}
@@ -237,7 +241,7 @@ export default function ArticleCard({
               {/* The button's own hover:bg-cardHover never shows here — the
                   image and this panel sit on top of it, fully opaque — so
                   the panel carries its own group-hover instead. */}
-              <div className="bg-white group-hover:bg-cardHover group-active:bg-cardHover flex items-start justify-between gap-2 px-3.5 pb-2.5 sm:px-4 sm:pb-3">
+              <div className="relative -mb-px bg-white group-hover:bg-cardHover group-active:bg-cardHover flex items-start justify-between gap-2 px-3.5 pb-[11px] sm:px-4 sm:pb-[13px]">
                 {heading && (
                   <h3 className="flex-1 font-semibold text-sm leading-snug text-balance line-clamp-2 text-gray-900">
                     {heading}
