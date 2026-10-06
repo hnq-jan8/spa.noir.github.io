@@ -4,7 +4,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useContentState } from "@/hooks/useContentData";
-import { useLocale } from "@/hooks/useLocale";
+import { useLocale, useRouteLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
 import { isHomePath } from "@/i18n/paths";
 import {
@@ -54,12 +54,16 @@ export default function Footer({
   logoOnWhite: string | null;
 }) {
   const pathname = usePathname();
-  const isHome = isHomePath(pathname);
+  const routeLocale = useRouteLocale();
   // `failed` too: on a dead content.json these blocks never arrive, and a
   // skeleton left running forever reads as a hung page.
   const { data, failed } = useContentState();
   const [logoBroken, setLogoBroken] = useState(false);
   const locale = useLocale();
+  // URL của ngôn ngữ đã tắt (vd `/tw`) khớp dạng trang chủ nhưng LocaleGate đang
+  // trả 404 ở đó — không có khối liên hệ riêng của trang chủ, nên footer vẫn
+  // phải hiện liên hệ như mọi trang 404 khác.
+  const isHome = isHomePath(pathname) && (routeLocale === "" || routeLocale === locale);
   // Fallback về label bundle lúc build — hiện ngay, content.json ghi đè khi về.
   const footer =
     data?.common.labels["footer"] ?? bundledLabels(locale, "footer");
