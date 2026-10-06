@@ -2,9 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing, activeLocales } from "@/i18n/routing";
-import Navbar from "@/components/layout/Navbar";
-import Breadcrumb from "@/components/layout/Breadcrumb";
-import Footer from "@/components/layout/Footer";
+import SiteShell from "@/components/layout/SiteShell";
 import RememberLocale from "@/components/sys/RememberLocale";
 import ActivePoller from "@/components/sys/ActivePoller";
 import LocaleGate from "@/components/sys/LocaleGate";
@@ -63,32 +61,17 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  const { officialSiteUrl, logoOnBlack, logoOnWhite, buildId } = await getBuildMode();
+  const { officialSiteUrl, buildId } = await getBuildMode();
 
   return (
     <>
       <RememberLocale />
       <ActivePoller officialSiteUrl={officialSiteUrl} buildId={buildId} />
-      {/* Gate bọc CẢ khung (header/footer): locale tắt hiện y hệt 404.html, không
-          có header — thay vì một vùng 404 nằm giữa khung của site. */}
-      <LocaleGate buildActive={activeLocales.includes(locale)}>
-        <div className="flex flex-col min-h-[100dvh] bg-page">
-          <Navbar logoOnBlack={logoOnBlack} />
-          {/* Dải crumb của trang, chỉ có ở mobile — đứng ngay sau header vì nó
-              sticky theo `top-12` của header đó. */}
-          <Breadcrumb />
-          {/* Navbar's header is `sticky` on mobile (stays in flow, no spacer
-              needed) but `fixed` from `md:` up, where it drops out of flow —
-              this spacer reserves its md:h-14 there so content below (and
-              sticky offsets like `top-12`) sits exactly where it would if the
-              header were still in flow. */}
-          <div className="hidden md:block md:h-14 flex-shrink-0" aria-hidden="true" />
-          {/* flex column so a page can claim leftover height with `flex-1`
-              — see PressReleasesContent's article wrapper. */}
-          <main className="flex-1 flex flex-col">{children}</main>
-          <Footer logoOnWhite={logoOnWhite} />
-        </div>
-      </LocaleGate>
+      <SiteShell>
+        <LocaleGate buildActive={activeLocales.includes(locale)}>
+          {children}
+        </LocaleGate>
+      </SiteShell>
     </>
   );
 }

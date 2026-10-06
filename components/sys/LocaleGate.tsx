@@ -8,7 +8,7 @@ import NotFoundContent from "@/components/features/NotFoundContent";
  * Route của MỌI ngôn ngữ (kể cả đang tắt) được sinh sẵn lúc build — xem
  * i18n/routing.ts. Gate này quyết định trang của một locale có "tồn tại" hay
  * không, theo content.json (runtime) thay vì theo lúc build:
- *   - ngôn ngữ tắt        → trả y hệt 404.html (không header/footer), kể cả ai gõ thẳng URL
+ *   - ngôn ngữ tắt        → trả 404 giống 404.html (trong khung site, có header/footer), kể cả ai gõ thẳng URL
  *   - ngôn ngữ vừa bật    → hiện nội dung ngay sau quick build, không cần build lại route
  *
  * `buildActive` (trạng thái lúc build) là giá trị đầu để HTML tĩnh đúng ngay
@@ -34,8 +34,9 @@ export default function LocaleGate({
 
   if (!active) {
     return (
-      // Cùng markup với app/not-found.tsx (404.html): không header/footer.
-      <div className="min-h-[100dvh] flex items-center justify-center">
+      // Cùng markup với app/not-found.tsx (404.html) và [locale]/not-found.tsx:
+      // nằm trong khung site, có header/footer.
+      <div className="container-page">
         <NotFoundContent />
       </div>
     );

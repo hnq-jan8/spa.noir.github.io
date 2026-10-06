@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { useParams } from "next/navigation";
-import { routing, activeLocales } from "@/i18n/routing";
+import { activeLocales } from "@/i18n/routing";
 import { getCachedLanguageCodes } from "@/hooks/useContentData";
 import { getSavedLocale } from "@/i18n/preference";
 
@@ -14,10 +14,13 @@ function subscribeSavedLocale(onChange: () => void) {
   return () => window.removeEventListener("storage", onChange);
 }
 
-/** Locale đúng như trên URL — kể cả ngôn ngữ đang tắt. Chỉ LocaleGate cần. */
+/**
+ * Locale đúng như trên URL — kể cả ngôn ngữ đang tắt; "" nếu route nằm ngoài
+ * [locale] (vd 404.html). Chỉ LocaleGate cần.
+ */
 export function useRouteLocale(): string {
   const params = useParams();
-  return (params?.locale as string) ?? routing.defaultLocale;
+  return (params?.locale as string) ?? "";
 }
 
 /**
