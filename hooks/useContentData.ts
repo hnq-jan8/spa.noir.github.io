@@ -35,6 +35,11 @@ function fetchPayload(): Promise<ContentPayload> {
   return cachedPromise;
 }
 
+/** Mã các ngôn ngữ đang bật theo content.json đã tải (null nếu chưa có). */
+export function getCachedLanguageCodes(): string[] | null {
+  return cachedPayload?.common.languages.map((l) => l.code) ?? null;
+}
+
 export function invalidateContent() {
   // Giữ cachedPayload để UI còn dữ liệu cũ hiển thị trong lúc revalidate.
   cachedPromise = null;

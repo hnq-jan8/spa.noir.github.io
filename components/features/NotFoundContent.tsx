@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useContentData } from "@/hooks/useContentData";
+import { useLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
 import { getSavedLocale } from "@/i18n/preference";
 import { routing } from "@/i18n/routing";
@@ -13,7 +14,9 @@ import NotFoundLayout, {
 
 export default function NotFoundContent() {
   const params = useParams();
-  const paramLocale = params?.locale as string | undefined;
+  // Trong [locale]: locale hiển thị (fallback nếu URL là ngôn ngữ đã tắt).
+  const displayLocale = useLocale();
+  const paramLocale = params?.locale ? displayLocale : undefined;
   // Route gốc (ngoài [locale], vd 404.html tĩnh trên GitHub Pages) không có
   // param locale — render locale mặc định trước để khớp SSR, rồi đổi sang
   // locale đã lưu (nếu có) sau khi mount, tránh lệch nội dung server/client.

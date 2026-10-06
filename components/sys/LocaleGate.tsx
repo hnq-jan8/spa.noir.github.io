@@ -1,7 +1,7 @@
 "use client";
 
 import { useContentState } from "@/hooks/useContentData";
-import { useLocale } from "@/hooks/useLocale";
+import { useRouteLocale } from "@/hooks/useLocale";
 import NotFoundContent from "@/components/features/NotFoundContent";
 
 /**
@@ -25,7 +25,7 @@ export default function LocaleGate({
   buildActive: boolean;
   children: React.ReactNode;
 }) {
-  const locale = useLocale();
+  const locale = useRouteLocale();
   const { data } = useContentState();
 
   const live = data?.common.languages;
