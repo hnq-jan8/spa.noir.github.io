@@ -43,6 +43,12 @@
   .bg-chrome {
     --focus-ring: theme(colors.gray.300);
   }
+  /* Drawer mobile đang mở (Navbar, data-menu-open): nền trang theo màu header
+     để Safari tô thanh trạng thái tối, không trắng phía trên header. */
+  html[data-menu-open],
+  html[data-menu-open] body {
+    @apply bg-chrome;
+  }
   .bg-white,
   .bg-page,
   .bg-surface {

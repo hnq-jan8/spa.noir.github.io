@@ -17,7 +17,7 @@ export default async function SiteShell({
 
   return (
     <div className="flex flex-col min-h-[100dvh] bg-page">
-      <Navbar logoOnBlack={logoOnBlack} logoOnWhite={logoOnWhite} />
+      <Navbar logoOnBlack={logoOnBlack} />
       {/* Dải crumb của trang, chỉ có ở mobile — đứng ngay sau header; header
           cuộn đi thì nó bám `top-0`. */}
       <Breadcrumb />

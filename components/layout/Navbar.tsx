@@ -36,16 +36,13 @@ const MENU_ICON_ANIM_MS = 370;
 
 export default function Navbar({
   logoOnBlack,
-  logoOnWhite,
 }: {
   logoOnBlack: string | null;
-  logoOnWhite: string | null;
 }) {
   const locale = useLocale();
   const pathname = usePathname();
   const data = useContentData();
   const [logoBroken, setLogoBroken] = useState(false);
-  const [lightLogoBroken, setLightLogoBroken] = useState(false);
   // Fallback về label bundle lúc build để nav hiện ngay first paint,
   // không chờ content.json; bản trong content.json ghi đè khi về.
   const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
@@ -141,26 +138,61 @@ export default function Navbar({
     }
   }, [langOpen]);
 
+  // Drawer mở ở mobile thì tô <html> màu header (globals.css: data-menu-open)
+  // để Safari không để thanh trạng thái trắng toát phía trên header tối.
+  // Không ghim header bằng `fixed`: Safari lấy màu từ thứ fixed ở mép trên
+  // rồi giữ luôn màu đó sau khi đóng. Đóng xong nhích 1px rồi trả về — Safari
+  // chỉ lấy mẫu lại khi trang cuộn.
+  const menuTinted = menuOpen && isMobile;
+  const wasTintedRef = useRef(false);
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-menu-open", menuTinted);
+    if (!menuTinted && wasTintedRef.current) {
+      const y = window.scrollY;
+      window.scrollTo({ top: y + 1, behavior: "instant" });
+      // Trả về ở frame sau — cùng frame thì Safari không thấy lần cuộn nào.
+      requestAnimationFrame(() =>
+        window.scrollTo({ top: y, behavior: "instant" }),
+      );
+    }
+    wasTintedRef.current = menuTinted;
+  }, [menuTinted]);
+
   // `isMobile` chứ không chỉ `menuOpen`: kéo cửa sổ rộng ra desktop thì
   // `md:hidden` giấu drawer đi nhưng state vẫn mở, khoá cuộn mà treo lại là
   // trang không cuộn được nữa và cũng chẳng còn nút nào để đóng.
   //
-  // Header mobile không sticky: mở drawer lúc đã cuộn dở thì header (và mép
-  // trên của drawer) đang lệch khỏi đỉnh — kéo về đầu trang trước khi khoá.
-  // Chỉ gỡ đúng hai thuộc tính đã đặt, không ghi đè cả `style`: các biến CSS
-  // của useHeaderOffset cũng nằm trên <html>.
+  // Header mobile không sticky: mở drawer lúc đã cuộn dở thì header đang lệch
+  // khỏi đỉnh — kéo về đầu trang trước khi khoá. Chỉ gỡ đúng các thuộc tính
+  // đã đặt, không ghi đè cả `style`: các biến CSS của useHeaderOffset cũng
+  // nằm trên <html>.
   useEffect(() => {
     if (!menuOpen || !isMobile) return;
     window.scrollTo({ top: 0, behavior: "instant" });
-    // Sự kiện scroll tự nhiên tới sau một frame — bắn ngay để các biến CSS
-    // của useHeaderOffset (mép drawer) đúng từ frame đầu tiên mở drawer.
-    window.dispatchEvent(new Event("scroll"));
     const html = document.documentElement;
     html.style.setProperty("overflow", "hidden", "important");
     html.style.setProperty("height", "100%", "important");
+    html.style.setProperty("overscroll-behavior", "none");
+    // iOS vẫn cuộn trang dưới drawer dù <html> đã overflow:hidden, kéo header
+    // trôi mất. Chặn touchmove trừ khi nó nằm trong drawer và drawer thật sự
+    // cuộn được (overscroll-contain lo phần chạm mép).
+    const blockTouch = (e: TouchEvent) => {
+      const drawer = document.getElementById("mobile-menu");
+      if (
+        drawer &&
+        e.target instanceof Node &&
+        drawer.contains(e.target) &&
+        drawer.scrollHeight > drawer.clientHeight
+      )
+        return;
+      e.preventDefault();
+    };
+    document.addEventListener("touchmove", blockTouch, { passive: false });
     return () => {
+      document.removeEventListener("touchmove", blockTouch);
       html.style.removeProperty("overflow");
       html.style.removeProperty("height");
+      html.style.removeProperty("overscroll-behavior");
     };
   }, [menuOpen, isMobile]);
 
@@ -190,12 +222,6 @@ export default function Navbar({
   const scrollNav = (dir: "left" | "right") => scrollNavBy(dir, 120);
 
   const logoSrc = logoBroken ? FALLBACK_LOGO : logoOnBlack || FALLBACK_LOGO;
-  // Logo cho header nền sáng lúc mở menu mobile; thiếu bản on-white thì đảo
-  // màu logo mặc định, như Footer.
-  const lightLogoOk = !!logoOnWhite && !lightLogoBroken;
-  // Mở menu ở mobile: header cùng drawer chuyển sang nền page. menuOpen chỉ
-  // bật dưới md (lên md là tự đóng), các class dưới đây vẫn chặn bằng max-md:.
-  const lightHeader = menuOpen;
 
   // The desktop/tablet nav scrolls horizontally once labels overflow (see
   // useHorizontalScroll above) -- without this, landing on a tab that's
@@ -216,9 +242,7 @@ export default function Navbar({
           the page — only the breadcrumb sticks (see useHeaderOffset). */}
       <header
         ref={headerRef}
-        className={`relative md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white transition-colors duration-300 ease-out ${
-          lightHeader ? "max-md:bg-page max-md:text-gray-900" : ""
-        }`}
+        className="relative md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">
@@ -260,27 +284,13 @@ export default function Navbar({
                   height={43}
                   // `rounded-lg` không đổi gì về hình (logo nền trong suốt) —
                   // nó ở đây để vòng focus bám theo được bo góc.
-                  className={`h-7 md:h-9 w-auto rounded-lg transition duration-300 group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)] ${
-                    lightHeader ? "max-md:opacity-0" : ""
-                  }`}
+                  className="h-7 md:h-9 w-auto rounded-lg transition group-hover:drop-shadow-[0_0_9px_rgba(255,255,255,0.35)]"
                   priority
-                />
-                {/* Bản nền sáng, chồng đúng chỗ logo trên để crossfade. */}
-                <Image
-                  src={lightLogoOk ? logoOnWhite : FALLBACK_LOGO}
-                  onError={() => setLightLogoBroken(true)}
-                  alt=""
-                  aria-hidden="true"
-                  width={185}
-                  height={43}
-                  className={`md:hidden absolute h-7 w-auto pointer-events-none transition-opacity duration-300 ${
-                    lightLogoOk ? "" : "invert"
-                  } ${lightHeader ? "opacity-100" : "opacity-0"}`}
                 />
               </Link>
               {nav?.["selectLanguage"] && (
                 <span
-                  className={`xs:hidden absolute inset-0 pl-1.5 flex items-center text-base font-light text-gray-600 transform-gpu transition-opacity ease-out ${
+                  className={`xs:hidden absolute inset-0 pl-1.5 flex items-center text-base font-light text-gray-200 transform-gpu transition-opacity ease-out ${
                     langOpen && menuOpen
                       ? "duration-200 opacity-100"
                       : "duration-100 opacity-0 pointer-events-none"
@@ -408,7 +418,6 @@ export default function Navbar({
               selectLanguageLabel={nav?.["selectLanguage"]}
               open={langOpen}
               onOpenChange={setLangOpen}
-              onLight={lightHeader}
             />
 
             <div className="flex md:hidden items-stretch gap-1">
@@ -431,8 +440,8 @@ export default function Navbar({
                     menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                   } ${
                     langOpen
-                      ? "bg-gray-900/5 text-gray-900"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-white/10 text-white"
+                      : "text-gray-200 hover:text-white"
                   }`}
                   aria-label={nav?.["selectLanguage"]}
                   aria-expanded={langOpen}
@@ -446,11 +455,7 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={toggleMenu}
-                className={`relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center transition-colors duration-300 ${
-                  lightHeader
-                    ? "text-gray-600 hover:text-gray-900"
-                    : "text-gray-200 hover:text-white"
-                }`}
+                className="relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white"
                 aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"

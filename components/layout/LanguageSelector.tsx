@@ -103,8 +103,6 @@ interface LanguageSelectorProps {
   languages?: LanguageOption[];
   /** aria-label cho nút mở dropdown (ui_labels: nav.selectLanguage). */
   selectLanguageLabel?: string;
-  /** Header đang nền sáng (mở menu mobile) — đổi pill sang tông tối. */
-  onLight?: boolean;
   /** Chung state với nút globe/langView bên mobile drawer (xem Navbar). */
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -115,7 +113,6 @@ export function DesktopLanguageSelector({
   pathWithoutLocale,
   languages: liveLanguages,
   selectLanguageLabel,
-  onLight = false,
   open,
   onOpenChange,
 }: LanguageSelectorProps) {
@@ -266,23 +263,13 @@ export function DesktopLanguageSelector({
       >
         <span
           className={`relative flex items-center h-9 rounded-full [transition:background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
-            pillActive
-              ? onLight
-                ? "bg-gray-900/5"
-                : "bg-white/10"
-              : "bg-transparent"
+            pillActive ? "bg-white/10" : "bg-transparent"
           }`}
         >
           <span
             ref={restRef}
             className={`flex items-center gap-1.5 px-3 whitespace-nowrap transition-colors duration-150 ${
-              onLight
-                ? pillActive
-                  ? "text-gray-900"
-                  : "text-gray-600"
-                : pillActive
-                  ? "text-white"
-                  : "text-gray-200"
+              pillActive ? "text-white" : "text-gray-200"
             }`}
           >
             <GlobeIcon className="w-4 h-4 md:w-3.5 md:h-3.5 flex-shrink-0" />
