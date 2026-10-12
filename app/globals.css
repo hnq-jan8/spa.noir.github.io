@@ -18,6 +18,22 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Scrollbar chiếm chỗ (Windows, Mac cắm chuột) làm bề rộng trang đổi
+     ~15px giữa trang ngắn và trang dài, mọi thứ căn giữa nhảy theo. Từ 1280px
+     (xl, = max-w-7xl của header/footer) trang luôn rộng đúng bằng cửa sổ
+     (100vw), scrollbar đè lên mép phải — ngay mốc 1280 nó ăn ~15px trong
+     padding 32px của container, rộng hơn thì rơi dần ra lề trống. Hẹp hơn
+     1280 để trình duyệt tự co như thường, không thì scrollbar dí sát nút ở
+     mép phải. Không dùng scrollbar-gutter: trang ngắn hở một dải trống bên
+     phải. Header fixed cũng rộng 100vw ở mốc này (Navbar: xl:w-screen) để
+     thẳng hàng với nội dung. */
+  @media (min-width: 1280px) {
+    html {
+      width: 100vw;
+      overflow-x: hidden;
+    }
+  }
+
   body {
     /* `100dvh`, not `min-h-screen` (`100vh`): on iOS `100vh` is the *large*
        viewport (URL bar collapsed), so with the bar showing the document is

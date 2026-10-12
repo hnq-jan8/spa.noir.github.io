@@ -242,7 +242,7 @@ export default function Navbar({
           the page — only the breadcrumb sticks (see useHeaderOffset). */}
       <header
         ref={headerRef}
-        className="relative md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
+        className="relative md:fixed top-0 inset-x-0 z-50 w-full xl:w-screen bg-chrome text-white"
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">
