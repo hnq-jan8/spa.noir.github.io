@@ -315,10 +315,18 @@
     border-right-width: 0;
     border-top-width: 0;
     padding: 5px 1rem;
+    /* Nền, lớp blur và viền cùng hiện/ẩn dần một nhịp. */
+    transition:
+      background-color 200ms ease-out,
+      border-color 200ms ease-out,
+      backdrop-filter 200ms ease-out;
   }
   html:not([data-scrolled]) .strip-flat {
     border-bottom-color: transparent;
     background-color: transparent;
+    /* blur(0) chứ không `none`: hai đầu cùng một hàm thì mới nội suy được.
+       Không viết bản -webkit-: autoprefixer tự lo theo browserslist. */
+    backdrop-filter: blur(0);
   }
 }
 

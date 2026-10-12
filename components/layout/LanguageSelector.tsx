@@ -103,6 +103,8 @@ interface LanguageSelectorProps {
   languages?: LanguageOption[];
   /** aria-label cho nút mở dropdown (ui_labels: nav.selectLanguage). */
   selectLanguageLabel?: string;
+  /** Header đang nền sáng (mở menu mobile) — đổi pill sang tông tối. */
+  onLight?: boolean;
   /** Chung state với nút globe/langView bên mobile drawer (xem Navbar). */
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -113,6 +115,7 @@ export function DesktopLanguageSelector({
   pathWithoutLocale,
   languages: liveLanguages,
   selectLanguageLabel,
+  onLight = false,
   open,
   onOpenChange,
 }: LanguageSelectorProps) {
@@ -201,11 +204,21 @@ export function DesktopLanguageSelector({
       // bỏ qua, giữ số đo tốt gần nhất. Ghi đè bằng 0 thì quay lại size lớn
       // (zoom in/out qua lại mốc xs) dropdown mở ra cao 0, như bấm không ăn.
       if (h === 0) return;
-      setSize({
+      const next = {
         rest: restRef.current.offsetWidth,
         open: measureListRef.current.offsetWidth,
         h,
-      });
+      };
+      // resize bắn liên tục khi kéo cửa sổ — số đo không đổi thì giữ object
+      // cũ để React bỏ qua render.
+      setSize((prev) =>
+        prev &&
+        prev.rest === next.rest &&
+        prev.open === next.open &&
+        prev.h === next.h
+          ? prev
+          : next,
+      );
     };
     measureRef.current = measure;
     measure();
@@ -253,13 +266,23 @@ export function DesktopLanguageSelector({
       >
         <span
           className={`relative flex items-center h-9 rounded-full [transition:background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
-            pillActive ? "bg-white/10" : "bg-transparent"
+            pillActive
+              ? onLight
+                ? "bg-gray-900/5"
+                : "bg-white/10"
+              : "bg-transparent"
           }`}
         >
           <span
             ref={restRef}
             className={`flex items-center gap-1.5 px-3 whitespace-nowrap transition-colors duration-150 ${
-              pillActive ? "text-white" : "text-gray-200"
+              onLight
+                ? pillActive
+                  ? "text-gray-900"
+                  : "text-gray-600"
+                : pillActive
+                  ? "text-white"
+                  : "text-gray-200"
             }`}
           >
             <GlobeIcon className="w-4 h-4 md:w-3.5 md:h-3.5 flex-shrink-0" />
@@ -299,10 +322,14 @@ export function DesktopLanguageSelector({
             height: open && size ? size.h : 0,
             width: size ? (open ? size.open : size.rest) : undefined,
           }}
-          className={`flex items-start justify-end overflow-hidden rounded-[24px] bg-white/80 backdrop-blur-xl ring-1 ring-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
+          // Nền trắng mờ + blur hiện/ẩn dần (như dải breadcrumb ở mobile
+          // nhỏ) thay vì có sẵn từ đầu. Lúc mở kéo dài 450ms — lâu hơn nhịp
+          // giãn thẻ (250ms) nên vẫn đang lên khi thẻ đã mở hết; lúc đóng
+          // 150ms. blur(0px) chứ không `none` để nội suy được.
+          className={`flex items-start justify-end overflow-hidden rounded-[24px] ring-1 ring-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
             open
-              ? "opacity-100 pointer-events-auto [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,width_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,opacity_120ms_ease-out]"
-              : "opacity-0 pointer-events-none [transition:height_150ms_cubic-bezier(1,0,0.68,0.28),width_150ms_cubic-bezier(1,0,0.68,0.28),opacity_90ms_ease-out]"
+              ? "bg-white/80 backdrop-blur-xl opacity-100 pointer-events-auto [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,width_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,opacity_120ms_ease-out,background-color_450ms_ease-out,backdrop-filter_450ms_ease-out]"
+              : "bg-white/0 backdrop-blur-[0px] opacity-0 pointer-events-none [transition:height_150ms_cubic-bezier(1,0,0.68,0.28),width_150ms_cubic-bezier(1,0,0.68,0.28),opacity_90ms_ease-out,background-color_150ms_ease-out,backdrop-filter_150ms_ease-out]"
           }`}
         >
           {/* p-1.5 (6px) quanh danh sách, item không có gap. rounded-[18px] =
