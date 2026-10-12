@@ -92,10 +92,10 @@ export default function ArticleDetail({
           <button
             type="button"
             onClick={onBack}
-            className="hidden md:inline-flex group focus-ring-gap items-center gap-1 self-start text-sm text-gray-600 hover:text-gray-900 active:text-gray-900"
+            className="hidden md:inline-flex group focus-ring-gap items-center gap-1 self-start text-sm text-gray-600 hover:text-gray-900"
           >
             <ChevronLeft
-              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1 group-active:-translate-x-1"
+              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1"
               strokeWidth={2}
             />
             {labels["back"]}
@@ -148,10 +148,10 @@ export default function ArticleDetail({
           <button
             type="button"
             onClick={onBack}
-            className="group flex w-full items-center justify-center gap-1 bg-surface px-5 py-3 text-sm text-gray-900 hover:bg-[#e4e4e4] active:bg-[#e4e4e4]"
+            className="group flex w-full items-center justify-center gap-1 bg-surface px-5 py-3 text-sm text-gray-900 hover:bg-[#e4e4e4]"
           >
             <ChevronLeft
-              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1 group-active:-translate-x-1"
+              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1"
               strokeWidth={2}
             />
             {labels["back"]}

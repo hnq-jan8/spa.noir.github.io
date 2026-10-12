@@ -18,13 +18,16 @@ import {
   useArticleKey,
 } from "@/hooks/useArticleRoute";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
+import { useHeaderOffset } from "@/hooks/useHeaderOffset";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useLocale } from "@/hooks/useLocale";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useNavItems } from "@/hooks/useNavItems";
 import { useUnreadUpdate } from "@/hooks/useUnreadUpdate";
 import { bundledLabels } from "@/i18n/labels";
 import { normalizePath, stripLocale } from "@/i18n/paths";
 import { languages as routingLanguages } from "@/i18n/routing";
+import { MOBILE_QUERY, SMALL_MOBILE_QUERY } from "@/lib/breakpoints";
 
 const FALLBACK_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.svg`;
 
@@ -55,11 +58,11 @@ export default function Navbar({
     languageOptions.find((lang) => lang.code === locale) ?? languageOptions[0];
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useMediaQuery(MOBILE_QUERY);
   // < xs (390px): the only size where language picking lives in the drawer's
   // full-screen sub-view. From xs up the header's dropdown pill takes over,
   // drawer or not.
-  const [isSmallMobile, setIsSmallMobile] = useState(false);
+  const isSmallMobile = useMediaQuery(SMALL_MOBILE_QUERY);
   // Shared by the header dropdown and the small-mobile drawer's language
   // sub-view, so a resize between breakpoints keeps the same open state.
   const [langOpen, setLangOpen] = useState(false);
@@ -92,35 +95,29 @@ export default function Navbar({
     return () => clearTimeout(iconAnimationTimeoutRef.current);
   }, []);
 
-  // `data-scrolled` trên <html>: dải as-of / breadcrumb ở mobile nhỏ chỉ hiện
-  // nền + viền đáy khi trang đã rời đỉnh (xem .strip-flat trong globals.css).
-  useEffect(() => {
-    const html = document.documentElement;
-    const sync = () => html.toggleAttribute("data-scrolled", window.scrollY > 0);
-    sync();
-    window.addEventListener("scroll", sync, { passive: true });
-    return () => window.removeEventListener("scroll", sync);
-  }, []);
+  useHeaderOffset();
 
+  // Đóng drawer do rời mobile nhỏ (xem effect bên dưới) thì giữ nguyên menu
+  // ngôn ngữ — nó vừa chuyển sang dạng dropdown trên header.
+  const keepLangOnCloseRef = useRef(false);
   useEffect(() => {
-    const mql = window.matchMedia("(max-width: 767px)");
-    const smallMql = window.matchMedia("(max-width: 389px)");
-    const sync = () => {
-      setIsMobile(mql.matches);
-      setIsSmallMobile(smallMql.matches);
-    };
-    sync();
-    mql.addEventListener("change", sync);
-    smallMql.addEventListener("change", sync);
-    return () => {
-      mql.removeEventListener("change", sync);
-      smallMql.removeEventListener("change", sync);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!menuOpen) setLangOpen(false);
+    if (menuOpen) return;
+    if (keepLangOnCloseRef.current) {
+      keepLangOnCloseRef.current = false;
+      return;
+    }
+    setLangOpen(false);
   }, [menuOpen]);
+
+  // Drawer tự mở chỉ để chứa màn ngôn ngữ ở mobile nhỏ (effect bên dưới):
+  // quay lại size lớn hơn thì ngôn ngữ về dropdown, drawer phải đóng theo —
+  // không thì danh sách nav lộ ra dưới dropdown.
+  useEffect(() => {
+    if (isSmallMobile || !menuOpenedByLangSync.current) return;
+    menuOpenedByLangSync.current = false;
+    keepLangOnCloseRef.current = true;
+    setMenuOpen(false);
+  }, [isSmallMobile]);
 
   // Opening the header dropdown then resizing down to small mobile should
   // reveal the drawer already on the language screen. Gated on
@@ -197,12 +194,11 @@ export default function Navbar({
 
   return (
     <>
-      {/* `fixed` from md up only: below that, iOS Safari's URL-bar collapse
-          leaves a fixed header painted at a stale offset it never recovers
-          from. `sticky` rides the scroller instead. */}
+      {/* `fixed` from md up only. Below md the header just scrolls away with
+          the page — only the breadcrumb sticks (see useHeaderOffset). */}
       <header
         ref={headerRef}
-        className="sticky md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
+        className="relative md:fixed top-0 inset-x-0 z-50 w-full bg-chrome text-white"
       >
         <div className="container-page">
           <div className="flex items-stretch h-12 md:h-14">
@@ -212,7 +208,11 @@ export default function Navbar({
                 being shared with the desktop dropdown doesn't crossfade the
                 logo there. Both layers stay mounted (never unmount) so the
                 swap is a crossfade instead of a snap. */}
-            <div className="relative self-stretch flex items-center flex-shrink-0 mr-2">
+            <div
+              // pl-1.5 dưới md: icon hamburger có lề trong riêng trong nút, logo
+              // lùi vào một chút cho cân.
+              className="relative self-stretch flex items-center flex-shrink-0 mr-2 pl-1.5 md:pl-0"
+            >
               <Link
                 href={`/${locale}`}
                 // h-full: hit-area khớp chiều cao header, giống các tab bên
@@ -246,7 +246,7 @@ export default function Navbar({
               </Link>
               {nav?.["selectLanguage"] && (
                 <span
-                  className={`xs:hidden absolute inset-0 flex items-center text-base font-light text-gray-200 transform-gpu transition-opacity ease-out ${
+                  className={`xs:hidden absolute inset-0 pl-1.5 flex items-center text-base font-light text-gray-200 transform-gpu transition-opacity ease-out ${
                     langOpen && menuOpen
                       ? "duration-200 opacity-100"
                       : "duration-100 opacity-0 pointer-events-none"
@@ -286,7 +286,7 @@ export default function Navbar({
                         className={`group text-xs whitespace-nowrap px-4 flex items-center relative flex-shrink-0 focus-visible:outline-none ${
                           isActive
                             ? "text-white font-medium bg-white/10"
-                            : "text-gray-200 hover:text-white hover:font-medium active:text-white active:font-medium"
+                            : "text-gray-200 hover:text-white hover:font-medium"
                         }`}
                       >
                         <span
@@ -353,7 +353,7 @@ export default function Navbar({
                         a11y[side === "left" ? "scrollLeft" : "scrollRight"]
                       }
                       Icon={Icon}
-                      className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 active:text-black/80 z-20 lg:hidden ${
+                      className={`absolute top-0 bottom-0 w-24 flex items-center justify-center text-black/50 hover:text-black/80 z-20 lg:hidden ${
                         side === "left" ? "left-0" : "right-0"
                       }`}
                       iconClassName={`absolute ${
@@ -397,7 +397,7 @@ export default function Navbar({
                   } ${
                     langOpen
                       ? "bg-white/10 text-white"
-                      : "text-gray-200 hover:text-white active:text-white"
+                      : "text-gray-200 hover:text-white"
                   }`}
                   aria-label={nav?.["selectLanguage"]}
                   aria-expanded={langOpen}
@@ -411,7 +411,7 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={toggleMenu}
-                className="relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white active:text-white"
+                className="relative focus-ring-inner h-full min-w-[44px] px-2 flex items-center justify-center text-gray-200 hover:text-white"
                 aria-label={a11y["toggleMenu"]}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"

@@ -85,8 +85,8 @@ export default function HomeContent() {
           either element, the pill sits too close to the card below it. */}
       {/* Mobile nhỏ (< xs): pill thành dải sát ngay dưới header, tràn hai
           mép, không bo, chỉ còn viền đáy mảnh — cùng kiểu với dải breadcrumb. */}
-      <div className="sticky top-12 md:top-14 z-10 pt-4 mb-4 md:mb-6 max-xs:pt-0 max-xs:mb-0 max-xs:-mx-4">
-        <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none max-xs:hidden" />
+      <div className="sticky top-0 md:top-14 z-10 mt-2.5 pt-1.5 md:mt-0 md:pt-4 mb-4 md:mb-6 max-xs:mt-0 max-xs:pt-0 max-xs:mb-0 max-xs:-mx-4">
+        <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none max-md:hidden" />
         {/* Ba trạng thái chứ không hai: có mốc -> pill; chưa có data ->
             skeleton; có data mà không mốc -> giấu hẳn, vì nhãn cụt kèm chấm
             "đang sống" là sai, mà skeleton quay mãi cũng sai. Trường hợp cuối
@@ -119,8 +119,9 @@ export default function HomeContent() {
           <div
             // Vạch trái là ngoại lệ cố ý của quy tắc card không viền: nó là
             // điểm nhấn, không phải đường bao, cho thẻ phải thắng cái nhìn đầu
-            // tiên. Nền trắng và hover vẫn y hệt mọi card khác.
-            className="group relative bg-white rounded-2xl max-xs:card-bleed p-6 card-shadow hover:bg-cardHover active:bg-cardHover border-l-4 border-l-gray-900 pt-5 pb-4"
+            // tiên. Nền trắng và hover vẫn y hệt mọi card khác. Mobile nhỏ:
+            // thẻ tràn mép nên vạch thành span thụt vào trong (bên dưới).
+            className="group relative bg-white rounded-2xl max-xs:card-bleed p-6 card-shadow hover:bg-cardHover border-l-4 border-l-gray-900 max-xs:border-l-0 pt-4 pb-4"
           >
             {/* Link phủ kín thẻ: cả thẻ mở thẳng bài viết, không qua danh sách. */}
             <Link
@@ -128,6 +129,13 @@ export default function HomeContent() {
               onClick={() => presetArticleKey(latestUpdate.key)}
               className="absolute inset-0 rounded-2xl max-xs:rounded-none"
               aria-label={titleOf(latestUpdate) ?? undefined}
+            />
+            {/* Mobile nhỏ: thẻ tràn mép, vạch `border-l` sát mép màn hình nhìn
+                như lỗi — thay bằng vạch thụt vào trong lề trái, cao từ nhãn
+                tới dòng ngày giờ (đúng vùng pt-4/pb-4 của thẻ). */}
+            <span
+              aria-hidden="true"
+              className="hidden max-xs:block absolute left-1.5 top-4 bottom-4 w-[3px] rounded-full bg-gray-900"
             />
             <p className="flex items-center gap-1.5 text-gray-600 text-xs font-semibold uppercase tracking-wide mb-4">
               <Megaphone className="w-4 h-4" strokeWidth={2} />
@@ -151,11 +159,11 @@ export default function HomeContent() {
               {/* Riêng link này mở trang danh sách, đè lên link phủ nhờ z-10. */}
               <Link
                 href={`/${locale}/official-updates`}
-                className="group/viewall relative z-10 text-gray-600 font-semibold inline-flex items-center gap-1 hover:underline active:underline"
+                className="group/viewall relative z-10 -mr-2 md:mr-0 text-gray-600 font-semibold inline-flex items-center gap-1 hover:underline"
               >
                 {home["viewAll"]}
                 <ChevronRight
-                  className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover/viewall:translate-x-1 group-active/viewall:translate-x-1"
+                  className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover/viewall:translate-x-1"
                   strokeWidth={2}
                 />
               </Link>
@@ -181,7 +189,7 @@ export default function HomeContent() {
           the heading arriving first and reading as a separate element. */}
       <Reveal delay={50}>
         {data ? (
-          <p className="text-xs text-gray-600 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+          <p className="text-xs text-gray-600 uppercase tracking-wide mb-2 mt-6 pl-1.5 max-xs:pl-0">
             {home["supportSection"]}
           </p>
         ) : (
@@ -205,7 +213,7 @@ export default function HomeContent() {
                       </p>
                       <a
                         href={href}
-                        className="focus-ring-gap text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
+                        className="focus-ring-gap text-sm font-semibold text-gray-900 hover:text-gray-600"
                       >
                         {value}
                       </a>
@@ -240,7 +248,7 @@ export default function HomeContent() {
           urgent update and the hotlines above. */}
       <Reveal delay={100}>
         {data ? (
-          <p className="text-xs text-gray-600 uppercase tracking-wide mb-2 mt-6 pl-1.5">
+          <p className="text-xs text-gray-600 uppercase tracking-wide mb-2 mt-6 pl-1.5 max-xs:pl-0">
             {home["browseSection"]}
           </p>
         ) : (
@@ -258,7 +266,7 @@ export default function HomeContent() {
               <Link
                 key={index}
                 href={item.href}
-                className="group focus-ring-inset flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-cardHover active:bg-cardHover"
+                className="group focus-ring-inset flex items-center gap-4 px-4 py-3.5 sm:px-6 hover:bg-cardHover"
               >
                 <item.Icon
                   className="w-5 h-5 text-gray-400 flex-shrink-0 mr-1 sm:mr-2"
@@ -269,7 +277,7 @@ export default function HomeContent() {
                   <p className="text-sm text-gray-600">{item.desc}</p>
                 </div>
                 <ChevronRight
-                  className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:translate-x-1 group-active:translate-x-1"
+                  className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:translate-x-1"
                   strokeWidth={2}
                 />
               </Link>
@@ -303,7 +311,7 @@ export default function HomeContent() {
                     </div>
                   </div>
                   <ChevronRight
-                    className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                    className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
                     strokeWidth={2}
                   />
                 </CardLink>
@@ -335,7 +343,7 @@ export default function HomeContent() {
                 </div>
               </div>
               <ChevronRight
-                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
                 strokeWidth={2}
               />
             </CardLink>

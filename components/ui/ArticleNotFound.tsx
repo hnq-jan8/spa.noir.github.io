@@ -33,7 +33,7 @@ export default function ArticleNotFound({
             className={`group inline-flex items-center gap-1.5 pl-4 pr-5 ${NOT_FOUND_ACTION_CLASS}`}
           >
             <ChevronLeft
-              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1 group-active:-translate-x-1"
+              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1"
               strokeWidth={2}
             />
             {backLabel}

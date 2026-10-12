@@ -24,7 +24,7 @@ export function AsOfPillSkeleton() {
 /** Nhãn phân mục. `h-4` là line box của text-xs, bar 12px đặt giữa hộp đó. */
 export function SectionLabelSkeleton({ width }: { width: string }) {
   return (
-    <div className="h-4 mb-2 mt-6 pl-1.5 flex items-center">
+    <div className="h-4 mb-2 mt-6 pl-1.5 max-xs:pl-0 flex items-center">
       <Skeleton className={`h-3 ${width}`} />
     </div>
   );
@@ -33,7 +33,8 @@ export function SectionLabelSkeleton({ width }: { width: string }) {
 /** Thẻ cập nhật chính thức — vạch trái nhạt bớt nhưng vẫn nhận ra thẻ ngay. */
 export function LatestUpdateSkeleton() {
   return (
-    <div className="bg-white border-l-4 border-l-gray-900/30 rounded-2xl max-xs:card-bleed pt-5 pb-4 px-6 card-shadow">
+    <div className="relative bg-white border-l-4 border-l-gray-900/30 max-xs:border-l-0 rounded-2xl max-xs:card-bleed pt-4 pb-4 px-6 card-shadow">
+      <span className="hidden max-xs:block absolute left-1.5 top-4 bottom-4 w-[3px] rounded-full bg-gray-900/30" />
       {/* Từng khối lấy đúng line box của chữ nó thay: nhãn text-xs = 16,
           tiêu đề text-xl = 28 và sm:text-2xl = 32, mỗi dòng excerpt
           text-sm = 20, hàng cuối text-xs = 16. Đặt bar mảnh vào giữa hộp đó,

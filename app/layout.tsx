@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getBuildMode } from "@/lib/buildMode";
 import { routing } from "@/i18n/routing";
+import { MOBILE_QUERY, SMALL_MOBILE_QUERY } from "@/lib/breakpoints";
 import "./globals.css";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -62,7 +63,7 @@ export default async function RootLayout({
             desktop nav/language markup stacked on top of the mobile ones. */}
         <style
           dangerouslySetInnerHTML={{
-            __html: `@media (max-width:767px){[data-fallback-desktop-only]{display:none !important;}}@media (max-width:389px){[data-fallback-hide-below-xs]{display:none !important;}}`,
+            __html: `@media ${MOBILE_QUERY}{[data-fallback-desktop-only]{display:none !important;}}@media ${SMALL_MOBILE_QUERY}{[data-fallback-hide-below-xs]{display:none !important;}}`,
           }}
         />
       </head>

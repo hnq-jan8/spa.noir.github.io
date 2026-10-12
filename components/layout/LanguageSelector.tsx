@@ -162,15 +162,11 @@ export function DesktopLanguageSelector({
       highlightFullyHiddenRef.current = true;
     }, HIGHLIGHT_FADE_MS);
   };
-  const close = (keepHover = false) => {
+  // `hovering` không đụng tới ở đây: nó chỉ đổi theo pointer chuột thật (xem
+  // container), nên đóng bằng chuột thì vẫn đúng trạng thái, còn cảm ứng
+  // không bao giờ bật nó.
+  const close = () => {
     setHoveredCode(null);
-    // Vuốt scroll (không phải tap) không phát `mouseleave` bù cho
-    // `mouseenter` giả lập lúc chạm mở dropdown — reset thủ công, không thì
-    // pill kẹt sáng như đang hover dù dropdown đã đóng. Nhưng khi đóng bằng
-    // cách bấm lại nút (chuột vẫn đang ở trên pill, không có mouseleave nào
-    // xảy ra), giữ nguyên `hovering` — không thì pill tắt hover tới khi rê
-    // chuột ra rồi vào lại.
-    if (!keepHover) setHovering(false);
     // Cả dropdown vừa biến mất — lần mở lại sau luôn phải snap, không trượt
     // từ vị trí hover dở dang trước khi đóng.
     clearTimeout(highlightHideTimeoutRef.current);
@@ -179,7 +175,6 @@ export function DesktopLanguageSelector({
   };
   useDismissOnOutside(containerRef, open, close);
   const pillActive = open || hovering;
-  const lastPointerTypeRef = useRef<string>("mouse");
 
   // Đo trên các phần tử không animate, để mọi animation chạy trên px cố định.
   const restRef = useRef<HTMLSpanElement>(null);
@@ -196,21 +191,26 @@ export function DesktopLanguageSelector({
   const optionsKey = options
     .map((lang) => `${lang.code}:${lang.label}`)
     .join("|");
+  const measureRef = useRef(() => {});
   useLayoutEffect(() => {
     const measure = () => {
       if (!restRef.current || !listRef.current || !measureListRef.current)
         return;
+      const h = listRef.current.offsetHeight;
+      // Dưới xs component chỉ `hidden` (không unmount) nên mọi số đo ra 0 —
+      // bỏ qua, giữ số đo tốt gần nhất. Ghi đè bằng 0 thì quay lại size lớn
+      // (zoom in/out qua lại mốc xs) dropdown mở ra cao 0, như bấm không ăn.
+      if (h === 0) return;
       setSize({
         rest: restRef.current.offsetWidth,
         open: measureListRef.current.offsetWidth,
-        h: listRef.current.offsetHeight,
+        h,
       });
     };
+    measureRef.current = measure;
     measure();
     // Font web về muộn thì đo lại, không thì pill giữ số đo bằng font fallback.
     document.fonts?.ready.then(measure).catch(() => {});
-    // Dưới xs component chỉ `hidden` (không unmount) nên offsetWidth ra 0 —
-    // đo lại khi resize để không kẹt width 0 tới lúc reload.
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [optionsKey, locale]);
@@ -229,7 +229,7 @@ export function DesktopLanguageSelector({
       ref={containerRef}
       // Pointer events lọc theo `pointerType`: chạm cũng bắn mouseenter giả
       // lập (không có mouseleave bù), làm pill/khối highlight dính sáng và
-      // nhảy giật dưới ngón tay. Cảm ứng chỉ dùng trạng thái `active:`.
+      // nhảy giật dưới ngón tay. Cảm ứng không có hiệu ứng nào.
       onPointerEnter={(e) => e.pointerType === "mouse" && setHovering(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && setHovering(false)}
       className="hidden xs:flex relative items-stretch flex-shrink-0 ml-2 md:ml-6 lg:ml-2 w-max"
@@ -239,20 +239,17 @@ export function DesktopLanguageSelector({
         aria-label={selectLanguageLabel}
         aria-haspopup="menu"
         aria-expanded={open}
-        // Chạm (touch) không có mouseleave bù cho mouseenter giả lập, nên chỉ
-        // giữ hover khi đóng bằng chuột thật — chạm lại để đóng thì tắt luôn.
-        onPointerDown={(e) => {
-          lastPointerTypeRef.current = e.pointerType;
-        }}
         onClick={() =>
           open
-            ? close(lastPointerTypeRef.current === "mouse")
-            : onOpenChange(true)
+            ? close()
+            : // Đo lại ngay trước khi mở: lúc mount/resize có thể component
+              // đang ẩn (dưới xs) nên chưa từng có số đo dùng được.
+              (measureRef.current(), onOpenChange(true))
         }
         // self-stretch để hit-area khớp vùng hover (container ngoài) — viên
         // pill bo tròn chuyển xuống span con, chỉ còn là lớp hiển thị, nên
         // vòng focus cũng phải xuống theo nó (focus-ring-inner).
-        className="relative focus-ring-inner self-stretch flex items-center text-xs font-medium"
+        className="relative focus-ring-inner self-stretch flex items-center text-sm md:text-xs font-medium"
       >
         <span
           className={`relative flex items-center h-9 rounded-full [transition:background-color_200ms_cubic-bezier(0.32,0.72,0,1)] ${
@@ -265,7 +262,7 @@ export function DesktopLanguageSelector({
               pillActive ? "text-white" : "text-gray-200"
             }`}
           >
-            <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+            <GlobeIcon className="w-4 h-4 md:w-3.5 md:h-3.5 flex-shrink-0" />
             {locale.toUpperCase()}
           </span>
         </span>
@@ -350,7 +347,7 @@ export function DesktopLanguageSelector({
                     close();
                   }
                 }}
-                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-6 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap active:bg-cardHover active:shadow-[0_0_0.5px_1.5px_rgba(255,255,255,0.6)] ${
+                className={`focus-ring-inset relative z-10 flex items-center justify-between gap-6 h-10 pl-4 pr-3 rounded-[18px] text-sm text-black whitespace-nowrap ${
                   open
                     ? "opacity-100 translate-x-0 translate-y-0 [transition:opacity_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,transform_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
                     : "opacity-0 translate-x-5 -translate-y-3 animate-item-out [transition:opacity_150ms_ease-out]"

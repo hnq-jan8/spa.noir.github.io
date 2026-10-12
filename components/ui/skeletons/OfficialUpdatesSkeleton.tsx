@@ -35,8 +35,7 @@ function NodeSkeleton({
             <div className="flex-1 min-w-0">
               <Skeleton className="h-5 w-10/12 mb-2.5" />
               <Skeleton className="h-3.5 w-full mb-1.5" />
-              <Skeleton className="h-3.5 w-4/5 mb-3" />
-              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3.5 w-4/5" />
             </div>
             <Skeleton className="w-20 h-20 rounded-xl flex-shrink-0" />
           </div>

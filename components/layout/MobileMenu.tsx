@@ -66,7 +66,7 @@ export default function MobileMenu({
       // overflow-x-hidden: hai panel xếp chồng bên dưới nằm ngoài khung bằng
       // translate-x lúc ẩn, mà con đã transform vẫn nới overflow của cha —
       // không clip thì cả drawer cuộn ngang được đúng bằng khoảng đó.
-      className={`md:hidden fixed inset-x-0 top-[calc(3rem-1px)] h-[calc(100dvh-3rem+1px)] z-40 bg-chrome text-white overflow-y-auto overflow-x-hidden overscroll-contain ${
+      className={`md:hidden fixed inset-x-0 top-[calc(var(--header-offset)-1px)] h-[calc(100dvh-var(--header-offset)+1px)] z-40 bg-chrome text-white overflow-y-auto overflow-x-hidden overscroll-contain ${
         open
           ? "[clip-path:inset(0_0_0_0)] visible pointer-events-auto [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_0s]"
           : "[clip-path:inset(0_0_100%_0)] invisible pointer-events-none [transition:clip-path_500ms_cubic-bezier(0.32,0.72,0,1),visibility_0s_linear_500ms]"
@@ -110,7 +110,7 @@ export default function MobileMenu({
                 } ${
                   isActive
                     ? "text-white font-semibold"
-                    : "text-gray-200 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
+                    : "text-gray-200 font-normal hover:text-white hover:font-medium"
                 }`}
               >
                 {/* Anchors the unread dot to the text, not the row, so it sits on
@@ -161,7 +161,7 @@ export default function MobileMenu({
                   } ${
                     isActive
                       ? "text-white font-semibold"
-                      : "text-gray-200 font-normal hover:text-white hover:font-medium active:text-white active:font-medium"
+                      : "text-gray-200 font-normal hover:text-white hover:font-medium"
                   }`}
                 >
                   <span>{lang.label}</span>

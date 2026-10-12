@@ -142,7 +142,7 @@ export default function ArticleCard({
       onClick={onOpen}
       // No padding on the card: the thumbnail runs flush to its edges and the
       // text block supplies its own insets.
-      className={`group w-full max-xs:w-[calc(100%+2rem)] text-left bg-white rounded-2xl max-xs:card-bleed max-xs:border-b max-xs:border-gray-100 overflow-hidden card-shadow hover:bg-cardHover active:bg-cardHover ${
+      className={`group w-full max-xs:w-[calc(100%+2rem)] text-left bg-white rounded-2xl max-xs:card-bleed max-xs:border-b max-xs:border-gray-100 overflow-hidden card-shadow hover:bg-cardHover ${
         featured
           ? ""
           : layout === "grid"
@@ -165,20 +165,41 @@ export default function ArticleCard({
             />
           )}
           <div className="p-5 sm:p-6 pt-4 sm:pt-5 pb-4 sm:pb-5">
+            {/* Mobile nhỏ: cùng bố cục với các card list bên dưới — ngày ở
+                trên (nhãn "mới nhất" dạt phải), chevron cạnh cột tiêu đề, bỏ
+                dòng "Đọc tiếp". Từ xs trở lên giữ bố cục card nổi bật. */}
+            <div className="hidden max-xs:flex items-center justify-between gap-4 text-xs mb-2.5">
+              <span className="text-gray-600">
+                {article.date && formatTimestamp(article.date, locale)}
+              </span>
+              {badge && (
+                <span className="text-gray-600 font-semibold uppercase tracking-wide">
+                  {badge}
+                </span>
+              )}
+            </div>
             {badge && (
-              <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-3">
+              <p className="max-xs:hidden text-gray-600 text-xs font-semibold uppercase tracking-wide mb-3">
                 {badge}
               </p>
             )}
-            {heading && (
-              <h2 className="font-bold text-lg sm:text-xl mb-2 text-balance">
-                {heading}
-              </h2>
-            )}
-            {excerpt && (
-              <p className="text-sm text-gray-600 line-clamp-3">{excerpt}</p>
-            )}
-            <div className="flex items-center justify-between gap-4 text-xs mt-4 -mr-1">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                {heading && (
+                  <h2 className="font-bold text-lg sm:text-xl mb-2 text-balance">
+                    {heading}
+                  </h2>
+                )}
+                {excerpt && (
+                  <p className="text-sm text-gray-600 line-clamp-3">{excerpt}</p>
+                )}
+              </div>
+              <ChevronRight
+                className="hidden max-xs:block w-5 h-5 -mr-2 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
+                strokeWidth={2}
+              />
+            </div>
+            <div className="max-xs:hidden flex items-center justify-between gap-4 text-xs mt-4 -mr-1">
               <span className="text-gray-600">
                 {article.date && formatTimestamp(article.date, locale)}
               </span>
@@ -186,7 +207,7 @@ export default function ArticleCard({
                 <span className="text-gray-600 font-semibold inline-flex items-center gap-1">
                   {readMoreLabel}
                   <ChevronRight
-                    className="w-3.5 h-4 pt-[0.1rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
+                    className="w-3.5 h-4 pt-[0.1rem] transition-transform group-hover:translate-x-1"
                     strokeWidth={2}
                   />
                 </span>
@@ -241,14 +262,14 @@ export default function ArticleCard({
               {/* The button's own hover:bg-cardHover never shows here — the
                   image and this panel sit on top of it, fully opaque — so
                   the panel carries its own group-hover instead. */}
-              <div className="relative -mb-px bg-white group-hover:bg-cardHover group-active:bg-cardHover flex items-start justify-between gap-2 px-3.5 pb-[11px] sm:px-4 sm:pb-[13px]">
+              <div className="relative -mb-px bg-white group-hover:bg-cardHover flex items-start justify-between gap-2 px-3.5 pb-[11px] sm:px-4 sm:pb-[13px]">
                 {heading && (
                   <h3 className="flex-1 font-semibold text-sm leading-snug text-balance line-clamp-2 text-gray-900">
                     {heading}
                   </h3>
                 )}
                 <ChevronRight
-                  className="w-5 h-5 mt-0.5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                  className="w-5 h-5 mt-0.5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
                   strokeWidth={2}
                 />
               </div>
@@ -270,7 +291,7 @@ export default function ArticleCard({
                     {heading}
                   </h3>
                   <ChevronRight
-                    className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                    className="w-5 h-5 text-gray-300 flex-shrink-0 transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
                     strokeWidth={2}
                   />
                 </div>
@@ -358,7 +379,7 @@ export default function ArticleCard({
             </div>
           )}
           <ChevronRight
-            className="w-5 h-5 mr-3 sm:mr-4 text-gray-300 flex-shrink-0 self-center transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+            className="w-5 h-5 mr-3 sm:mr-4 text-gray-300 flex-shrink-0 self-center transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
             strokeWidth={2}
           />
         </>

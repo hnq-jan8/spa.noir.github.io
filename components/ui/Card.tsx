@@ -4,7 +4,7 @@ import { ComponentProps, ReactNode } from "react";
 // Card bấm được — bọc toàn bộ nội dung trong 1 <Link>. Lúc nghỉ, card bấm được
 // và card nội dung trông y hệt nhau: không viền, chỉ có nền + glow rất nhẹ tỏa
 // đều 4 phía (0 offset, không lệch xuống dưới như shadow thường) để tách khỏi
-// màu nền trang. Thứ duy nhất phân biệt là phản hồi khi tương tác — hover/active
+// màu nền trang. Thứ duy nhất phân biệt là phản hồi khi rê chuột — hover
 // đổi màu nền (card nội dung thì đứng yên).
 //
 // Dưới xs (< 390px) card tràn sát mép, không bo góc: khung ngoài của mọi card
@@ -20,7 +20,7 @@ export function CardLink({
   return (
     <Link
       {...linkProps}
-      className={`group bg-white rounded-2xl max-xs:card-bleed p-6 card-shadow hover:bg-cardHover active:bg-cardHover ${className}`}
+      className={`group bg-white rounded-2xl max-xs:card-bleed p-6 card-shadow hover:bg-cardHover ${className}`}
     >
       {children}
     </Link>

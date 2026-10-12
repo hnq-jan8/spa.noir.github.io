@@ -15,7 +15,7 @@ import { normalizePath } from "@/i18n/paths";
  * Dải crumb dạng viên thuốc, chỉ có ở mobile và chỉ trên bốn route của nav
  * (trang chủ không cần). Nằm ngoài <header> của Navbar vì nó thuộc về trang,
  * không phải thanh điều hướng — nhưng vẫn là một dải sticky riêng, xem
- * `top-12` bám đúng chiều cao header.
+ * `top-0`: header mobile không sticky, cuộn qua là breadcrumb lên sát mép.
  */
 export default function Breadcrumb() {
   const locale = useLocale();
@@ -50,11 +50,15 @@ export default function Breadcrumb() {
     // else (FAQs search capsule) — keeps its layout space and is more
     // reliable than masking it (hooks/useBreadcrumbVisibility.ts).
     //
+    // mt-2.5 + pt-1.5: dưới header cách 16px, nhưng phần margin cuộn đi cùng
+    // header (margin không thuộc hộp sticky) — bám mép trên thì còn 6px. Sát
+    // hơn (4px) thì Safari iOS coi là chạm mép, tô thanh trạng thái màu đặc.
+    //
     // Mobile nhỏ (< xs): viên thuốc duỗi thành dải sát dưới header, tràn hai
     // mép, không bo, chỉ còn viền đáy mảnh. Ô tìm kiếm FAQ (FaqsContent) không
-    // bám theo dải này — nó vẫn là lớp nổi riêng ở top-16 như mọi size mobile.
+    // bám theo dải này — nó vẫn là lớp nổi riêng, cách mép dưới header 16px (6px khi header đã cuộn khuất).
     <div
-      className={`md:hidden sticky top-12 z-10 px-4 pt-4 pb-6 max-xs:px-0 max-xs:pt-0 max-xs:pb-0 ${breadcrumbHidden ? "invisible" : ""}`}
+      className={`md:hidden sticky top-0 z-10 px-4 mt-2.5 pt-1.5 pb-6 max-xs:px-0 max-xs:mt-0 max-xs:pt-0 max-xs:pb-0 ${breadcrumbHidden ? "invisible" : ""}`}
     >
       <div
         className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full overflow-hidden whitespace-nowrap
@@ -64,7 +68,7 @@ export default function Breadcrumb() {
         <Link
           href={`/${locale}`}
           onClick={() => clearArticleRoute()}
-          className="focus-ring-gap inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-900 active:text-gray-900"
+          className="focus-ring-gap inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-900"
         >
           {nav?.["home"]}
         </Link>
@@ -82,9 +86,9 @@ export default function Breadcrumb() {
           }}
           // With an article open, "you are here" moves to the icon crumb and
           // this one drops back to a plain link.
-          className={`focus-ring-gap inline-flex items-center min-h-[24px] truncate hover:text-gray-600 active:text-gray-600 ${
+          className={`focus-ring-gap inline-flex items-center min-h-[24px] truncate hover:text-gray-600 ${
             openedArticle
-              ? "text-gray-700 hover:text-gray-900 active:text-gray-900"
+              ? "text-gray-700 hover:text-gray-900"
               : "font-medium"
           }`}
         >

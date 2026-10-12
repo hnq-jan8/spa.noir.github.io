@@ -70,7 +70,7 @@ function SearchField({
           // Applies immediately — waiting out the debounce would read as a dead button.
           onClick={onClear}
           aria-label={clearLabel}
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 active:text-gray-700 hover:bg-gray-100 active:bg-gray-100"
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
         >
           <X className="w-4 h-4" strokeWidth={2} />
         </button>
@@ -189,14 +189,14 @@ export default function FaqsContent() {
           reads as the icon stretching sideways). The z-[19] mask below hides
           the breadcrumb and list scrolling under it. */}
       <div
-        className={`md:hidden fixed inset-x-0 top-12 h-[50px] bg-page z-[19] transition-opacity duration-200 pointer-events-none ${
+        className={`md:hidden fixed inset-x-0 top-[var(--header-offset)] h-[50px] bg-page z-[19] transition-opacity duration-200 pointer-events-none ${
           mobileSearchOpen ? "opacity-100" : "opacity-0"
         }`}
       />
       {/* Fades past the mask's bottom edge so a text line crossing it
           dissolves instead of being sliced in half. */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[98px] h-6 bg-gradient-to-b from-page to-transparent z-[19] transition-opacity duration-200 pointer-events-none ${
+        className={`md:hidden fixed inset-x-0 top-[calc(var(--header-offset)+50px)] h-6 bg-gradient-to-b from-page to-transparent z-[19] transition-opacity duration-200 pointer-events-none ${
           mobileSearchOpen ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -205,7 +205,7 @@ export default function FaqsContent() {
         // là lớp chữ trong suốt nằm giữa viên, chỉ báo bám vào nó sẽ ra một
         // khung chữ nhật lửng lơ. Lúc thu gọn thì nút mở nằm đè (input
         // tabIndex -1) và tự vẽ ring của nó.
-        className={`md:hidden fixed top-16 right-4 z-20 h-[34px] rounded-full bg-white/75 backdrop-blur-md border border-gray-200 shadow-[0_0_5px_rgba(0,0,0,0.05)] overflow-hidden transition-[width] focus-within:border-gray-500 focus-within:ring-1 focus-within:ring-inset focus-within:ring-gray-500 ${CAPSULE_TRANSITION} ${
+        className={`md:hidden fixed top-[var(--crumb-top)] max-xs:top-[calc(var(--header-offset)+1rem)] right-4 z-20 h-[34px] rounded-full bg-white/75 backdrop-blur-md border border-gray-200 shadow-[0_0_5px_rgba(0,0,0,0.05)] overflow-hidden transition-[width] focus-within:border-gray-500 focus-within:ring-1 focus-within:ring-inset focus-within:ring-gray-500 ${CAPSULE_TRANSITION} ${
           mobileSearchOpen ? "w-[calc(100vw-2rem)]" : "w-[34px]"
         }`}
       >
@@ -261,7 +261,7 @@ export default function FaqsContent() {
               inputRef.current?.focus();
             }}
             aria-label={labels["clearSearch"]}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 active:text-gray-700 hover:bg-gray-100 active:bg-gray-100"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
           >
             <X className="w-4 h-4" strokeWidth={2} />
           </button>
@@ -313,7 +313,7 @@ export default function FaqsContent() {
       {/* Mobile, capsule open: the hidden breadcrumb still reserves its row
           (hooks/useBreadcrumbVisibility.ts), leaving too much air below the
           field. Below xs that row is a flat 35px strip, shorter than the
-          capsule's reach (top-16 + 34px), so the container's max-xs:pt-[35px]
+          capsule's reach (--crumb-top + 34px), so the container's max-xs:pt-[35px]
           puts the list 20px below the capsule; open, it rises 2px. */}
       <div
         className={`transition-[margin-top] ${CAPSULE_TRANSITION} ${mobileSearchOpen ? "-mt-6 max-xs:-mt-0.5 md:mt-0" : "mt-0"}`}

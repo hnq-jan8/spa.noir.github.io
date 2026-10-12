@@ -8,21 +8,28 @@
       system-ui,
       -apple-system,
       sans-serif;
-    /* `surface` (footer's color), not `page`: the actual content area still
-       paints its own `bg-page` (see `[locale]/layout.tsx`) on top of this —
-       this only shows through in the rubber-band overscroll area, where it
-       should match the footer you're overscrolling past, not the page. */
-    @apply bg-surface;
+    /* Màu trang, không phải màu footer: đây cũng là nền Safari iOS lấy để
+       tô vùng thanh trạng thái / vùng kéo giãn khi không có gì bám mép. */
+    @apply bg-page;
     /* Marker read by the stylesheet-load-recovery script in app/layout.tsx —
        only present once this (external) stylesheet has actually applied. */
     --app-css-loaded: 1;
+    /* Cảm ứng không có phản hồi khi chạm — kể cả ô xám mặc định của WebKit. */
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     /* `100dvh`, not `min-h-screen` (`100vh`): on iOS `100vh` is the *large*
        viewport (URL bar collapsed), so with the bar showing the document is
        ~86px taller than the screen and even a short page scrolls. */
-    @apply bg-surface text-gray-900 min-h-[100dvh];
+    @apply bg-page text-gray-900 min-h-[100dvh];
+  }
+
+  /* Phần header mobile còn thấy trong khung nhìn — hooks/useHeaderOffset.ts
+     cập nhật theo cuộn; đây là giá trị trước khi JS chạy. */
+  :root {
+    --header-offset: 3rem;
+    --crumb-top: 4rem;
   }
 
   /* Vòng focus bàn phím dùng chung, thay cho ring xanh mặc định của trình
@@ -109,15 +116,18 @@
       rgba(255, 255, 255, 0) 100%
     );
   }
-  .group:hover .card-fade,
-  .group:active .card-fade {
-    background-image: linear-gradient(
-      to top,
-      rgba(235, 235, 235, 1) 0%,
-      rgba(235, 235, 235, 0.85) 30%,
-      rgba(235, 235, 235, 0.45) 65%,
-      rgba(235, 235, 235, 0) 100%
-    );
+  /* Chỉ thiết bị có chuột: cảm ứng không có hiệu ứng hover/active nào (cùng
+     điều kiện với `hoverOnlyWhenSupported` của Tailwind). */
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover .card-fade {
+      background-image: linear-gradient(
+        to top,
+        rgba(235, 235, 235, 1) 0%,
+        rgba(235, 235, 235, 0.85) 30%,
+        rgba(235, 235, 235, 0.45) 65%,
+        rgba(235, 235, 235, 0) 100%
+      );
+    }
   }
 
   /* Horizontal inset a full-bleed CMS article cancels via
@@ -260,7 +270,7 @@
      Không gói padding vào đây: nút có icon cần padding lệch (xem
      NotFoundLayout). */
   .btn-primary {
-    @apply bg-gray-900 text-white hover:bg-gray-700 active:bg-gray-700;
+    @apply bg-gray-900 text-white hover:bg-gray-700;
   }
 
   .pill-badge {
@@ -297,8 +307,8 @@
 
   /* Mobile nhỏ (`max-xs:strip-flat`): viên thuốc as-of / breadcrumb duỗi thành
      dải phẳng sát dưới header — không bo, chỉ còn viền đáy mảnh. Ở đỉnh trang
-     cả nền lẫn viền trong suốt, hoà vào trang; cuộn đi (`data-scrolled` do
-     Navbar gắn) thì trả về nền/viền của chính phần tử. */
+     cả nền lẫn viền trong suốt, hoà vào trang; cuộn qua hết header
+     (`data-scrolled`, hooks/useHeaderOffset.ts) thì trả về nền/viền của chính phần tử. */
   .strip-flat {
     border-radius: 0;
     border-left-width: 0;

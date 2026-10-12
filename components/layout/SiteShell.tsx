@@ -18,14 +18,14 @@ export default async function SiteShell({
   return (
     <div className="flex flex-col min-h-[100dvh] bg-page">
       <Navbar logoOnBlack={logoOnBlack} />
-      {/* Dải crumb của trang, chỉ có ở mobile — đứng ngay sau header vì nó
-          sticky theo `top-12` của header đó. */}
+      {/* Dải crumb của trang, chỉ có ở mobile — đứng ngay sau header; header
+          cuộn đi thì nó bám `top-0`. */}
       <Breadcrumb />
-      {/* Navbar's header is `sticky` on mobile (stays in flow, no spacer
-          needed) but `fixed` from `md:` up, where it drops out of flow —
-          this spacer reserves its md:h-14 there so content below (and
-          sticky offsets like `top-12`) sits exactly where it would if the
-          header were still in flow. */}
+      {/* Navbar's header is in normal flow on mobile (no spacer needed) but
+          `fixed` from `md:` up, where it drops out of flow — this spacer
+          reserves its md:h-14 there so content below (and sticky offsets
+          like `md:top-14`) sits exactly where it would if the header were
+          still in flow. */}
       <div className="hidden md:block md:h-14 flex-shrink-0" aria-hidden="true" />
       {/* flex column so a page can claim leftover height with `flex-1`
           — see PressReleasesContent's article wrapper. */}

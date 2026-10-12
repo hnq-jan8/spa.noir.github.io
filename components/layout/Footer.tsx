@@ -109,7 +109,7 @@ export default function Footer({
                     </p>
                     <a
                       href={href}
-                      className="focus-ring-gap inline-flex items-center text-sm font-semibold text-gray-900 hover:text-gray-600 active:text-gray-600"
+                      className="focus-ring-gap inline-flex items-center text-sm font-semibold text-gray-900 hover:text-gray-600"
                     >
                       {value}
                     </a>
@@ -134,7 +134,7 @@ export default function Footer({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  className={`flex items-center justify-center py-1 ${"padX" in social ? social.padX : "px-1"} text-gray-900 hover:text-gray-600 active:text-gray-600`}
+                  className={`flex items-center justify-center py-1 ${"padX" in social ? social.padX : "px-1"} text-gray-900 hover:text-gray-600`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -157,9 +157,9 @@ export default function Footer({
           </p>
           <a
             href="https://www.sunphuquocairways.com"
-            // Same hover/active as every other pill button (see
+            // Same hover as every other pill button (see
             // NotFoundLayout): a step darker on the neutral fill, no accent.
-            className={`group inline-flex items-center justify-center gap-2 ${OFFICIAL_SITE_MIN_W} bg-black/5 hover:bg-black/10 active:bg-black/10 text-gray-900 text-sm px-5 py-2 rounded-xl`}
+            className={`group inline-flex items-center justify-center gap-2 ${OFFICIAL_SITE_MIN_W} bg-black/5 hover:bg-black/10 text-gray-900 text-sm px-5 py-2 rounded-xl`}
           >
             <span className="whitespace-nowrap">
               {footer?.["officialSite"]}
@@ -174,7 +174,7 @@ export default function Footer({
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="transition-transform duration-300 ease-out translate-y-[0.02rem] group-hover:translate-x-1.5 group-active:translate-x-1.5"
+              className="transition-transform duration-300 ease-out translate-y-[0.02rem] group-hover:translate-x-1.5"
             >
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />

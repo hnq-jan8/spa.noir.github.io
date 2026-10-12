@@ -5,11 +5,11 @@ import { excerptOf, titleOf } from "@/components/ui/ArticleCard";
 import type { ResolvedArticle } from "@/lib/contentData";
 import { formatTimestamp } from "@/lib/siteData";
 
-// Underline grows left-to-right on hover/active instead of the heading
+// Underline grows left-to-right on hover instead of the heading
 // dimming — a background line (not text-decoration) so its width can
 // animate. ease-out reads as quick-start-slow-end, matching the dot's snap.
 const TITLE_UNDERLINE_CLASS =
-  "bg-[linear-gradient(currentColor,currentColor)] bg-no-repeat bg-left-bottom bg-[length:0%_1.5px] transition-[background-size] duration-300 ease-out group-hover:bg-[length:100%_1.5px] group-active:bg-[length:100%_1.5px]";
+  "bg-[linear-gradient(currentColor,currentColor)] bg-no-repeat bg-left-bottom bg-[length:0%_1.5px] transition-[background-size] duration-300 ease-out group-hover:bg-[length:100%_1.5px]";
 
 function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
   const [failed, setFailed] = useState(false);
@@ -39,7 +39,7 @@ function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
         alt=""
         loading="lazy"
         onError={() => setFailed(true)}
-        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 group-active:scale-110"
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
       />
     </div>
   );
@@ -51,18 +51,16 @@ function Thumb({ src, size }: { src: string; size: "lg" | "md" }) {
  *
  * Nhóm mới nhất chỉ tách ra bằng độ đậm và màu — không card, không viền, nên
  * rail (chấm + đường) là đường dọc duy nhất và feed đọc ra như status log.
- * `group` đặt trên cả hàng để chấm sáng cùng chữ; mọi group-hover đều có cặp
- * group-active vì thiết bị cảm ứng không bao giờ :hover.
+ * `group` đặt trên cả hàng để chấm sáng cùng chữ khi hover (chỉ chuột — cảm
+ * ứng không có hiệu ứng nào).
  */
 export default function TimelineCarousel({
   items,
-  viewDetailsLabel,
   latestLabel,
   locale,
   onOpen,
 }: {
   items: ResolvedArticle[];
-  viewDetailsLabel: string;
   latestLabel?: string;
   locale: string;
   onOpen: (key: string) => void;
@@ -113,8 +111,8 @@ export default function TimelineCarousel({
                 // Same hollow dot as the rest, near-black border instead of gray.
                 className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 mt-1 transition-transform duration-200 ${
                   isPassed
-                    ? "bg-white border-gray-900 group-hover:scale-125 group-hover:bg-gray-900 group-active:scale-125 group-active:bg-gray-900"
-                    : "bg-white border-gray-400 group-hover:scale-125 group-hover:border-gray-500 group-hover:bg-gray-500 group-active:scale-125 group-active:border-gray-500 group-active:bg-gray-500"
+                    ? "bg-white border-gray-900 group-hover:scale-125 group-hover:bg-gray-900"
+                    : "bg-white border-gray-400 group-hover:scale-125 group-hover:border-gray-500 group-hover:bg-gray-500"
                 }`}
               />
               {!isLast && (
@@ -145,7 +143,7 @@ export default function TimelineCarousel({
                 {isGroupStart && item.date && (
                   <div className="flex items-center gap-2 mb-2.5">
                     <span
-                      className={`text-xs sm:text-sm ${isPassed ? "text-gray-600 font-medium group-hover:text-gray-900 group-active:text-gray-900" : "text-gray-600 group-hover:text-gray-700 group-active:text-gray-700"}`}
+                      className={`text-xs sm:text-sm ${isPassed ? "text-gray-600 font-medium group-hover:text-gray-900" : "text-gray-600 group-hover:text-gray-700"}`}
                     >
                       {formatTimestamp(item.date, locale)}
                     </span>
@@ -160,22 +158,21 @@ export default function TimelineCarousel({
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 min-w-0">
                       {heading && (
+                        // Chevron cạnh tiêu đề như các mục cũ hơn bên dưới,
+                        // thay cho dòng "Xem chi tiết" riêng.
                         <h3 className="text-base sm:text-lg font-bold mb-1.5 text-balance">
-                          <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>
+                          <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>{" "}
+                          <ChevronRight
+                            className="inline-block w-4 h-5 align-[-4px] text-gray-300 transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
+                            strokeWidth={2}
+                          />
                         </h3>
                       )}
                       {excerpt && (
-                        <p className="text-sm text-gray-600 mb-2.5 group-hover:text-gray-700 group-active:text-gray-700">
+                        <p className="text-sm text-gray-600 group-hover:text-gray-700">
                           {excerpt}
                         </p>
                       )}
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600">
-                        {viewDetailsLabel}
-                        <ChevronRight
-                          className="w-3.5 h-4 pt-[0.06rem] transition-transform group-hover:translate-x-1 group-active:translate-x-1"
-                          strokeWidth={2}
-                        />
-                      </span>
                     </div>
                     {item.previewImage && (
                       <Thumb src={item.previewImage} size="lg" />
@@ -191,13 +188,13 @@ export default function TimelineCarousel({
                         <h4 className="text-sm sm:text-base font-semibold text-gray-700 text-balance mb-1">
                           <span className={TITLE_UNDERLINE_CLASS}>{heading}</span>{" "}
                           <ChevronRight
-                            className="inline-block w-3.5 h-4 align-[-3px] text-gray-300 transition-transform group-hover:text-gray-400 group-hover:translate-x-1 group-active:text-gray-400 group-active:translate-x-1"
+                            className="inline-block w-3.5 h-4 align-[-3px] text-gray-300 transition-transform group-hover:text-gray-400 group-hover:translate-x-1"
                             strokeWidth={2}
                           />
                         </h4>
                       )}
                       {excerpt && (
-                        <p className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-700 group-active:text-gray-700">
+                        <p className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-700">
                           {excerpt}
                         </p>
                       )}
