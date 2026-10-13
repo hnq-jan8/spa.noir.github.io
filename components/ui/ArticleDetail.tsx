@@ -5,7 +5,6 @@ import { ChevronLeft } from "lucide-react";
 import ArticleContent from "@/components/ui/ArticleContent";
 import Reveal from "@/components/ui/Reveal";
 import {
-  ArticleBackBarSkeleton,
   ArticleBackSkeleton,
   ArticleMetaSkeleton,
 } from "@/components/ui/skeletons/ArticleDetailSkeleton";
@@ -84,7 +83,7 @@ export default function ArticleDetail({
       {/* Meta sits outside the article card: a full-bleed article has no
           headline block, so anything anchored there vanished on exactly the
           articles most likely to be shared. Back is hidden below md, where the
-          mobile breadcrumb already covers it; md:px-1 is an optical offset
+          footer breadcrumb already covers it; md:px-1 is an optical offset
           against the card's rounded corners, which only exist at md+. */}
       <div className="print:hidden flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-4 mb-3 md:mb-4 md:px-1 text-xs">
         {!article && <ArticleBackSkeleton />}
@@ -132,35 +131,6 @@ export default function ArticleDetail({
           body={article?.body ?? null}
         />
       </div>
-      {/* Mobile-only equivalent of the desktop back button above, placed
-          after the article body as a full-width, edge-to-edge action bar
-          instead of an inline link. `-mx-*` cancels container-page's
-          padding to bleed it to the screen edges; `mt-auto` (root div is a
-          flex column) rides a short article's leftover height down so the
-          bar sits flush against the footer instead of floating mid-page,
-          with `pt-6` as a floor when there's no leftover height to claim.
-          The divider below it matches Footer.tsx's own rule above its
-          copyright bar (same color + inset), so bar and footer read as one
-          continuous band. */}
-      {!article && <ArticleBackBarSkeleton />}
-      {labels["back"] && (
-        <div className="print:hidden md:hidden -mx-4 sm:-mx-6 pt-6 mt-auto">
-          <button
-            type="button"
-            onClick={onBack}
-            className="group flex w-full items-center justify-center gap-1 bg-surface px-5 py-3 text-sm text-gray-900 hover:bg-[#e4e4e4]"
-          >
-            <ChevronLeft
-              className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1"
-              strokeWidth={2}
-            />
-            {labels["back"]}
-          </button>
-          <div className="bg-surface px-4 sm:px-6">
-            <div className="border-t border-black/10" />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

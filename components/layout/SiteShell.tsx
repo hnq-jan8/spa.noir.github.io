@@ -1,10 +1,9 @@
 import Navbar from "@/components/layout/Navbar";
-import Breadcrumb from "@/components/layout/Breadcrumb";
 import Footer from "@/components/layout/Footer";
 import { getBuildMode } from "@/lib/buildMode";
 
 /**
- * Khung site (header + dải crumb mobile + footer) dùng chung cho layout
+ * Khung site (header + footer) dùng chung cho layout
  * [locale] và 404 gốc (404.html) — để mọi trang 404 đều có header/footer như
  * nhau, không riêng trang trong [locale].
  */
@@ -18,9 +17,6 @@ export default async function SiteShell({
   return (
     <div className="flex flex-col min-h-[100dvh] bg-page">
       <Navbar logoOnBlack={logoOnBlack} />
-      {/* Dải crumb của trang, chỉ có ở mobile — đứng ngay sau header; header
-          cuộn đi thì nó bám `top-0`. */}
-      <Breadcrumb />
       {/* Navbar's header is in normal flow on mobile (no spacer needed) but
           `fixed` from `md:` up, where it drops out of flow — this spacer
           reserves its md:h-14 there so content below (and sticky offsets

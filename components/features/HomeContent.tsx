@@ -83,16 +83,15 @@ export default function HomeContent() {
     >
       {/* As-of timestamp. Extra bottom margin at md+ — with no outline on
           either element, the pill sits too close to the card below it. */}
-      {/* Mobile nhỏ (< xs): pill thành dải sát ngay dưới header, tràn hai
-          mép, không bo, chỉ còn viền đáy mảnh — cùng kiểu với dải breadcrumb. */}
-      <div className="sticky top-0 md:top-14 z-10 mt-2.5 pt-1.5 md:mt-0 md:pt-4 mb-4 md:mb-6 max-xs:mt-0 max-xs:pt-0 max-xs:mb-0 max-xs:-mx-4">
-        <div className="absolute inset-x-0 top-0 h-12 md:h-14 bg-gradient-to-t from-transparent to-page pointer-events-none max-md:hidden" />
+      {/* Mobile nhỏ (< xs): pill thành dải phẳng sát ngay dưới header, tràn
+          hai mép, không bo, không viền (.strip-flat). */}
+      <div className="pt-4 mb-4 md:mb-6 max-xs:pt-0 max-xs:mb-0 max-xs:-mx-4">
         {/* Ba trạng thái chứ không hai: có mốc -> pill; chưa có data ->
             skeleton; có data mà không mốc -> giấu hẳn, vì nhãn cụt kèm chấm
             "đang sống" là sai, mà skeleton quay mãi cũng sai. Trường hợp cuối
             đến từ emptyContentPayload() trong lib/buildContentPayload.ts. */}
         {data && asOf ? (
-          <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full bg-white/60 backdrop-blur-md max-xs:strip-flat max-xs:gap-4">
+          <div className="relative flex items-center gap-2 text-gray-600 text-xs border border-gray-200 px-3 py-1 rounded-full max-xs:strip-flat max-xs:gap-4">
             {/* `aspect-square`, not `h-1.5` — with both width and height set
                 independently, fractional browser zoom can round them to
                 different physical pixel counts even though they're the same

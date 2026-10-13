@@ -1,5 +1,6 @@
 "use client";
 
+import Breadcrumb from "@/components/layout/Breadcrumb";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -80,6 +81,7 @@ export default function Footer({
   return (
     <footer className="bg-surface text-gray-900">
       <div className="container-page py-8">
+        <Breadcrumb />
         <div className="mb-8">
           <Image
             src={logoBroken ? FALLBACK_LOGO : logoOnWhite || FALLBACK_LOGO}

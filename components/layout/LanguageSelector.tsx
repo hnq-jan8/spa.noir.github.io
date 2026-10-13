@@ -309,8 +309,7 @@ export function DesktopLanguageSelector({
             height: open && size ? size.h : 0,
             width: size ? (open ? size.open : size.rest) : undefined,
           }}
-          // Nền trắng mờ + blur hiện/ẩn dần (như dải breadcrumb ở mobile
-          // nhỏ) thay vì có sẵn từ đầu. Lúc mở kéo dài 450ms — lâu hơn nhịp
+          // Nền trắng mờ + blur hiện/ẩn dần thay vì có sẵn từ đầu. Lúc mở kéo dài 450ms — lâu hơn nhịp
           // giãn thẻ (250ms) nên vẫn đang lên khi thẻ đã mở hết; lúc đóng
           // 150ms. blur(0px) chứ không `none` để nội suy được.
           className={`flex items-start justify-end overflow-hidden rounded-[24px] ring-1 ring-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${

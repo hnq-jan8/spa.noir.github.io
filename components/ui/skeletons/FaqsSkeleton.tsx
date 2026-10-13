@@ -1,14 +1,12 @@
 import Skeleton from "@/components/ui/Skeleton";
 
 /**
- * Mirrors FaqsContent's resting state: the desktop search field docked above
- * the list, the first card open (the accordion opens item 0 on load), the
- * rest collapsed. The mobile capsule isn't drawn — it's a 34px circle pinned
- * beside the breadcrumb, and a placeholder dot there reads as a stray mark.
+ * Mirrors FaqsContent's resting state: the search field above the list, the
+ * first card open (the accordion opens item 0 on load), the rest collapsed.
  */
-/** Ô tìm kiếm desktop, đứng đúng chỗ SearchField thật trong khung sticky. */
+/** Ô tìm kiếm, đứng đúng chỗ SearchField thật. */
 export function FaqsSearchFieldSkeleton() {
-  return <Skeleton className="h-[46px] w-full rounded-full" />;
+  return <Skeleton className="h-[34px] md:h-[46px] w-full rounded-full" />;
 }
 
 /**

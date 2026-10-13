@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight, FileText, Megaphone } from "lucide-react";
 import { clearArticleRoute, useArticleKey } from "@/hooks/useArticleRoute";
-import { useBreadcrumbHidden } from "@/hooks/useBreadcrumbVisibility";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
 import { useLocale } from "@/hooks/useLocale";
 import { useNavItems } from "@/hooks/useNavItems";
@@ -12,18 +11,34 @@ import { bundledLabels } from "@/i18n/labels";
 import { normalizePath } from "@/i18n/paths";
 
 /**
- * Dải crumb dạng viên thuốc, chỉ có ở mobile và chỉ trên bốn route của nav
- * (trang chủ không cần). Nằm ngoài <header> của Navbar vì nó thuộc về trang,
- * không phải thanh điều hướng — nhưng vẫn là một dải sticky riêng, xem
- * `top-0`: header mobile không sticky, cuộn qua là breadcrumb lên sát mép.
+ * Breadcrumb ở đầu footer (như apple.com), mọi size, trên bốn route của nav —
+ * trang chủ không cần. Mục đầu là chữ "Trang chủ" chứ không phải logo: logo đã
+ * nằm ngay bên dưới trong footer (mobile: icon ngôi nhà). Đang mở bài thì thêm
+ * mục cuối là icon của mục đó (tiêu đề chỉ cho trình đọc màn hình).
  */
+/**
+ * Khối nhà đặc — đường viền ngoài của lucide `House`, bỏ khung cửa: ở 16px
+ * nét cửa của bản gốc thành hai vạch lắt nhắt.
+ */
+function HomeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    </svg>
+  );
+}
+
 export default function Breadcrumb() {
   const locale = useLocale();
   const pathname = usePathname();
   const data = useContentData();
   const navItems = useNavItems();
   const articleKey = useArticleKey();
-  const breadcrumbHidden = useBreadcrumbHidden();
 
   const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
   const normalizedPath = normalizePath(pathname);
@@ -45,79 +60,64 @@ export default function Breadcrumb() {
 
   if (!activeItem) return null;
 
+  const chevron = (
+    <ChevronRight
+      className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
+      strokeWidth={2}
+      aria-hidden="true"
+    />
+  );
+
   return (
-    // `invisible`, not unmounted, when a page needs this row for something
-    // else (FAQs search capsule) — keeps its layout space and is more
-    // reliable than masking it (hooks/useBreadcrumbVisibility.ts).
-    //
-    // mt-2.5 + pt-1.5: dưới header cách 16px, nhưng phần margin cuộn đi cùng
-    // header (margin không thuộc hộp sticky) — bám mép trên thì còn 6px. Sát
-    // hơn (4px) thì Safari iOS coi là chạm mép, tô thanh trạng thái màu đặc.
-    //
-    // Mobile nhỏ (< xs): viên thuốc duỗi thành dải sát dưới header, tràn hai
-    // mép, không bo, chỉ còn viền đáy mảnh. Ô tìm kiếm FAQ (FaqsContent) không
-    // bám theo dải này — nó vẫn là lớp nổi riêng, cách mép dưới header 16px (6px khi header đã cuộn khuất).
-    <div
-      className={`md:hidden sticky top-0 z-10 px-4 mt-2.5 pt-1.5 pb-6 max-xs:px-0 max-xs:mt-0 max-xs:pt-0 max-xs:pb-0 ${breadcrumbHidden ? "invisible" : ""}`}
+    // Không aria-label: nhãn phải qua ui_labels (chưa có khoá nào cho nó) —
+    // footer chỉ có mỗi landmark <nav> này nên vẫn nhận ra được.
+    <nav
+      // Cao đúng 44px như thanh "Quay lại" (py-3 + text-sm) của ArticleDetail
+      // ngay phía trên; -mt-8 ăn phần py-8 đầu footer để dải bám sát mép trên.
+      className="flex items-center gap-2 min-w-0 h-11 -mt-8 mb-8 border-b border-black/10 text-sm text-gray-600"
     >
-      <div
-        className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full overflow-hidden whitespace-nowrap
-                bg-white/75 backdrop-blur-md border border-gray-200 text-xs text-black max-w-full
-                max-xs:flex max-xs:w-full max-xs:strip-flat"
+      <Link
+        href={`/${locale}`}
+        onClick={() => clearArticleRoute()}
+        className="group focus-ring-gap flex-shrink-0 inline-flex items-center hover:text-gray-900"
       >
-        <Link
-          href={`/${locale}`}
-          onClick={() => clearArticleRoute()}
-          className="focus-ring-gap inline-flex items-center min-h-[24px] text-gray-700 hover:text-gray-900"
-        >
-          {nav?.["home"]}
-        </Link>
-        <ChevronRight
-          className="w-3 h-3 text-gray-400 flex-shrink-0"
-          strokeWidth={2}
-        />
-        <Link
-          href={activeItem.href}
-          onClick={() => {
-            // Same as the tab bar: close the detail view (its query param is
-            // invisible to Next's router) and refresh the list.
-            clearArticleRoute();
-            invalidateContent();
-          }}
-          // With an article open, "you are here" moves to the icon crumb and
-          // this one drops back to a plain link.
-          className={`focus-ring-gap inline-flex items-center min-h-[24px] truncate hover:text-gray-600 ${
-            openedArticle
-              ? "text-gray-700 hover:text-gray-900"
-              : "font-medium"
-          }`}
-        >
-          {activeItem.label}
-        </Link>
-        {openedArticle && (
-          <>
-            <ChevronRight
-              className="w-3 h-3 text-gray-400 flex-shrink-0"
-              strokeWidth={2}
-            />
-            {/* Icon-only: a headline would blow out the pill's width or
-                truncate to nothing. The title still reaches screen readers. */}
-            <span
-              aria-current="page"
-              className="inline-flex items-center min-h-[24px] text-gray-900 flex-shrink-0"
-            >
-              <ArticleIcon
-                className="w-3.5 h-3.5"
-                strokeWidth={2.5}
-                aria-hidden="true"
-              />
-              <span className="sr-only">
-                {openedArticle.title ?? activeItem.label}
-              </span>
+        {/* Mobile: icon ngôi nhà nhường chỗ cho tiêu đề bài; nhãn vẫn tới
+            trình đọc màn hình. */}
+        <HomeIcon className="md:hidden w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+        <span className="max-md:sr-only">{nav?.["home"]}</span>
+      </Link>
+      {chevron}
+      <Link
+        href={activeItem.href}
+        onClick={() => {
+          // Same as the tab bar: close the detail view (its query param is
+          // invisible to Next's router) and refresh the list.
+          clearArticleRoute();
+          invalidateContent();
+        }}
+        aria-current={openedArticle ? undefined : "page"}
+        className={`focus-ring-gap whitespace-nowrap hover:text-gray-900 ${
+          openedArticle ? "truncate" : "truncate text-gray-900"
+        }`}
+      >
+        {activeItem.label}
+      </Link>
+      {openedArticle && (
+        <>
+          {chevron}
+          {/* Icon-only: a headline would blow out the row's width or truncate
+              to nothing. The title still reaches screen readers. */}
+          <span
+            aria-current="page"
+            className="inline-flex items-center flex-shrink-0 text-gray-900"
+          >
+            <ArticleIcon className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+            <span className="sr-only">
+              {openedArticle.title ?? activeItem.label}
             </span>
-          </>
-        )}
-      </div>
-    </div>
+          </span>
+        </>
+      )}
+    </nav>
   );
 }

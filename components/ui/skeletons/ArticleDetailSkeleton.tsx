@@ -53,17 +53,3 @@ export function ArticleBodySkeleton() {
     </>
   );
 }
-
-/** Thanh quay lại chạy hết chiều ngang ở cuối bài (chỉ dưới md). */
-export function ArticleBackBarSkeleton() {
-  return (
-    <div className="print:hidden md:hidden -mx-4 sm:-mx-6 pt-6 mt-auto">
-      <div className="flex w-full items-center justify-center gap-1 bg-surface px-5 py-3">
-        <Skeleton className="skeleton-on-surface h-4 w-20" />
-      </div>
-      <div className="bg-surface px-4 sm:px-6">
-        <div className="border-t border-black/10" />
-      </div>
-    </div>
-  );
-}

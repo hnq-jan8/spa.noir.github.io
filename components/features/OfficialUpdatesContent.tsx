@@ -24,7 +24,7 @@ export default function OfficialUpdatesContent() {
 
   if (data && updates.length === 0) {
     return (
-      <div className="container-page pt-4 pb-8 md:pb-8 md:pt-8">
+      <div className="container-page pt-6 pb-8 md:pb-8 md:pt-8">
         <EmptyState data={data} />
       </div>
     );
@@ -46,9 +46,8 @@ export default function OfficialUpdatesContent() {
         // wrapper itself carries the white background — same mechanism as
         // PressReleasesContent (see that file for the full rationale) —
         // and `flex flex-col flex-1` claims `main`'s leftover space so a
-        // short update's white still reaches the footer, with no bottom
-        // padding — ArticleDetail's own back bar owns that edge.
-        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 max-xs:pt-[116px] md:mt-0 pb-0"
+        // short update's white still reaches the footer.
+        className="flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent pt-4 pb-8"
       >
         <ArticleDetail
           article={opened ?? null}
@@ -64,7 +63,7 @@ export default function OfficialUpdatesContent() {
     const t =
       data.common.labels["notFound"] ?? bundledLabels(locale, "notFound");
     return (
-      <div className="container-page pt-4 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto">
+      <div className="container-page pt-6 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto">
         <ArticleNotFound
           title={t?.["title"]}
           description={t?.["description"]}
@@ -77,7 +76,7 @@ export default function OfficialUpdatesContent() {
 
   return (
     <div
-      className="container-page pt-4 max-xs:pt-5 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4"
+      className="container-page pt-6 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4"
       {...loadingProps(!data)}
     >
       <Reveal>

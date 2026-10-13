@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Search, X } from "lucide-react";
 import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
 import FaqAccordion from "@/components/ui/FaqAccordion";
-import { useHideBreadcrumbWhen } from "@/hooks/useBreadcrumbVisibility";
 import { useContentState } from "@/hooks/useContentData";
 import FaqsSkeleton, {
   FaqsSearchFieldSkeleton,
@@ -14,12 +13,11 @@ import Reveal from "../ui/Reveal";
 
 /** Same curve + negative-delay trick as the FAQ accordion's own expand
  * (lib/expandTransition.ts): only the decelerating half of the curve plays. */
-const CAPSULE_TRANSITION = "duration-300 delay-[-150ms] ease-out";
 
 /** Delay before a keystroke actually filters the list. */
 const SEARCH_DEBOUNCE_MS = 200;
 
-/** Shared by the desktop dock and the mobile capsule — same field, different framing. */
+/** The search field — sticky dock on desktop, in-flow on mobile. */
 function SearchField({
   query,
   onChange,
@@ -62,7 +60,8 @@ function SearchField({
         // mọi lần bấm — thừa, vì con trỏ nháy đã là chỉ báo rõ nhất. Thay bằng
         // viền đậm lên một nấc, cùng tông xám với vòng focus chung. `ring-inset`
         // 1px chồng lên viền cho dày thành 2px mà không đội layout như border-2.
-        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 py-3 text-sm text-gray-900 placeholder:text-gray-600 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
+        // Mobile: ô thấp (34px, như viên nang cũ) nên chỉ đậm viền 1px, không chồng ring.
+        className="relative w-full bg-white/75 backdrop-blur-md border border-gray-200 rounded-full pl-11 pr-11 h-[34px] md:h-auto md:py-3 text-base md:text-sm leading-5 text-gray-900 placeholder:text-gray-400 shadow-[0_0_5px_rgba(0,0,0,0.05)] focus:outline-none focus:bg-white focus:border-gray-500 md:focus:ring-1 focus:ring-inset focus:ring-gray-500"
       />
       {query && (
         <button
@@ -85,13 +84,10 @@ export default function FaqsContent() {
   // theo nội dung nên lọc từng phím sẽ remount accordion khi đang gõ.
   const [query, setQuery] = useState("");
   const [applied, setApplied] = useState("");
-  // Below md the field starts collapsed into an icon beside the breadcrumb.
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   // Desktop: focusing docks the field under the tab nav and drops the padding
   // above it; reverts once the field is both empty and unfocused.
   const [desktopFieldEngaged, setDesktopFieldEngaged] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const desktopInputRef = useRef<HTMLInputElement>(null);
   const prevFirstQuestionRef = useRef<string | undefined>(undefined);
   // Reported by FaqAccordion: it owns the state but remounts, this parent doesn't.
   const firstItemOpenRef = useRef(false);
@@ -114,14 +110,6 @@ export default function FaqsContent() {
     }
     window.scrollTo({ top: 0 });
   }, [applied]);
-
-  useEffect(() => {
-    if (mobileSearchOpen) inputRef.current?.focus();
-  }, [mobileSearchOpen]);
-
-  // iOS Safari's overscroll bounce can desync fixed/sticky layers and let the
-  // breadcrumb peek through the curtain — hide the breadcrumb itself instead.
-  useHideBreadcrumbWhen(mobileSearchOpen);
 
   const faqs = data?.faqs.faqs ?? [];
   const labels = data?.faqs.labels["faqs"] ?? {};
@@ -175,104 +163,21 @@ export default function FaqsContent() {
       // ô tìm kiếm đang đứng, để ô và card trượt lên cùng một nhịp.
       // md:pt-[18px] khớp chính xác top-[58px] — lệch 2px là sticky kẹp ô sớm
       // trong khi card còn đang chạy, nhìn ra ngay là hai thứ rời nhau.
-      className={`container-page pb-8 max-xs:pb-0 md:pb-8 max-w-3xl mx-auto pt-4 max-xs:pt-[35px] transition-[padding-top] duration-300 ease-out ${
+      className={`container-page pb-8 max-xs:pb-0 md:pb-8 max-w-3xl mx-auto pt-4 transition-[padding-top] duration-300 ease-out ${
         desktopFieldEngaged ? "md:pt-[18px]" : "md:pt-8"
-      } ${desktopFieldEngaged || mobileSearchOpen ? "min-h-[100dvh]" : ""}`}
+      } ${desktopFieldEngaged ? "min-h-[100dvh]" : ""}`}
       {...loadingProps(!data)}
     >
       {/* min-h while engaged: a short result list would otherwise let the
           field's sticky wrapper reach the footer boundary and un-stick
-          mid-search.
-
-          Mobile: one capsule anchored beside the breadcrumb morphs its width
-          from a 34px circle into the full-width field (fixed height, so it
-          reads as the icon stretching sideways). The z-[19] mask below hides
-          the breadcrumb and list scrolling under it. */}
+          mid-search. */}
+      {/* Mọi size dùng chung ô này. Desktop: luôn sticky dưới tab nav
+          (swapping to `fixed` on engage remounts the input and drops focus),
+          `top` transitions directly — riding the container's pt animation
+          only worked near scrollY 0. Mobile: header không sticky nên ô cũng
+          nằm yên, cuộn theo trang. */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[var(--header-offset)] h-[50px] bg-page z-[19] transition-opacity duration-200 pointer-events-none ${
-          mobileSearchOpen ? "opacity-100" : "opacity-0"
-        }`}
-      />
-      {/* Fades past the mask's bottom edge so a text line crossing it
-          dissolves instead of being sliced in half. */}
-      <div
-        className={`md:hidden fixed inset-x-0 top-[calc(var(--header-offset)+50px)] h-6 bg-gradient-to-b from-page to-transparent z-[19] transition-opacity duration-200 pointer-events-none ${
-          mobileSearchOpen ? "opacity-100" : "opacity-0"
-        }`}
-      />
-      <div
-        // Trạng thái focus vẽ trên viên nang chứ không trên ô nhập: ô nhập chỉ
-        // là lớp chữ trong suốt nằm giữa viên, chỉ báo bám vào nó sẽ ra một
-        // khung chữ nhật lửng lơ. Lúc thu gọn thì nút mở nằm đè (input
-        // tabIndex -1) và tự vẽ ring của nó.
-        className={`md:hidden fixed top-[var(--crumb-top)] max-xs:top-[calc(var(--header-offset)+1rem)] right-4 z-20 h-[34px] rounded-full bg-white/75 backdrop-blur-md border border-gray-200 shadow-[0_0_5px_rgba(0,0,0,0.05)] overflow-hidden transition-[width] focus-within:border-gray-500 focus-within:ring-1 focus-within:ring-inset focus-within:ring-gray-500 ${CAPSULE_TRANSITION} ${
-          mobileSearchOpen ? "w-[calc(100vw-2rem)]" : "w-[34px]"
-        }`}
-      >
-        {!mobileSearchOpen && (
-          <button
-            type="button"
-            onClick={() => {
-              // The capsule is pinned to the breadcrumb row — scrolled down, it
-              // would expand over content the user wasn't looking at.
-              window.scrollTo({ top: 0 });
-              setMobileSearchOpen(true);
-            }}
-            aria-label={labels["searchPlaceholder"]}
-            className="absolute inset-0"
-          />
-        )}
-        {/* Centered in the circle when collapsed, docked as the field's prefix
-            icon when open — same curve as the capsule so it slides, not jumps. */}
-        <Search
-          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-[left,transform] ${CAPSULE_TRANSITION} ${
-            mobileSearchOpen
-              ? "left-2.5 translate-x-0"
-              : "left-1/2 -translate-x-1/2"
-          }`}
-          strokeWidth={2}
-        />
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          // Blur with nothing typed collapses back to the icon: an open, empty
-          // field covering the breadcrumb reads as unfinished.
-          onBlur={() => {
-            if (!query.trim()) setMobileSearchOpen(false);
-          }}
-          placeholder={labels["searchPlaceholder"]}
-          aria-label={labels["searchPlaceholder"]}
-          tabIndex={mobileSearchOpen ? 0 : -1}
-          // text-base (16px), not text-sm: iOS Safari auto-zooms the viewport on
-          // focus for anything smaller, fighting the capsule's expand.
-          className={`absolute inset-y-0 left-9 right-9 bg-transparent text-base text-gray-900 placeholder:text-gray-600 focus:outline-none transition-opacity duration-150 ${
-            mobileSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
-        />
-        {mobileSearchOpen && query && (
-          <button
-            type="button"
-            // Clicking blurs the input (native focus shift), so refocus —
-            // otherwise the next blur collapses the capsule as "empty".
-            onClick={() => {
-              clearSearch();
-              inputRef.current?.focus();
-            }}
-            aria-label={labels["clearSearch"]}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-          >
-            <X className="w-4 h-4" strokeWidth={2} />
-          </button>
-        )}
-      </div>
-
-      {/* Permanently sticky (swapping to `fixed` on engage remounts the input
-          and drops focus), and `top` transitions directly — riding the
-          container's pt animation only worked near scrollY 0. */}
-      <div
-        className={`hidden md:block sticky z-[9] pt-4 pb-6 -mt-4 -mb-2 pointer-events-none transition-[top] duration-300 ease-out ${
+        className={`md:sticky z-[9] pt-4 pb-6 -mt-4 -mb-2 pointer-events-none transition-[top] duration-300 ease-out ${
           desktopFieldEngaged ? "top-[58px]" : "top-[72px]"
         }`}
       >
@@ -283,18 +188,18 @@ export default function FaqsContent() {
               dissolves through the backdrop-blur below that line instead of
               being masked twice. -inset-x-2 covers the cards' 6px shadow blur,
               which bled past a flush edge at the pill's corners. */}
-          <div className="absolute -inset-x-2 -top-8 h-[55px] bg-page pointer-events-none" />
+          <div className="hidden md:block absolute -inset-x-2 -top-8 h-[55px] bg-page pointer-events-none" />
           {!data && <FaqsSearchFieldSkeleton />}
           {data && (
             <SearchField
               query={query}
               onChange={setQuery}
-              inputRef={desktopInputRef}
+              inputRef={inputRef}
               onClear={() => {
                 // Clicking blurs the input (native focus shift) — refocus so the
                 // now-empty field doesn't un-engage on the next blur check.
                 clearSearch();
-                desktopInputRef.current?.focus();
+                inputRef.current?.focus();
               }}
               onFocus={() => {
                 window.scrollTo({ top: 0 });
@@ -310,14 +215,7 @@ export default function FaqsContent() {
         </div>
       </div>
 
-      {/* Mobile, capsule open: the hidden breadcrumb still reserves its row
-          (hooks/useBreadcrumbVisibility.ts), leaving too much air below the
-          field. Below xs that row is a flat 35px strip, shorter than the
-          capsule's reach (--crumb-top + 34px), so the container's max-xs:pt-[35px]
-          puts the list 20px below the capsule; open, it rises 2px. */}
-      <div
-        className={`transition-[margin-top] ${CAPSULE_TRANSITION} ${mobileSearchOpen ? "-mt-6 max-xs:-mt-0.5 md:mt-0" : "mt-0"}`}
-      >
+      <div>
         {!data ? (
           // Placeholder đi chung <Reveal> với accordion thật nên React giữ
           // nguyên thẻ bọc, chỉ đổi ruột (xem Reveal.tsx).

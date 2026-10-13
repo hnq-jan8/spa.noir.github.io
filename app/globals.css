@@ -41,13 +41,6 @@
     @apply bg-page text-gray-900 min-h-[100dvh];
   }
 
-  /* Phần header mobile còn thấy trong khung nhìn — hooks/useHeaderOffset.ts
-     cập nhật theo cuộn; đây là giá trị trước khi JS chạy. */
-  :root {
-    --header-offset: 3rem;
-    --crumb-top: 4rem;
-  }
-
   /* Vòng focus bàn phím dùng chung, thay cho ring xanh mặc định của trình
      duyệt — màu duy nhất phá vỡ bảng trắng-đen. Màu đi theo NỀN gần nhất qua
      biến kế thừa, nên panel trắng nằm trong header tối (dropdown ngôn ngữ) tự
@@ -327,28 +320,12 @@
     border-radius: 0;
   }
 
-  /* Mobile nhỏ (`max-xs:strip-flat`): viên thuốc as-of / breadcrumb duỗi thành
-     dải phẳng sát dưới header — không bo, chỉ còn viền đáy mảnh. Ở đỉnh trang
-     cả nền lẫn viền trong suốt, hoà vào trang; cuộn qua hết header
-     (`data-scrolled`, hooks/useHeaderOffset.ts) thì trả về nền/viền của chính phần tử. */
+  /* Mobile nhỏ (`max-xs:strip-flat`): viên thuốc as-of duỗi thành
+     dải phẳng sát dưới header, hoà vào trang — không bo, không viền. */
   .strip-flat {
     border-radius: 0;
-    border-left-width: 0;
-    border-right-width: 0;
-    border-top-width: 0;
+    border-width: 0;
     padding: 5px 1rem;
-    /* Nền, lớp blur và viền cùng hiện/ẩn dần một nhịp. */
-    transition:
-      background-color 200ms ease-out,
-      border-color 200ms ease-out,
-      backdrop-filter 200ms ease-out;
-  }
-  html:not([data-scrolled]) .strip-flat {
-    border-bottom-color: transparent;
-    background-color: transparent;
-    /* blur(0) chứ không `none`: hai đầu cùng một hàm thì mới nội suy được.
-       Không viết bản -webkit-: autoprefixer tự lo theo browserslist. */
-    backdrop-filter: blur(0);
   }
 }
 

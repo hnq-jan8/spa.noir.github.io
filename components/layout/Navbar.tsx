@@ -18,7 +18,6 @@ import {
   useArticleKey,
 } from "@/hooks/useArticleRoute";
 import { useContentData, invalidateContent } from "@/hooks/useContentData";
-import { useHeaderOffset } from "@/hooks/useHeaderOffset";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useLocale } from "@/hooks/useLocale";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -95,8 +94,6 @@ export default function Navbar({
     return () => clearTimeout(iconAnimationTimeoutRef.current);
   }, []);
 
-  useHeaderOffset();
-
   // Đóng drawer do rời mobile nhỏ (xem effect bên dưới) thì giữ nguyên menu
   // ngôn ngữ — nó vừa chuyển sang dạng dropdown trên header.
   const keepLangOnCloseRef = useRef(false);
@@ -164,8 +161,7 @@ export default function Navbar({
   //
   // Header mobile không sticky: mở drawer lúc đã cuộn dở thì header đang lệch
   // khỏi đỉnh — kéo về đầu trang trước khi khoá. Chỉ gỡ đúng các thuộc tính
-  // đã đặt, không ghi đè cả `style`: các biến CSS của useHeaderOffset cũng
-  // nằm trên <html>.
+  // đã đặt, không ghi đè cả `style` của <html>.
   useEffect(() => {
     if (!menuOpen || !isMobile) return;
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -239,7 +235,7 @@ export default function Navbar({
   return (
     <>
       {/* `fixed` from md up only. Below md the header just scrolls away with
-          the page — only the breadcrumb sticks (see useHeaderOffset). */}
+          the page. */}
       <header
         ref={headerRef}
         className="relative md:fixed top-0 inset-x-0 z-50 w-full xl:w-screen bg-chrome text-white"

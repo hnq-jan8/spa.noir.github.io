@@ -43,7 +43,7 @@ export default function PressReleasesContent() {
 
   if (data && releases.length === 0) {
     return (
-      <div className="container-page pt-4 pb-8 md:py-8">
+      <div className="container-page pt-6 pb-8 md:py-8">
         <EmptyState data={data} />
       </div>
     );
@@ -57,14 +57,11 @@ export default function PressReleasesContent() {
   if (key && (!data || opened)) {
     return (
       <div
-        // Dưới md không có card nên chính wrapper mang nền trắng: kéo lên sau
-        // breadcrumb sticky (margin âm + padding bằng, z-0 dưới z-10 của nó) và
-        // `flex flex-col flex-1` để chiếm phần cao còn thừa của main — bài ngắn
-        // vẫn phủ trắng tới footer. Không padding đáy: thanh back của
-        // ArticleDetail giữ mép đó (xem mt-auto của nó).
-        // max-xs:pt-[116px]: breadcrumb ở mobile nhỏ không còn pb-6 đệm phía dưới
-        // (xem Breadcrumb.tsx), bù 20px để dòng meta không dính sát dải đó.
-        className="relative z-0 flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent -mt-24 pt-24 max-xs:pt-[116px] md:mt-0 pb-0"
+        // Dưới md không có card nên chính wrapper mang nền trắng, ngay dưới
+        // header, và `flex flex-col flex-1` để chiếm phần cao còn thừa của
+        // main — bài ngắn vẫn phủ trắng tới footer. Không có nút quay lại ở
+        // mobile: breadcrumb ngay đầu footer bên dưới làm việc đó.
+        className="flex flex-col flex-1 md:block md:flex-none container-page md:py-8 md:max-w-6xl md:mx-auto bg-white md:bg-transparent pt-4 pb-8"
       >
         <ArticleDetail
           article={opened ?? null}
@@ -80,7 +77,7 @@ export default function PressReleasesContent() {
     const t =
       data.common.labels["notFound"] ?? bundledLabels(locale, "notFound");
     return (
-      <div className="container-page pt-4 pb-8 md:py-8 max-w-3xl mx-auto">
+      <div className="container-page pt-6 pb-8 md:py-8 max-w-3xl mx-auto">
         <ArticleNotFound
           title={t?.["title"]}
           description={t?.["description"]}
@@ -101,11 +98,10 @@ export default function PressReleasesContent() {
 
   return (
     <div
-      // Mobile nhỏ: cả trang trắng như trang xem bài — cùng mẹo kéo nền lên
-      // sau breadcrumb (-mt-24 + pt-24, z-0) và flex-1 phủ tới footer. Card
+      // Mobile nhỏ: cả trang trắng như trang xem bài — flex-1 phủ tới footer. Card
       // trắng trên nền trắng nên ngăn nhau bằng viền đáy (ArticleCard), không
       // còn khe 1px.
-      className="container-page pt-4 max-xs:relative max-xs:z-0 max-xs:flex-1 max-xs:bg-white max-xs:-mt-24 max-xs:pt-24 pb-8 max-xs:pb-0 md:py-8 max-w-3xl mx-auto"
+      className="container-page pt-6 max-xs:flex-1 max-xs:bg-white pb-8 max-xs:pb-0 md:py-8 max-w-3xl mx-auto"
       {...loadingProps(!data)}
     >
       <Reveal>
@@ -145,9 +141,8 @@ export default function PressReleasesContent() {
                   />
                 ) : (
                   <>
-                    {/* Below md — the app's own mobile threshold (it's where
-                    the navbar switches from the desktop back-button to the
-                    mobile breadcrumb, see Navbar.tsx) — a 3-column grid
+                    {/* Below md — the app's own mobile threshold (where the
+                    navbar collapses into the drawer) — a 3-column grid
                     doesn't fit, so every item in the row just stacks as a
                     plain compact card (no excerpt, to save height) instead
                     of splitting into columns. */}

@@ -47,7 +47,7 @@ export default function MobileMenu({
       // Mirrors the closed-state classes below so the drawer stays hidden even
       // if the stylesheet fails to load.
       style={open ? undefined : { visibility: "hidden", pointerEvents: "none" }}
-      // top cố định 47px (không bám --header-offset): lúc mở Navbar đã kéo
+      // top cố định 47px: lúc mở Navbar đã kéo
       // trang về đầu và khoá cuộn, header luôn ở mép trên. 47 chứ không 48 —
       // chồm lên 1px: bo tròn subpixel giữa
       // <header> (đứng ngoài, z-50) và drawer (z-40) thỉnh thoảng hở một
