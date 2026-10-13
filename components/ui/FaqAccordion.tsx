@@ -167,7 +167,7 @@ export default function FaqAccordion({
           // bàn phím: góc vuông nằm ngoài cung bo của card nên ring bị cắt cụt
           // hai đầu, bo lại cho khớp. `rounded-b-none` phải viết ra, không thì
           // `:focus-visible` ở layer base (globals.css) lọt vào bo đáy 8px.
-          className={`focus-ring-inset w-full rounded-t-2xl rounded-b-none ${isOpen ? "" : "focus-visible:rounded-b-2xl"} max-xs:rounded-none max-xs:focus-visible:rounded-none flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left hover:bg-cardHover`}
+          className={`peer focus-ring-inset w-full rounded-t-2xl rounded-b-none ${isOpen ? "" : "focus-visible:rounded-b-2xl"} max-xs:rounded-none max-xs:focus-visible:rounded-none flex items-center justify-between pl-4 pr-4 py-3 sm:pl-[22px] sm:pr-6 sm:py-4 text-left hover:bg-cardHover`}
           onClick={() => toggle(i)}
         >
           <span className="pr-4 text-gray-900 font-medium">
@@ -190,7 +190,9 @@ export default function FaqAccordion({
           </svg>
         </button>
         <AccordionPanel isOpen={isOpen} panelId={panelId}>
-          <div className="mx-4 sm:mx-6 border-t border-gray-200 max-xs:border-t-0 pt-3 max-xs:pt-0 sm:pt-4 pb-4 sm:pb-6 text-gray-700 leading-relaxed text-sm">
+          {/* Hover tiêu đề thì ẩn divider; tự bọc (hover:hover) vì
+              hoverOnlyWhenSupported không áp cho variant tự viết. */}
+          <div className="mx-4 sm:mx-6 border-t border-gray-200 [@media(hover:hover)]:[.peer:hover~*_&]:border-transparent max-xs:border-t-0 pt-3 max-xs:pt-0 sm:pt-4 pb-4 sm:pb-6 text-gray-700 leading-relaxed text-sm">
             {item.answer}
           </div>
         </AccordionPanel>
