@@ -1,5 +1,6 @@
 "use client";
 
+import PageTitle from "@/components/ui/PageTitle";
 import ArticleDetail from "@/components/ui/ArticleDetail";
 import ArticleNotFound from "@/components/ui/ArticleNotFound";
 import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
@@ -76,9 +77,10 @@ export default function OfficialUpdatesContent() {
 
   return (
     <div
-      className="container-page pt-6 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4"
+      className="container-page pt-8 pb-8 md:pt-12 md:pb-8 max-w-3xl mx-auto lg:pl-4"
       {...loadingProps(!data)}
     >
+      <PageTitle gap="mb-6" />
       <Reveal>
         {data ? (
           <TimelineCarousel

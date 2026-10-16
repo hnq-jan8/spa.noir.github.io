@@ -1,5 +1,6 @@
 "use client";
 
+import PageTitle from "@/components/ui/PageTitle";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Search, X } from "lucide-react";
 import EmptyState, { ContentLoadError } from "@/components/ui/EmptyState";
@@ -84,9 +85,11 @@ export default function FaqsContent() {
   // theo nội dung nên lọc từng phím sẽ remount accordion khi đang gõ.
   const [query, setQuery] = useState("");
   const [applied, setApplied] = useState("");
-  // Desktop: focusing docks the field under the tab nav and drops the padding
-  // above it; reverts once the field is both empty and unfocused.
-  const [desktopFieldEngaged, setDesktopFieldEngaged] = useState(false);
+  // Focusing docks the field near the top and drops what's above it — desktop:
+  // under the tab nav; mobile: the page title collapses and the padding
+  // shrinks so the field rises to just under the header. Reverts once the
+  // field is both empty and unfocused.
+  const [fieldEngaged, setFieldEngaged] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const prevFirstQuestionRef = useRef<string | undefined>(undefined);
   // Reported by FaqAccordion: it owns the state but remounts, this parent doesn't.
@@ -159,18 +162,29 @@ export default function FaqsContent() {
 
   return (
     <div
-      // Chỉ pt ở desktop: lúc engage nó co về đúng offset mà khung sticky của
-      // ô tìm kiếm đang đứng, để ô và card trượt lên cùng một nhịp.
+      // Desktop: lúc engage pt co về đúng offset mà khung sticky của ô tìm
+      // kiếm đang đứng, để ô và card trượt lên cùng một nhịp. Mobile: co từ
+      // 32px về 16px, cùng lúc tiêu đề trang thu lại.
       // md:pt-[18px] khớp chính xác top-[58px] — lệch 2px là sticky kẹp ô sớm
       // trong khi card còn đang chạy, nhìn ra ngay là hai thứ rời nhau.
-      className={`container-page pb-8 max-xs:pb-0 md:pb-8 max-w-3xl mx-auto pt-4 transition-[padding-top] duration-300 ease-out ${
-        desktopFieldEngaged ? "md:pt-[18px]" : "md:pt-8"
-      } ${desktopFieldEngaged ? "min-h-[100dvh]" : ""}`}
+      className={`container-page pb-8 max-xs:pb-0 md:pb-8 max-w-3xl mx-auto transition-[padding-top] duration-300 ease-out ${
+        fieldEngaged ? "pt-4 md:pt-[18px]" : "pt-8"
+      } ${fieldEngaged ? "min-h-[100dvh]" : ""}`}
       {...loadingProps(!data)}
     >
       {/* min-h while engaged: a short result list would otherwise let the
           field's sticky wrapper reach the footer boundary and un-stick
           mid-search. */}
+      {/* Thu cao về 0 bằng grid-rows (như accordion) lúc engage. */}
+      <div
+        className={`md:hidden grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+          fieldEngaged ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <PageTitle />
+        </div>
+      </div>
       {/* Mọi size dùng chung ô này. Desktop: luôn sticky dưới tab nav
           (swapping to `fixed` on engage remounts the input and drops focus),
           `top` transitions directly — riding the container's pt animation
@@ -178,7 +192,7 @@ export default function FaqsContent() {
           nằm yên, cuộn theo trang. */}
       <div
         className={`md:sticky z-[9] pt-4 pb-6 -mt-4 -mb-2 pointer-events-none transition-[top] duration-300 ease-out ${
-          desktopFieldEngaged ? "top-[58px]" : "top-[72px]"
+          fieldEngaged ? "top-[58px]" : "top-[72px]"
         }`}
       >
         <div className="relative">
@@ -203,10 +217,10 @@ export default function FaqsContent() {
               }}
               onFocus={() => {
                 window.scrollTo({ top: 0 });
-                setDesktopFieldEngaged(true);
+                setFieldEngaged(true);
               }}
               onBlur={() => {
-                if (!query.trim()) setDesktopFieldEngaged(false);
+                if (!query.trim()) setFieldEngaged(false);
               }}
               placeholder={labels["searchPlaceholder"]}
               clearLabel={labels["clearSearch"]}

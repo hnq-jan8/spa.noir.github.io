@@ -78,7 +78,7 @@ export default function HomeContent() {
 
   return (
     <div
-      className="container-page pb-8 max-xs:pb-0 md:pt-3 md:pb-11 max-w-3xl mx-auto"
+      className="container-page pb-4 max-xs:pb-0 md:pt-3 md:pb-11 max-w-3xl mx-auto"
       {...loadingProps(!data)}
     >
       {/* As-of timestamp. Extra bottom margin at md+ — with no outline on
@@ -155,10 +155,12 @@ export default function HomeContent() {
                 {latestUpdate.date &&
                   formatTimestamp(latestUpdate.date, locale)}
               </span>
-              {/* Riêng link này mở trang danh sách, đè lên link phủ nhờ z-10. */}
+              {/* Riêng link này mở trang danh sách, đè lên link phủ nhờ z-10.
+                  Dưới md, ::before nới vùng chạm ra quanh chữ (cao ~48px)
+                  mà không xê dịch chữ — chạm hụt là mở nhầm bài. */}
               <Link
                 href={`/${locale}/official-updates`}
-                className="group/viewall relative z-10 -mr-2 md:mr-0 text-gray-600 font-semibold inline-flex items-center gap-1 hover:underline"
+                className="group/viewall relative z-10 -mr-2 md:mr-0 max-md:before:absolute max-md:before:-inset-x-3 max-md:before:-inset-y-4 max-md:before:content-[''] text-gray-600 font-semibold inline-flex items-center gap-1 hover:underline"
               >
                 {home["viewAll"]}
                 <ChevronRight

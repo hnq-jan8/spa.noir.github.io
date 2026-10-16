@@ -432,19 +432,25 @@ export default function Navbar({
                   onClick={() => setLangOpen((v) => !v)}
                   tabIndex={menuOpen ? 0 : -1}
                   aria-hidden={!menuOpen}
-                  className={`xs:hidden relative z-50 self-center h-9 min-w-[44px] pl-2.5 pr-3 flex items-center justify-center gap-1.5 rounded-full transition-[opacity,background-color,color] duration-300 ease-out ${
+                  // Vùng bấm cao hết header (self-stretch, 48px); viên pill 36px
+                  // chỉ là lớp hiển thị bên trong — như DesktopLanguageSelector.
+                  className={`group xs:hidden relative z-50 self-stretch focus-ring-inner flex items-center transition-opacity duration-300 ease-out ${
                     menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-                  } ${
-                    langOpen
-                      ? "bg-white/10 text-white"
-                      : "text-gray-200 hover:text-white"
                   }`}
                   aria-label={nav?.["selectLanguage"]}
                   aria-expanded={langOpen}
                 >
-                  <GlobeIcon className="w-[18px] h-[18px] flex-shrink-0" />
-                  <span className="text-sm font-medium">
-                    {currentLanguage?.code.toUpperCase()}
+                  <span
+                    className={`h-9 min-w-[44px] pl-2.5 pr-3 flex items-center justify-center gap-1.5 rounded-full transition-[background-color,color] duration-300 ease-out ${
+                      langOpen
+                        ? "bg-white/10 text-white"
+                        : "text-gray-200 group-hover:text-white"
+                    }`}
+                  >
+                    <GlobeIcon className="w-[18px] h-[18px] flex-shrink-0" />
+                    <span className="text-sm font-medium">
+                      {currentLanguage?.code.toUpperCase()}
+                    </span>
                   </span>
                 </button>
               )}

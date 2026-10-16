@@ -299,8 +299,7 @@ export function DesktopLanguageSelector({
         />
 
         {/* Thẻ giãn cả chiều cao lẫn chiều ngang từ bề rộng viên pill (mép phải
-            cố định): mở 250ms, đóng ngược chiều 150ms và mờ hẳn trong 90ms
-            (xong trước khi chiều cao co được nửa). Danh sách bên trong rộng cố
+            cố định): mở 250ms, đóng ngược chiều 150ms. Danh sách bên trong rộng cố
             định `size.open`, căn phải, bị `overflow-hidden` cắt. Delay âm
             −62ms lúc mở: vào transition ở trạng thái đã chạy sẵn ¼ đường
             cong, bớt layout recalc — mẹo của lib/expandTransition. */}
@@ -309,13 +308,14 @@ export function DesktopLanguageSelector({
             height: open && size ? size.h : 0,
             width: size ? (open ? size.open : size.rest) : undefined,
           }}
-          // Nền trắng mờ + blur hiện/ẩn dần thay vì có sẵn từ đầu. Lúc mở kéo dài 450ms — lâu hơn nhịp
-          // giãn thẻ (250ms) nên vẫn đang lên khi thẻ đã mở hết; lúc đóng
-          // 150ms. blur(0px) chứ không `none` để nội suy được.
-          className={`flex items-start justify-end overflow-hidden rounded-[24px] ring-1 ring-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
+          // Nền trắng mờ + blur chạy cùng nhịp và cùng đường cong với thẻ giãn
+          // (nhanh đầu, chậm cuối); lúc đóng chạy ngược lại đúng đường đó, và
+          // opacity cũng kéo dài bằng để còn thấy blur thu lại trước khi
+          // tắt hẳn. blur(0px) chứ không `none` để nội suy được.
+          className={`flex items-start justify-end overflow-hidden rounded-[24px] ring-[0.5px] ring-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
             open
-              ? "bg-white/80 backdrop-blur-xl opacity-100 pointer-events-auto [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,width_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,opacity_120ms_ease-out,background-color_450ms_ease-out,backdrop-filter_450ms_ease-out]"
-              : "bg-white/0 backdrop-blur-[0px] opacity-0 pointer-events-none [transition:height_150ms_cubic-bezier(1,0,0.68,0.28),width_150ms_cubic-bezier(1,0,0.68,0.28),opacity_90ms_ease-out,background-color_150ms_ease-out,backdrop-filter_150ms_ease-out]"
+              ? "bg-white/70 backdrop-blur-lg opacity-100 pointer-events-auto [transition:height_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,width_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,opacity_120ms_ease-out,background-color_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms,backdrop-filter_250ms_cubic-bezier(0.32,0.72,0,1)_-62ms]"
+              : "bg-white/0 backdrop-blur-[0px] opacity-0 pointer-events-none [transition:height_150ms_cubic-bezier(1,0,0.68,0.28),width_150ms_cubic-bezier(1,0,0.68,0.28),opacity_150ms_cubic-bezier(1,0,0.68,0.28),background-color_150ms_cubic-bezier(1,0,0.68,0.28),backdrop-filter_150ms_cubic-bezier(1,0,0.68,0.28)]"
           }`}
         >
           {/* p-1.5 (6px) quanh danh sách, item không có gap. rounded-[18px] =
@@ -333,7 +333,7 @@ export function DesktopLanguageSelector({
             <div
               ref={highlightRef}
               aria-hidden
-              className={`absolute inset-x-1.5 top-1.5 h-10 rounded-[18px] bg-cardHover shadow-[0_0_0.5px_1.5px_rgba(255,255,255,0.6)] transition-[transform,opacity] duration-150 ease-out ${
+              className={`absolute inset-x-1.5 top-1.5 h-10 rounded-[18px] bg-cardHover shadow-[0_0_0_0.5px_rgba(255,255,255,0.6)] transition-[transform,opacity] duration-150 ease-out ${
                 hoveredIndex >= 0 ? "opacity-100" : "opacity-0"
               }`}
               style={{

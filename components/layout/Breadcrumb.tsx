@@ -17,14 +17,18 @@ import { normalizePath } from "@/i18n/paths";
  * mục cuối là icon của mục đó (tiêu đề chỉ cho trình đọc màn hình).
  */
 /**
- * Khối nhà đặc — đường viền ngoài của lucide `House`, bỏ khung cửa: ở 16px
- * nét cửa của bản gốc thành hai vạch lắt nhắt.
+ * Viền ngoài của lucide `House`, bỏ khung cửa: ở 16px nét cửa của bản gốc
+ * thành hai vạch lắt nhắt.
  */
 function HomeIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
       className={className}
     >
@@ -60,9 +64,11 @@ export default function Breadcrumb() {
 
   if (!activeItem) return null;
 
+  // Mọi icon cùng 16px và nét 2 nên dày nét như nhau; không mục nào được
+  // tô đậm hay làm nổi — mục hiện tại chỉ báo bằng aria-current.
   const chevron = (
     <ChevronRight
-      className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
+      className="w-4 h-4 text-gray-400 flex-shrink-0"
       strokeWidth={2}
       aria-hidden="true"
     />
@@ -83,7 +89,7 @@ export default function Breadcrumb() {
       >
         {/* Mobile: icon ngôi nhà nhường chỗ cho tiêu đề bài; nhãn vẫn tới
             trình đọc màn hình. */}
-        <HomeIcon className="md:hidden w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+        <HomeIcon className="md:hidden w-4 h-4 text-gray-500 group-hover:text-gray-700" />
         <span className="max-md:sr-only">{nav?.["home"]}</span>
       </Link>
       {chevron}
@@ -96,9 +102,7 @@ export default function Breadcrumb() {
           invalidateContent();
         }}
         aria-current={openedArticle ? undefined : "page"}
-        className={`focus-ring-gap whitespace-nowrap hover:text-gray-900 ${
-          openedArticle ? "truncate" : "truncate text-gray-900"
-        }`}
+        className="focus-ring-gap truncate whitespace-nowrap hover:text-gray-900"
       >
         {activeItem.label}
       </Link>
@@ -109,9 +113,9 @@ export default function Breadcrumb() {
               to nothing. The title still reaches screen readers. */}
           <span
             aria-current="page"
-            className="inline-flex items-center flex-shrink-0 text-gray-900"
+            className="inline-flex items-center flex-shrink-0 text-gray-500"
           >
-            <ArticleIcon className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+            <ArticleIcon className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
             <span className="sr-only">
               {openedArticle.title ?? activeItem.label}
             </span>

@@ -1,5 +1,6 @@
 "use client";
 
+import PageTitle from "@/components/ui/PageTitle";
 import ArticleCard from "@/components/ui/ArticleCard";
 import ArticleDetail from "@/components/ui/ArticleDetail";
 import ArticleNotFound from "@/components/ui/ArticleNotFound";
@@ -101,9 +102,10 @@ export default function PressReleasesContent() {
       // Mobile nhỏ: cả trang trắng như trang xem bài — flex-1 phủ tới footer. Card
       // trắng trên nền trắng nên ngăn nhau bằng viền đáy (ArticleCard), không
       // còn khe 1px.
-      className="container-page pt-6 max-xs:flex-1 max-xs:bg-white pb-8 max-xs:pb-0 md:py-8 max-w-3xl mx-auto"
+      className="container-page pt-8 max-xs:flex-1 max-xs:bg-white pb-8 max-xs:pb-0 md:py-8 max-w-3xl mx-auto"
       {...loadingProps(!data)}
     >
+      <PageTitle skeletonFill="max-xs:bg-gray-200" />
       <Reveal>
         {!data ? (
           <PressReleasesSkeleton />

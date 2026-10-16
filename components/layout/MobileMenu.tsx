@@ -77,7 +77,7 @@ export default function MobileMenu({
           opacity crossfade between nav and the language panel — no slide. */}
       <div className="grid">
         <nav
-          className={`col-start-1 row-start-1 flex flex-col transition-opacity duration-300 ease-out ${
+          className={`col-start-1 row-start-1 flex flex-col pt-2 transition-opacity duration-300 ease-out ${
             langView ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
           aria-hidden={langView}
@@ -109,7 +109,7 @@ export default function MobileMenu({
                 } ${
                   isActive
                     ? "text-white font-semibold"
-                    : "text-gray-200 font-normal hover:text-white hover:font-medium"
+                    : "text-gray-300 font-normal hover:text-white hover:font-medium"
                 }`}
               >
                 {/* Anchors the unread dot to the text, not the row, so it sits on
@@ -132,7 +132,7 @@ export default function MobileMenu({
 
         {languageOptions.length > 1 && (
           <div
-            className={`col-start-1 row-start-1 flex flex-col transition-opacity duration-300 ease-out ${
+            className={`col-start-1 row-start-1 flex flex-col pt-2 transition-opacity duration-300 ease-out ${
               langView ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
             aria-hidden={!langView}
@@ -160,7 +160,7 @@ export default function MobileMenu({
                   } ${
                     isActive
                       ? "text-white font-semibold"
-                      : "text-gray-200 font-normal hover:text-white hover:font-medium"
+                      : "text-gray-300 font-normal hover:text-white hover:font-medium"
                   }`}
                 >
                   <span>{lang.label}</span>
