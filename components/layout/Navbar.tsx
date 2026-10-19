@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Fragment, useState, useRef, useEffect } from "react";
+import { Fragment, useCallback, useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   DesktopLanguageSelector,
@@ -42,6 +42,10 @@ export default function Navbar({
   const pathname = usePathname();
   const data = useContentData();
   const [logoBroken, setLogoBroken] = useState(false);
+  // Handler ổn định: next/image gán lại `img.src = img.src` trong ref callback
+  // mỗi khi prop onError đổi — arrow inline là mỗi render (mỗi lần chuyển
+  // trang) ảnh tải lại và nháy.
+  const handleLogoError = useCallback(() => setLogoBroken(true), []);
   // Fallback về label bundle lúc build để nav hiện ngay first paint,
   // không chờ content.json; bản trong content.json ghi đè khi về.
   const nav = data?.common.labels["nav"] ?? bundledLabels(locale, "nav");
@@ -274,7 +278,7 @@ export default function Navbar({
               >
                 <Image
                   src={logoSrc}
-                  onError={() => setLogoBroken(true)}
+                  onError={handleLogoError}
                   alt="SUN PhuQuoc Airways"
                   width={185}
                   height={43}

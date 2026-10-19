@@ -3,7 +3,7 @@
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useContentState } from "@/hooks/useContentData";
 import { useLocale, useRouteLocale } from "@/hooks/useLocale";
 import { bundledLabels } from "@/i18n/labels";
@@ -60,6 +60,10 @@ export default function Footer({
   // skeleton left running forever reads as a hung page.
   const { data, failed } = useContentState();
   const [logoBroken, setLogoBroken] = useState(false);
+  // Handler ổn định: next/image gán lại `img.src = img.src` trong ref callback
+  // mỗi khi prop onError đổi — arrow inline là mỗi render (mỗi lần chuyển
+  // trang) ảnh tải lại và nháy.
+  const handleLogoError = useCallback(() => setLogoBroken(true), []);
   const locale = useLocale();
   // URL của ngôn ngữ đã tắt (vd `/tw`) khớp dạng trang chủ nhưng LocaleGate đang
   // trả 404 ở đó — không có khối liên hệ riêng của trang chủ, nên footer vẫn
@@ -85,7 +89,7 @@ export default function Footer({
         <div className="mb-8">
           <Image
             src={logoBroken ? FALLBACK_LOGO : logoOnWhite || FALLBACK_LOGO}
-            onError={() => setLogoBroken(true)}
+            onError={handleLogoError}
             alt="Sun PhuQuoc Airways"
             width={185}
             height={43}
