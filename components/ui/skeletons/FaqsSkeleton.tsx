@@ -6,7 +6,7 @@ import Skeleton from "@/components/ui/Skeleton";
  */
 /** Ô tìm kiếm, đứng đúng chỗ SearchField thật. */
 export function FaqsSearchFieldSkeleton() {
-  return <Skeleton className="h-[34px] md:h-[46px] w-full rounded-full" />;
+  return <Skeleton className="h-[46px] w-full rounded-full" />;
 }
 
 /**
