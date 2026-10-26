@@ -45,6 +45,11 @@ const defaultHeaders: FlightHeaders = {
  *  phần ba thẻ mobile: card đổi sang xếp dọc nhãn–giá trị. */
 const STACK_LABEL_MAX_LENGTH = 12;
 
+/** Note là chữ tự do (CMS cho tối đa 30 ký tự). Dài hơn ngưỡng này thì badge
+ *  cạnh số hiệu bị cắt cụt trên thẻ mobile: đẩy badge xuống dòng dưới số hiệu,
+ *  giãn hết bề ngang thẻ và được xuống dòng để hiện đủ chữ. */
+const NOTE_INLINE_MAX_LENGTH = 20;
+
 /** Giờ kèm múi giờ; `stack` đẩy múi giờ xuống dòng riêng để các giờ đậm
  *  thẳng cột. */
 function TimeValue({
@@ -106,24 +111,37 @@ export default function FlightTable({
         }`}
       >
         {rows.map((row, idx) => {
+          const longNote = (row.note?.length ?? 0) > NOTE_INLINE_MAX_LENGTH;
           return (
             <div
               key={idx}
               className="bg-white rounded-2xl max-xs:card-bleed overflow-hidden card-shadow"
             >
               <div className="px-4 pt-4">
-                <div className="flex items-center justify-between gap-2 mb-3">
+                <div
+                  className={`flex gap-2 mb-3 ${
+                    longNote
+                      ? "flex-col items-start"
+                      : "items-center justify-between"
+                  }`}
+                >
                   {/* min-w-0 lets the truncate below win over the flex item's
                       content-based minimum width — otherwise a garbage-length
                       flightNo just pushes the card wider instead of clipping. */}
-                  <span className="flex items-center gap-1.5 font-semibold text-gray-900 min-w-0">
+                  <span className="flex items-center gap-1.5 font-semibold text-gray-900 min-w-0 max-w-full">
                     <Plane
                       className="w-4 h-4 text-gray-400 flex-shrink-0"
                       strokeWidth={2}
                     />
                     <span className="truncate">{row.flightNo}</span>
                   </span>
-                  <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded truncate max-w-[40%] flex-shrink-0">
+                  <span
+                    className={`text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded ${
+                      longNote
+                        ? "self-stretch break-words"
+                        : "truncate max-w-[40%] flex-shrink-0"
+                    }`}
+                  >
                     {row.note}
                   </span>
                 </div>
